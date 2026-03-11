@@ -3,372 +3,53 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000';
-
-type LeadStatus =
-  | 'NEW'
-  | 'CONTACTED'
-  | 'PROPOSAL'
-  | 'NEGOTIATION'
-  | 'WON'
-  | 'LOST';
-
-type TemperatureFilter = 'ALL' | 'HOT' | 'WARM' | 'COLD';
-type ActivityComposerType = 'NOTE' | 'CALL' | 'MESSAGE' | 'MEETING';
-
-type UserOption = {
-  id: string;
-  name: string;
-  email?: string | null;
-  role?: string;
-};
-
-type BranchOption = {
-  id: string;
-  name: string;
-};
-
-type DepartmentOption = {
-  id: string;
-  name: string;
-  branchId?: string | null;
-};
-
-type LeadItem = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  name: string;
-  phone?: string | null;
-  email?: string | null;
-  companyName?: string | null;
-  notes?: string | null;
-  status: LeadStatus;
-  companyId: string;
-  ownerUserId?: string | null;
-  branchId?: string | null;
-  departmentId?: string | null;
-  ownerUser?: {
-    id: string;
-    name: string;
-    email?: string | null;
-  } | null;
-  branch?: {
-    id: string;
-    name: string;
-  } | null;
-  department?: {
-    id: string;
-    name: string;
-  } | null;
-};
-
-type PipelineResponse = Record<LeadStatus, LeadItem[]>;
-
-type LeadActivity = {
-  id: string;
-  createdAt: string;
-  type: string;
-  description: string;
-  user?: {
-    id: string;
-    name: string;
-    email?: string | null;
-  } | null;
-};
-
-type LeadTask = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  title: string;
-  description?: string | null;
-  dueAt?: string | null;
-  completedAt?: string | null;
-  assignedUserId?: string | null;
-  assignedUser?: {
-    id: string;
-    name: string;
-    email?: string | null;
-  } | null;
-};
-
-const STATUS_ORDER: LeadStatus[] = [
-  'NEW',
-  'CONTACTED',
-  'PROPOSAL',
-  'NEGOTIATION',
-  'WON',
-  'LOST',
-];
-
-const STATUS_LABELS: Record<LeadStatus, string> = {
-  NEW: 'Novo lead',
-  CONTACTED: 'Contato feito',
-  PROPOSAL: 'Proposta enviada',
-  NEGOTIATION: 'Negociação',
-  WON: 'Fechado',
-  LOST: 'Perdido',
-};
-
-const FILTER_STATUS_LABELS: Record<'ALL' | LeadStatus, string> = {
-  ALL: 'Todos',
-  NEW: 'Novo lead',
-  CONTACTED: 'Contato feito',
-  PROPOSAL: 'Proposta enviada',
-  NEGOTIATION: 'Negociação',
-  WON: 'Fechado',
-  LOST: 'Perdido',
-};
-
-const TEMPERATURE_LABELS: Record<TemperatureFilter, string> = {
-  ALL: 'Todas',
-  HOT: 'Quentes',
-  WARM: 'Mornos',
-  COLD: 'Frios',
-};
-
-const INTERACTION_OPTIONS: Array<{
-  type: ActivityComposerType;
-  label: string;
-  badge: string;
-}> = [
-  { type: 'NOTE', label: 'Nota', badge: 'NT' },
-  { type: 'CALL', label: 'Ligação', badge: 'CL' },
-  { type: 'MESSAGE', label: 'Mensagem', badge: 'MS' },
-  { type: 'MEETING', label: 'Reunião', badge: 'MT' },
-];
-
-const ACTIVITY_LABELS: Record<string, string> = {
-  LEAD_CREATED: 'Lead criado',
-  LEAD_UPDATED: 'Lead atualizado',
-  LEAD_NOTE_UPDATED: 'Observações atualizadas',
-  LEAD_STATUS_CHANGED: 'Status alterado',
-  TASK_CREATED: 'Tarefa criada',
-  TASK_DONE: 'Tarefa concluída',
-  NOTE: 'Nota',
-  CALL: 'Ligação',
-  MESSAGE: 'Mensagem',
-  MEETING: 'Reunião',
-};
-
-const utf8TextDecoder = new TextDecoder('utf-8');
-
-function formatDateTime(value?: string | null) {
-  if (!value) return 'Sem data';
-  return new Date(value).toLocaleString('pt-BR');
-}
-
-function formatDateShort(value?: string | null) {
-  if (!value) return 'Sem prazo';
-  return new Date(value).toLocaleDateString('pt-BR');
-}
-
-function formatRelativeTime(value?: string | null) {
-  if (!value) return 'Sem data';
-
-  const now = Date.now();
-  const time = new Date(value).getTime();
-  const diff = now - time;
-
-  const minute = 1000 * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  if (diff < minute) return 'Agora há pouco';
-  if (diff < hour) return `${Math.max(1, Math.floor(diff / minute))} min atrás`;
-  if (diff < day) return `${Math.max(1, Math.floor(diff / hour))}h atrás`;
-  if (diff < day * 7) return `${Math.max(1, Math.floor(diff / day))}d atrás`;
-
-  return formatDateShort(value);
-}
-
-function sanitizeText(value?: string | null) {
-  if (!value) return '';
-  const input = String(value);
-
-  if (!/[Ãâð]/.test(input)) return input;
-
-  try {
-    return utf8TextDecoder.decode(
-      Uint8Array.from(input, (char) => char.charCodeAt(0)),
-    );
-  } catch {
-    return input;
-  }
-}
-
-function normalizeUiText(value?: string | null) {
-  return sanitizeText(value);
-}
-
-function getToken() {
-  return localStorage.getItem('access_token');
-}
-
-function getLeadScore(
-  lead: LeadItem | null,
-  activities: LeadActivity[],
-  tasks: LeadTask[],
-) {
-  if (!lead) return 0;
-
-  let score = 0;
-
-  if (lead.phone) score += 10;
-  if (lead.email) score += 10;
-  if (lead.companyName) score += 10;
-  if (lead.notes) score += 5;
-
-  if (activities.length > 0) score += 10;
-  if (activities.some((a) => a.type === 'CALL')) score += 10;
-  if (activities.some((a) => a.type === 'MEETING')) score += 15;
-  if (activities.some((a) => a.type === 'MESSAGE')) score += 5;
-  if (activities.some((a) => a.type === 'TASK_CREATED')) score += 5;
-
-  switch (lead.status) {
-    case 'CONTACTED':
-      score += 10;
-      break;
-    case 'PROPOSAL':
-      score += 20;
-      break;
-    case 'NEGOTIATION':
-      score += 30;
-      break;
-    case 'WON':
-      score += 50;
-      break;
-    case 'LOST':
-      score = Math.max(0, score - 20);
-      break;
-  }
-
-  const now = new Date();
-
-  if (tasks.some((task) => task.dueAt && new Date(task.dueAt) > now && !task.completedAt)) {
-    score += 10;
-  }
-
-  if (tasks.some((task) => task.dueAt && new Date(task.dueAt) < now && !task.completedAt)) {
-    score -= 15;
-  }
-
-  return Math.max(0, Math.min(score, 100));
-}
-
-function getLeadTemperature(score: number) {
-  if (score >= 80) return 'Muito quente';
-  if (score >= 60) return 'Quente';
-  if (score >= 30) return 'Morno';
-  return 'Frio';
-}
-
-function getTemperatureChipClass(score: number) {
-  if (score >= 80) {
-    return 'border-[#3BFF8C]/20 bg-[#3BFF8C]/10 text-[#9CFFC2]';
-  }
-
-  if (score >= 60) {
-    return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200';
-  }
-
-  if (score >= 30) {
-    return 'border-amber-300/20 bg-amber-300/10 text-amber-100';
-  }
-
-  return 'border-sky-300/20 bg-sky-300/10 text-sky-100';
-}
-
-function getLeadHealth(updatedAt?: string | null, status?: LeadStatus) {
-  if (status === 'WON') return 'Fechado';
-  if (status === 'LOST') return 'Encerrado';
-  if (!updatedAt) return 'Sem atividade';
-
-  const diffMs = Date.now() - new Date(updatedAt).getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays >= 7) return 'Crítico';
-  if (diffDays >= 3) return 'Atenção';
-  return 'Saudável';
-}
-
-function getLeadHealthClass(updatedAt?: string | null, status?: LeadStatus) {
-  const health = getLeadHealth(updatedAt, status);
-
-  if (health === 'Fechado') {
-    return 'border-[#3BFF8C]/20 bg-[#3BFF8C]/10 text-[#9CFFC2]';
-  }
-
-  if (health === 'Encerrado') {
-    return 'border-red-500/20 bg-red-500/10 text-red-300';
-  }
-
-  if (health === 'Crítico') {
-    return 'border-red-500/20 bg-red-500/10 text-red-300';
-  }
-
-  if (health === 'Atenção') {
-    return 'border-amber-300/20 bg-amber-300/10 text-amber-100';
-  }
-
-  return 'border-white/10 bg-white/5 text-zinc-200';
-}
-
-function activityIcon(type: string) {
-  if (type === 'TASK_CREATED') return 'TC';
-  if (type === 'TASK_DONE') return 'OK';
-  if (type === 'LEAD_STATUS_CHANGED') return 'ST';
-  if (type === 'CALL') return 'CL';
-  if (type === 'MESSAGE') return 'MS';
-  if (type === 'MEETING') return 'MT';
-  if (type === 'LEAD_CREATED') return 'NV';
-  return 'NT';
-}
-
-function activityIconBadgeClass(type: string) {
-  if (type === 'TASK_DONE') {
-    return 'border-[#3BFF8C]/25 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.22),transparent_80%),rgba(59,255,140,0.08)] text-[#C8FFD8]';
-  }
-
-  if (type === 'LEAD_CREATED') {
-    return 'border-[#3BFF8C]/18 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.16),transparent_80%),rgba(255,255,255,0.04)] text-white';
-  }
-
-  if (type === 'CALL') {
-    return 'border-amber-300/20 bg-amber-300/10 text-amber-100';
-  }
-
-  if (type === 'MESSAGE') {
-    return 'border-sky-300/20 bg-sky-300/10 text-sky-100';
-  }
-
-  if (type === 'MEETING') {
-    return 'border-violet-300/20 bg-violet-300/10 text-violet-100';
-  }
-
-  return 'border-white/10 bg-white/[0.05] text-zinc-100';
-}
-
-function statusBadge(status: LeadStatus) {
-  if (status === 'WON') {
-    return 'rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]';
-  }
-
-  if (status === 'LOST') {
-    return 'rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs text-red-300';
-  }
-
-  return 'rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white';
-}
-
-function statusDotClass(status: LeadStatus) {
-  if (status === 'WON') return 'bg-[#3BFF8C] shadow-[0_0_12px_rgba(59,255,140,0.5)]';
-  if (status === 'LOST') return 'bg-red-400 shadow-[0_0_12px_rgba(248,113,113,0.45)]';
-  return 'bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.18)]';
-}
+import {
+  ACTIVITY_LABELS,
+  API_URL,
+  FILTER_STATUS_LABELS,
+  INTERACTION_OPTIONS,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  TEMPERATURE_LABELS,
+} from './_crm/constants';
+import {
+  CrmExecutiveHero,
+  CrmInsightCard,
+  CrmMetricCard,
+  CrmStyles,
+} from './_crm/components';
+import {
+  activityIcon,
+  activityIconBadgeClass,
+  formatDateShort,
+  formatDateTime,
+  formatRelativeTime,
+  getLeadHealth,
+  getLeadHealthClass,
+  getLeadScore,
+  getLeadTemperature,
+  getTemperatureChipClass,
+  getToken,
+  normalizeUiText,
+  sanitizeText,
+  statusBadge,
+  statusDotClass,
+} from './_crm/utils';
+import type {
+  ActivityComposerType,
+  BranchOption,
+  DepartmentOption,
+  LeadActivity,
+  LeadItem,
+  LeadStatus,
+  LeadTask,
+  PipelineResponse,
+  TemperatureFilter,
+  UserOption,
+} from './_crm/types';
 
 export default function Page() {
+
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [pipeline, setPipeline] = useState<PipelineResponse>({
     NEW: [],
@@ -1221,40 +902,19 @@ export default function Page() {
 
   return (
     <div className="space-y-5">
-      <style jsx>{`
-        .crm-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(59, 255, 140, 0.35) rgba(255, 255, 255, 0.04);
-        }
+      <CrmStyles />
 
-        .crm-scroll::-webkit-scrollbar {
-          width: 10px;
-        }
-
-        .crm-scroll::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.04);
-          border-radius: 999px;
-        }
-
-        .crm-scroll::-webkit-scrollbar-thumb {
-          background: linear-gradient(
-            180deg,
-            rgba(59, 255, 140, 0.45),
-            rgba(59, 255, 140, 0.2)
-          );
-          border-radius: 999px;
-          border: 2px solid rgba(17, 17, 19, 0.95);
-          box-shadow: 0 0 12px rgba(59, 255, 140, 0.12);
-        }
-
-        .crm-scroll::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(
-            180deg,
-            rgba(59, 255, 140, 0.65),
-            rgba(59, 255, 140, 0.28)
-          );
-        }
-      `}</style>
+      <CrmExecutiveHero
+        stats={stats}
+        topOwner={topOwner}
+        dominantStatus={STATUS_ORDER.reduce(
+          (best, current) =>
+            filteredPipeline[current].length > filteredPipeline[best].length ? current : best,
+          'NEW',
+        )}
+        onAddLead={() => setShowCreateModal(true)}
+        onViewPipeline={scrollToPipeline}
+      />
 
       <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1583,54 +1243,51 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-8">
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Leads totais</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{stats.total}</div>
-          <div className="mt-2 text-sm text-zinc-400">Base total filtrada</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Leads abertos</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{stats.open}</div>
-          <div className="mt-2 text-sm text-zinc-400">Oportunidades em andamento</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Ganhos</div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">{stats.won}</div>
-          <div className="mt-2 text-sm text-zinc-400">Negócios fechados com sucesso</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Perdidos</div>
-          <div className="mt-4 text-3xl font-semibold text-red-300">{stats.lost}</div>
-          <div className="mt-2 text-sm text-zinc-400">Oportunidades encerradas</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Conversão</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{stats.conversionRate}%</div>
-          <div className="mt-2 text-sm text-zinc-400">Relação entre ganhos e total</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Novos no mês</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{stats.newThisMonth}</div>
-          <div className="mt-2 text-sm text-zinc-400">Criados no mês atual</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Quentes</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{stats.hotLeads}</div>
-          <div className="mt-2 text-sm text-zinc-400">Leads com maior chance</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Em atenção</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{stats.stalledLeads}</div>
-          <div className="mt-2 text-sm text-zinc-400">Leads sem ritmo ideal</div>
-        </div>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-4">
+        <CrmMetricCard
+          label="Leads totais"
+          value={stats.total}
+          helper="Base total filtrada"
+        />
+        <CrmMetricCard
+          label="Leads abertos"
+          value={stats.open}
+          helper="Oportunidades em andamento"
+        />
+        <CrmMetricCard
+          label="Ganhos"
+          value={stats.won}
+          helper="Negócios fechados com sucesso"
+          accent="success"
+        />
+        <CrmMetricCard
+          label="Perdidos"
+          value={stats.lost}
+          helper="Oportunidades encerradas"
+          accent="danger"
+        />
+        <CrmMetricCard
+          label="Conversão"
+          value={`${stats.conversionRate}%`}
+          helper="Relação entre ganhos e total"
+        />
+        <CrmMetricCard
+          label="Novos no mês"
+          value={stats.newThisMonth}
+          helper="Criados no mês atual"
+        />
+        <CrmMetricCard
+          label="Leads quentes"
+          value={stats.hotLeads}
+          helper="Maior chance de fechamento"
+          accent="success"
+        />
+        <CrmMetricCard
+          label="Em atenção"
+          value={stats.stalledLeads}
+          helper="Leads sem ritmo ideal"
+          accent="attention"
+        />
       </div>
 
       {error ? (
@@ -1984,41 +1641,35 @@ export default function Page() {
             <div className="mb-4 text-sm font-medium text-white">Insights do CRM</div>
 
             <div className="space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Maior concentração</div>
-                <div className="mt-2 text-sm text-white">
-                  {STATUS_LABELS[
-                    STATUS_ORDER.reduce((best, current) =>
-                      filteredPipeline[current].length > filteredPipeline[best].length ? current : best,
-                    'NEW')
-                  ]}
-                </div>
-                <div className="mt-1 text-xs text-zinc-500">
-                  Etapa com mais leads no momento
-                </div>
-              </div>
+              <CrmInsightCard
+                label="Maior concentração"
+                value={
+                  STATUS_LABELS[
+                    STATUS_ORDER.reduce(
+                      (best, current) =>
+                        filteredPipeline[current].length > filteredPipeline[best].length ? current : best,
+                      'NEW',
+                    )
+                  ]
+                }
+                helper="Etapa com mais leads no momento"
+              />
 
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Responsável com mais leads</div>
-                <div className="mt-2 text-sm text-white">
-                  {topOwner ? `${topOwner[0]} · ${topOwner[1]}` : 'Sem dados'}
-                </div>
-                <div className="mt-1 text-xs text-zinc-500">
-                  Distribuição comercial atual
-                </div>
-              </div>
+              <CrmInsightCard
+                label="Responsável com mais leads"
+                value={topOwner ? `${topOwner[0]} · ${topOwner[1]}` : 'Sem dados'}
+                helper="Distribuição comercial atual"
+              />
 
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Prioridade operacional</div>
-                <div className="mt-2 text-sm text-white">
-                  {stats.stalledLeads > 0
+              <CrmInsightCard
+                label="Prioridade operacional"
+                value={
+                  stats.stalledLeads > 0
                     ? `Retomar ${stats.stalledLeads} lead(s) em atenção`
-                    : 'Pipeline com ritmo saudável'}
-                </div>
-                <div className="mt-1 text-xs text-zinc-500">
-                  Recomendação automática baseada na atividade
-                </div>
-              </div>
+                    : 'Pipeline com ritmo saudável'
+                }
+                helper="Recomendação automática baseada na atividade"
+              />
             </div>
           </div>
         </div>
