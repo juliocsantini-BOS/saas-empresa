@@ -1,0 +1,19 @@
+import { Controller, Get, Header, Query } from "@nestjs/common";
+import { Public } from "../common/decorators/public.decorator";
+import { MetricsService } from "./metrics.service";
+
+@Controller("metrics")
+export class MetricsController {
+  constructor(private readonly metrics: MetricsService) {}
+
+  @Public()
+  @Get()
+  @Header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+  getMetrics(@Query("format") format?: string) {
+    if (String(format ?? "").toLowerCase() === "json") {
+      return this.metrics.getJson();
+    }
+
+    return this.metrics.getPrometheusText();
+  }
+}

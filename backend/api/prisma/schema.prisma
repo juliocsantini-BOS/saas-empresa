@@ -1,0 +1,420 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN_MASTER
+  ADMIN
+  CEO
+  CFO
+  CMO
+  SALES
+  FINANCE
+  SUPPORT
+  USER
+}
+
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
+enum CrmLeadStatus {
+  NEW
+  CONTACTED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum AutomationModuleName {
+  CRM
+}
+
+enum AutomationTriggerType {
+  LEAD_CREATED
+  LEAD_STATUS_CHANGED
+  LEAD_STALE
+  TASK_CREATED
+  TASK_COMPLETED
+  TASK_DUE
+}
+
+enum AutomationActionType {
+  CREATE_TASK
+  CREATE_ACTIVITY
+  UPDATE_LEAD_STATUS
+  NOTIFY_INTERNAL
+}
+
+enum AutomationExecutionStatus {
+  SUCCESS
+  FAILED
+  SKIPPED
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  requestId String?
+
+  users                User[]
+  branches             Branch[]
+  departments          Department[]
+  sessions             Session[]
+  auditLogs            AuditLog[]
+  userPermissions      UserPermission[]
+  crmLeads             CrmLead[]
+  crmLeadActivities    CrmLeadActivity[]
+  crmLeadTasks         CrmLeadTask[]
+  automationRules      AutomationRule[]
+  automationActions    AutomationAction[]
+  automationExecutions AutomationExecution[]
+
+  @@index([createdAt])
+  @@index([requestId])
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  requestId String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  users       User[]
+  departments Department[]
+  crmLeads    CrmLead[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([companyId, createdAt])
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  requestId String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  users    User[]
+  crmLeads CrmLead[]
+
+  @@unique([branchId, name])
+  @@index([companyId])
+  @@index([branchId])
+  @@index([companyId, branchId])
+  @@index([companyId, createdAt])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String
+  name      String
+  password  String
+  role      Role     @default(ADMIN)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  refreshTokenHash String?
+  refreshTokenId   String?
+  tokenVersion     Int     @default(1)
+
+  sessions             Session[]
+  auditLogs            AuditLog[]
+  userPermissions      UserPermission[]
+  ownedCrmLeads        CrmLead[]         @relation("CrmLeadOwner")
+  crmLeadActivities    CrmLeadActivity[]
+  assignedCrmLeadTasks CrmLeadTask[]     @relation("CrmLeadTaskAssignedUser")
+
+  @@unique([companyId, email])
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([companyId, role])
+  @@index([companyId, isActive])
+  @@index([companyId, createdAt])
+}
+
+model Session {
+  id               String    @id @default(cuid())
+  createdAt        DateTime  @default(now())
+  lastUsedAt       DateTime  @default(now())
+  revokedAt        DateTime?
+  ip               String?
+  userAgent        String?
+  refreshTokenHash String
+  refreshTokenId   String    @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([companyId])
+  @@index([createdAt])
+  @@index([lastUsedAt])
+  @@index([revokedAt])
+  @@index([userId, revokedAt])
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  requestId String?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  method     String
+  path       String
+  statusCode Int
+  ip         String?
+  userAgent  String?
+  durationMs Int
+
+  bodyJson   Json?
+  queryJson  Json?
+  paramsJson Json?
+
+  @@index([createdAt])
+  @@index([companyId])
+  @@index([userId])
+  @@index([method, path])
+  @@index([requestId])
+  @@index([companyId, createdAt])
+  @@index([companyId, userId, createdAt])
+  @@index([companyId, requestId])
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+
+  @@index([createdAt])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  role         Role
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([role, permissionId])
+  @@index([role])
+  @@index([permissionId])
+  @@index([role, permissionId])
+}
+
+model UserPermission {
+  id String @id @default(cuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  effect PermissionEffect @default(ALLOW)
+
+  @@unique([companyId, userId, permissionId])
+  @@index([companyId])
+  @@index([userId])
+  @@index([permissionId])
+  @@index([companyId, userId])
+  @@index([companyId, permissionId])
+  @@index([companyId, userId, effect])
+}
+
+model CrmLead {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  requestId String?
+
+  name        String
+  phone       String?
+  email       String?
+  companyName String?
+  notes       String?
+  status      CrmLeadStatus @default(NEW)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  ownerUserId String?
+  ownerUser   User?   @relation("CrmLeadOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  activities CrmLeadActivity[]
+  tasks      CrmLeadTask[]
+
+  @@index([companyId])
+  @@index([ownerUserId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([status])
+  @@index([companyId, status])
+  @@index([companyId, createdAt])
+}
+
+model CrmLeadActivity {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  type        String
+  description String
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  leadId String
+  lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([companyId, leadId, createdAt])
+}
+
+model CrmLeadTask {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  description String?
+  dueAt       DateTime?
+  completedAt DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  leadId String
+  lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  assignedUserId String?
+  assignedUser   User?   @relation("CrmLeadTaskAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([assignedUserId])
+  @@index([dueAt])
+  @@index([completedAt])
+  @@index([companyId, leadId, createdAt])
+}
+
+model AutomationRule {
+  id             String                @id @default(cuid())
+  name           String
+  description    String?
+  module         AutomationModuleName
+  triggerType    AutomationTriggerType
+  isActive       Boolean               @default(true)
+  conditionsJson Json?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  actions    AutomationAction[]
+  executions AutomationExecution[]
+
+  @@index([companyId])
+  @@index([module])
+  @@index([triggerType])
+  @@index([isActive])
+  @@index([companyId, module, triggerType, isActive])
+  @@index([companyId, createdAt])
+}
+
+model AutomationAction {
+  id         String               @id @default(cuid())
+  type       AutomationActionType
+  order      Int                  @default(0)
+  configJson Json?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  ruleId String
+  rule   AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([ruleId])
+  @@index([type])
+  @@index([order])
+  @@index([companyId, ruleId])
+}
+
+model AutomationExecution {
+  id                 String                    @id @default(cuid())
+  status             AutomationExecutionStatus
+  triggerPayloadJson Json?
+  resultJson         Json?
+  errorMessage       String?
+  createdAt          DateTime                  @default(now())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  ruleId String
+  rule   AutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([ruleId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([companyId, createdAt])
+  @@index([companyId, ruleId, createdAt])
+}

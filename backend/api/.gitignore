@@ -1,0 +1,30 @@
+﻿# Dependencies
+node_modules/
+dist/
+
+# Env
+.env
+.env.*
+~$.env*
+
+# Logs
+*.log
+
+# Backups
+*.bak
+*.bak_*
+*.tmp
+
+# Dumps / Archives
+*.dump
+*.zip
+*.7z
+*.tar
+*.gz
+
+# OS
+Thumbs.db
+.DS_Store
+
+*.bak
+*.bak.*

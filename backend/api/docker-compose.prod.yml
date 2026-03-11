@@ -1,0 +1,49 @@
+﻿services:
+  postgres:
+    image: postgres:16
+    container_name: saas_postgres
+    environment:
+      POSTGRES_USER: saas
+      POSTGRES_PASSWORD: saas_pass
+      POSTGRES_DB: saas_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - saas_pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: saas_redis
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    container_name: saas_api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://saas:saas_pass@postgres:5432/saas_db?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_secret_change_me
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build: .
+    container_name: saas_worker
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://saas:saas_pass@postgres:5432/saas_db?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_secret_change_me
+    command: ["node", "dist/main.js"]
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  saas_pgdata:

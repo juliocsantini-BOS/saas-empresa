@@ -1,0 +1,1 @@
+-- NO-OP (baseline ja aplicado em 20260208044848_init)

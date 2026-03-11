@@ -1,0 +1,2 @@
+UPDATE "_prisma_migrations" SET checksum = '0259d1dba038e90042991654581cf02faa81a4d0f1200f2c4f9776189ac30159' WHERE migration_name = '20260208044848_init';
+UPDATE "_prisma_migrations" SET checksum = '9e10a0766b6c4f5201384addb7fe076b6f58dfeb1abd78bcbc7e590992a996bf' WHERE migration_name = '20260217223534_add_auditlog_requestid';
