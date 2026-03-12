@@ -277,6 +277,21 @@ model CrmLead {
   notes       String?
   status      CrmLeadStatus @default(NEW)
 
+  dealValue         Decimal? @db.Decimal(14, 2)
+  currency          String   @default("BRL")
+  probability       Int      @default(10)
+  source            String?
+  priority          String?
+  nextStep          String?
+  nextStepDueAt     DateTime?
+  expectedCloseDate DateTime?
+  statusChangedAt   DateTime @default(now())
+  lastActivityAt    DateTime?
+  lastContactAt     DateTime?
+  wonAt             DateTime?
+  lostAt            DateTime?
+  lostReason        String?
+
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -299,6 +314,11 @@ model CrmLead {
   @@index([status])
   @@index([companyId, status])
   @@index([companyId, createdAt])
+  @@index([companyId, statusChangedAt])
+  @@index([companyId, lastActivityAt])
+  @@index([companyId, expectedCloseDate])
+  @@index([companyId, probability])
+  @@index([companyId, ownerUserId, status])
 }
 
 model CrmLeadActivity {
