@@ -1,9 +1,9 @@
-﻿import {
+import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { CrmLeadStatus } from "@prisma/client";
+import { CrmLeadStatus, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCrmLeadDto } from "./dto/create-crm-lead.dto";
 import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
@@ -39,6 +39,64 @@ export class CrmLeadsService {
     }
 
     return raw as CrmLeadStatus;
+  }
+
+  private normalizeProbability(value?: number | null): number | undefined | null {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+
+    const parsed = Number(value);
+    if (!Number.isInteger(parsed) || parsed < 0 || parsed > 100) {
+      throw new BadRequestException("probability deve ser um inteiro entre 0 e 100.");
+    }
+
+    return parsed;
+  }
+
+  private normalizeMoney(value?: string | number | null): Prisma.Decimal | undefined | null {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+
+    const rawInput = String(value).trim();
+    if (!rawInput) return null;
+
+    let normalized = rawInput;
+
+    const brazilianPattern = /^-?\d{1,3}(\.\d{3})*,\d+$/;
+    if (brazilianPattern.test(normalized)) {
+      normalized = normalized.replace(/\./g, "").replace(",", ".");
+    } else {
+      normalized = normalized.replace(",", ".");
+    }
+
+    try {
+      return new Prisma.Decimal(normalized);
+    } catch {
+      throw new BadRequestException("dealValue inválido.");
+    }
+  }
+
+  private normalizeDate(value?: string | null): Date | undefined | null {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+
+    const raw = String(value).trim();
+    if (!raw) return null;
+
+    const parsed = new Date(raw);
+    if (Number.isNaN(parsed.getTime())) {
+      throw new BadRequestException("Data inválida.");
+    }
+
+    return parsed;
+  }
+
+  private normalizeOptionalString(value?: string | null): string | undefined | null {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+
+    const trimmed = String(value).trim();
+    return trimmed || null;
   }
 
   private leadInclude() {
@@ -98,6 +156,61 @@ export class CrmLeadsService {
     return lead;
   }
 
+  private async validateReferences(input: {
+    companyId: string;
+    ownerUserId?: string | null;
+    branchId?: string | null;
+    departmentId?: string | null;
+  }) {
+    const companyId = input.companyId;
+    const ownerUserId = input.ownerUserId ?? null;
+    const branchId = input.branchId ?? null;
+    const departmentId = input.departmentId ?? null;
+
+    if (ownerUserId) {
+      const owner = await this.prisma.user.findFirst({
+        where: {
+          id: ownerUserId,
+          companyId,
+        },
+        select: { id: true },
+      });
+
+      if (!owner) {
+        throw new BadRequestException("ownerUserId inválido para esta empresa.");
+      }
+    }
+
+    if (branchId) {
+      const branch = await this.prisma.branch.findFirst({
+        where: {
+          id: branchId,
+          companyId,
+        },
+        select: { id: true },
+      });
+
+      if (!branch) {
+        throw new BadRequestException("branchId inválido para esta empresa.");
+      }
+    }
+
+    if (departmentId) {
+      const department = await this.prisma.department.findFirst({
+        where: {
+          id: departmentId,
+          companyId,
+          ...(branchId ? { branchId } : {}),
+        },
+        select: { id: true },
+      });
+
+      if (!department) {
+        throw new BadRequestException("departmentId inválido para esta empresa.");
+      }
+    }
+  }
+
   private async createActivity(input: {
     companyId: string;
     leadId: string;
@@ -105,15 +218,31 @@ export class CrmLeadsService {
     type: string;
     description: string;
   }) {
-    return this.prisma.crmLeadActivity.create({
-      data: {
-        companyId: input.companyId,
-        leadId: input.leadId,
-        userId: input.userId ?? null,
-        type: input.type,
-        description: input.description,
-      },
-    });
+    const now = new Date();
+    const shouldUpdateContact = ["CALL", "MESSAGE", "MEETING"].includes(
+      String(input.type ?? "").trim().toUpperCase(),
+    );
+
+    const [activity] = await this.prisma.$transaction([
+      this.prisma.crmLeadActivity.create({
+        data: {
+          companyId: input.companyId,
+          leadId: input.leadId,
+          userId: input.userId ?? null,
+          type: input.type,
+          description: input.description,
+        },
+      }),
+      this.prisma.crmLead.update({
+        where: { id: input.leadId },
+        data: {
+          lastActivityAt: now,
+          ...(shouldUpdateContact ? { lastContactAt: now } : {}),
+        },
+      }),
+    ]);
+
+    return activity;
   }
 
   async create(input: {
@@ -138,7 +267,28 @@ export class CrmLeadsService {
       ? String(body.departmentId).trim()
       : null;
 
+    await this.validateReferences({
+      companyId,
+      ownerUserId,
+      branchId,
+      departmentId,
+    });
+
     const status = this.normalizeStatus(body?.status) ?? CrmLeadStatus.NEW;
+    const dealValue = this.normalizeMoney(body?.dealValue);
+    const probability =
+      this.normalizeProbability(body?.probability) ??
+      (status === CrmLeadStatus.NEW
+        ? 10
+        : status === CrmLeadStatus.CONTACTED
+          ? 25
+          : status === CrmLeadStatus.PROPOSAL
+            ? 50
+            : status === CrmLeadStatus.NEGOTIATION
+              ? 75
+              : status === CrmLeadStatus.WON
+                ? 100
+                : 0);
 
     const lead = await this.prisma.crmLead.create({
       data: {
@@ -152,6 +302,18 @@ export class CrmLeadsService {
         ownerUserId,
         branchId,
         departmentId,
+        dealValue,
+        currency: this.normalizeOptionalString(body?.currency) ?? "BRL",
+        probability,
+        source: this.normalizeOptionalString(body?.source) ?? null,
+        priority: this.normalizeOptionalString(body?.priority) ?? null,
+        nextStep: this.normalizeOptionalString(body?.nextStep) ?? null,
+        nextStepDueAt: this.normalizeDate(body?.nextStepDueAt) ?? null,
+        expectedCloseDate: this.normalizeDate(body?.expectedCloseDate) ?? null,
+        lostReason: this.normalizeOptionalString(body?.lostReason) ?? null,
+        statusChangedAt: new Date(),
+        ...(status === CrmLeadStatus.WON ? { wonAt: new Date(), lostAt: null } : {}),
+        ...(status === CrmLeadStatus.LOST ? { lostAt: new Date(), wonAt: null } : {}),
       },
       include: this.leadInclude(),
     });
@@ -228,7 +390,7 @@ export class CrmLeadsService {
     body: CreateCrmLeadActivityDto;
   }) {
     const cid = this.ensureCompanyId(input.companyId);
-    const lead = await this.ensureLeadExists(input.leadId, cid);
+    await this.ensureLeadExists(input.leadId, cid);
 
     const allowed = ["NOTE", "CALL", "MESSAGE", "MEETING"];
     const type = String(input.body?.type ?? "").trim().toUpperCase();
@@ -444,6 +606,34 @@ export class CrmLeadsService {
         }
       | null = null;
 
+    const nextOwnerUserId =
+      body.ownerUserId !== undefined
+        ? this.normalizeOptionalString(body.ownerUserId)
+        : exists.ownerUserId;
+
+    const nextBranchId =
+      body.branchId !== undefined
+        ? this.normalizeOptionalString(body.branchId)
+        : exists.branchId;
+
+    const nextDepartmentId =
+      body.departmentId !== undefined
+        ? this.normalizeOptionalString(body.departmentId)
+        : exists.departmentId;
+
+    if (
+      body.ownerUserId !== undefined ||
+      body.branchId !== undefined ||
+      body.departmentId !== undefined
+    ) {
+      await this.validateReferences({
+        companyId: cid,
+        ownerUserId: nextOwnerUserId,
+        branchId: nextBranchId,
+        departmentId: nextDepartmentId,
+      });
+    }
+
     if (body.name !== undefined) {
       const nextValue = body.name ? String(body.name).trim() : "";
       if (nextValue !== exists.name) {
@@ -501,10 +691,136 @@ export class CrmLeadsService {
       }
     }
 
+    if (body.dealValue !== undefined) {
+      const nextValue = this.normalizeMoney(body.dealValue);
+      const currentValue = exists.dealValue ? exists.dealValue.toString() : null;
+      const nextComparable = nextValue ? nextValue.toString() : null;
+
+      if (nextComparable !== currentValue) {
+        data.dealValue = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Valor estimado atualizado",
+        });
+      }
+    }
+
+    if (body.currency !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.currency) ?? "BRL";
+      if (nextValue !== exists.currency) {
+        data.currency = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Moeda atualizada",
+        });
+      }
+    }
+
+    if (body.probability !== undefined) {
+      const nextValue = this.normalizeProbability(body.probability);
+      if (nextValue !== null && nextValue !== exists.probability) {
+        data.probability = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: `Probabilidade atualizada para ${nextValue}%`,
+        });
+      }
+    }
+
+    if (body.source !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.source);
+      if (nextValue !== exists.source) {
+        data.source = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Origem atualizada",
+        });
+      }
+    }
+
+    if (body.priority !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.priority);
+      if (nextValue !== exists.priority) {
+        data.priority = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Prioridade atualizada",
+        });
+      }
+    }
+
+    if (body.nextStep !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.nextStep);
+      if (nextValue !== exists.nextStep) {
+        data.nextStep = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Próximo passo atualizado",
+        });
+      }
+    }
+
+    if (body.nextStepDueAt !== undefined) {
+      const nextValue = this.normalizeDate(body.nextStepDueAt);
+      const currentValue = exists.nextStepDueAt?.toISOString() ?? null;
+      const nextComparable = nextValue?.toISOString() ?? null;
+
+      if (nextComparable !== currentValue) {
+        data.nextStepDueAt = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Prazo do próximo passo atualizado",
+        });
+      }
+    }
+
+    if (body.expectedCloseDate !== undefined) {
+      const nextValue = this.normalizeDate(body.expectedCloseDate);
+      const currentValue = exists.expectedCloseDate?.toISOString() ?? null;
+      const nextComparable = nextValue?.toISOString() ?? null;
+
+      if (nextComparable !== currentValue) {
+        data.expectedCloseDate = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Previsão de fechamento atualizada",
+        });
+      }
+    }
+
+    if (body.lostReason !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.lostReason);
+      if (nextValue !== exists.lostReason) {
+        data.lostReason = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Motivo de perda atualizado",
+        });
+      }
+    }
+
     if (body.status !== undefined) {
       const nextStatus = this.normalizeStatus(body.status);
       if (nextStatus && nextStatus !== exists.status) {
         data.status = nextStatus;
+        data.statusChangedAt = new Date();
+
+        if (nextStatus === CrmLeadStatus.WON) {
+          data.wonAt = new Date();
+          data.lostAt = null;
+          data.lostReason = null;
+        } else if (nextStatus === CrmLeadStatus.LOST) {
+          data.lostAt = new Date();
+          data.wonAt = null;
+        } else {
+          if (exists.status === CrmLeadStatus.WON) {
+            data.wonAt = null;
+          }
+          if (exists.status === CrmLeadStatus.LOST) {
+            data.lostAt = null;
+          }
+        }
+
         activityDescriptions.push({
           type: "LEAD_STATUS_CHANGED",
           description: `Status alterado de ${exists.status} para ${nextStatus}`,
@@ -523,9 +839,7 @@ export class CrmLeadsService {
     }
 
     if (body.ownerUserId !== undefined) {
-      const nextValue = body.ownerUserId
-        ? String(body.ownerUserId).trim()
-        : null;
+      const nextValue = this.normalizeOptionalString(body.ownerUserId);
       if (nextValue !== exists.ownerUserId) {
         data.ownerUserId = nextValue;
         activityDescriptions.push({
@@ -536,7 +850,7 @@ export class CrmLeadsService {
     }
 
     if (body.branchId !== undefined) {
-      const nextValue = body.branchId ? String(body.branchId).trim() : null;
+      const nextValue = this.normalizeOptionalString(body.branchId);
       if (nextValue !== exists.branchId) {
         data.branchId = nextValue;
         activityDescriptions.push({
@@ -547,9 +861,7 @@ export class CrmLeadsService {
     }
 
     if (body.departmentId !== undefined) {
-      const nextValue = body.departmentId
-        ? String(body.departmentId).trim()
-        : null;
+      const nextValue = this.normalizeOptionalString(body.departmentId);
       if (nextValue !== exists.departmentId) {
         data.departmentId = nextValue;
         activityDescriptions.push({
