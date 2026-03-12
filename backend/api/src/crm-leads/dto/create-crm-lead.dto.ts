@@ -1,7 +1,14 @@
-﻿import { IsOptional, IsString, IsEmail } from "class-validator";
+import {
+  IsDateString,
+  IsEmail,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from "class-validator";
 
 export class CreateCrmLeadDto {
-
   @IsString()
   name!: string;
 
@@ -36,4 +43,42 @@ export class CreateCrmLeadDto {
   @IsOptional()
   @IsString()
   departmentId?: string;
+
+  @IsOptional()
+  @IsString()
+  dealValue?: string;
+
+  @IsOptional()
+  @IsString()
+  currency?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  probability?: number;
+
+  @IsOptional()
+  @IsString()
+  source?: string;
+
+  @IsOptional()
+  @IsString()
+  priority?: string;
+
+  @IsOptional()
+  @IsString()
+  nextStep?: string;
+
+  @IsOptional()
+  @IsDateString()
+  nextStepDueAt?: string;
+
+  @IsOptional()
+  @IsDateString()
+  expectedCloseDate?: string;
+
+  @IsOptional()
+  @IsString()
+  lostReason?: string;
 }
