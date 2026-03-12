@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import {
-=======
-﻿import {
->>>>>>> f92b445 (feat(crm): add enterprise lead fields and backend support)
   IsDateString,
   IsEmail,
   IsInt,
@@ -21,12 +17,40 @@ export class CreateCrmLeadDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  whatsapp?: string;
+
+  @IsOptional()
   @IsEmail()
   email?: string;
 
   @IsOptional()
   @IsString()
   companyName?: string;
+
+  @IsOptional()
+  @IsString()
+  jobTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  website?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  state?: string;
+
+  @IsOptional()
+  @IsString()
+  industry?: string;
+
+  @IsOptional()
+  @IsString()
+  companySize?: string;
 
   @IsOptional()
   @IsString()
@@ -68,7 +92,19 @@ export class CreateCrmLeadDto {
 
   @IsOptional()
   @IsString()
+  sourceDetail?: string;
+
+  @IsOptional()
+  @IsString()
   priority?: string;
+
+  @IsOptional()
+  @IsString()
+  competitor?: string;
+
+  @IsOptional()
+  @IsString()
+  wonReason?: string;
 
   @IsOptional()
   @IsString()
@@ -80,13 +116,13 @@ export class CreateCrmLeadDto {
 
   @IsOptional()
   @IsDateString()
+  nextMeetingAt?: string;
+
+  @IsOptional()
+  @IsDateString()
   expectedCloseDate?: string;
 
   @IsOptional()
   @IsString()
   lostReason?: string;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> f92b445 (feat(crm): add enterprise lead fields and backend support)

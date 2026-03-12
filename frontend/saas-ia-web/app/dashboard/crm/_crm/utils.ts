@@ -10,6 +10,10 @@ import type {
 
 const utf8TextDecoder = new TextDecoder('utf-8');
 
+export function classNames(...values: Array<string | false | null | undefined>) {
+  return values.filter(Boolean).join(' ');
+}
+
 export function formatDateTime(value?: string | null) {
   if (!value) return 'Sem data';
   return new Date(value).toLocaleString('pt-BR');
@@ -91,6 +95,47 @@ export function getLeadProbability(lead: LeadItem | null) {
   return STATUS_BASE_PROBABILITY[lead.status] ?? 0;
 }
 
+export function statusProbability(status: LeadStatus) {
+  if (status === 'NEW') return 10;
+  if (status === 'CONTACTED') return 25;
+  if (status === 'PROPOSAL') return 50;
+  if (status === 'NEGOTIATION') return 75;
+  if (status === 'WON') return 100;
+  return 0;
+}
+
+export function normalizeProbability(lead: LeadItem) {
+  if (typeof lead.probability === 'number' && Number.isFinite(lead.probability)) {
+    return Math.max(0, Math.min(100, lead.probability));
+  }
+  return statusProbability(lead.status);
+}
+
+export function parseMoney(value?: string | number | null) {
+  if (value === undefined || value === null || value === '') return 0;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+
+  const raw = String(value).trim();
+  if (!raw) return 0;
+
+  const brazilianPattern = /^-?\d{1,3}(\.\d{3})*,\d+$/;
+  const normalized = brazilianPattern.test(raw)
+    ? raw.replace(/\./g, '').replace(',', '.')
+    : raw.replace(',', '.');
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+export function formatMoney(value?: string | number | null, currency = 'BRL') {
+  const amount = parseMoney(value);
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: currency || 'BRL',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export function getLeadForecastValue(lead: LeadItem | null) {
   if (!lead) return 0;
   const amount = toNumber(lead.dealValue) ?? 0;
@@ -101,6 +146,23 @@ export function getLeadForecastValue(lead: LeadItem | null) {
 export function getLeadPriorityLabel(priority?: string | null) {
   const normalized = String(priority ?? '').trim().toUpperCase() as LeadPriority;
   return PRIORITY_LABELS[normalized] ?? 'Sem prioridade';
+}
+
+export function formatPriority(priority?: string | null) {
+  const value = String(priority ?? '').trim().toUpperCase();
+  if (value === 'HIGH' || value === 'ALTA') return 'Alta';
+  if (value === 'LOW' || value === 'BAIXA') return 'Baixa';
+  if (value === 'URGENT' || value === 'URGENTE') return 'Urgente';
+  if (value === 'MEDIUM' || value === 'MÃ‰DIA' || value === 'MEDIA') return 'MÃ©dia';
+  return value ? normalizeUiText(value) : 'MÃ©dia';
+}
+
+export function priorityClass(priority?: string | null) {
+  const label = formatPriority(priority);
+  if (label === 'Urgente') return 'border-red-400/25 bg-red-400/10 text-red-200';
+  if (label === 'Alta') return 'border-amber-300/25 bg-amber-300/10 text-amber-100';
+  if (label === 'Baixa') return 'border-sky-300/25 bg-sky-300/10 text-sky-100';
+  return 'border-white/10 bg-white/5 text-zinc-200';
 }
 
 export function getLeadPriorityClass(priority?: string | null) {
@@ -128,6 +190,23 @@ export function getLeadSourceLabel(source?: string | null) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(' ');
+}
+
+export function temperatureFilterMatch(temperature: string, filter: 'ALL' | 'HOT' | 'WARM' | 'COLD') {
+  if (filter === 'ALL') return true;
+  if (filter === 'HOT') return temperature === 'Quente';
+  if (filter === 'WARM') return temperature === 'Morno';
+  return temperature === 'Frio';
+}
+
+export function daysSince(value?: string | null) {
+  if (!value) return 999;
+  const diff = Date.now() - new Date(value).getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+export function getLastActivity(lead: LeadItem) {
+  return lead.lastActivityAt || lead.updatedAt || lead.createdAt;
 }
 
 export function getPipelineStageSummary(status: LeadStatus, leads: LeadItem[]): PipelineStageSummary {
@@ -264,10 +343,13 @@ export function getLeadHealthClass(updatedAt?: string | null, status?: LeadStatu
 
 export function activityIcon(type: string) {
   if (type === 'TASK_DONE') return 'OK';
+  if (type === 'TASK_REOPENED') return 'RE';
   if (type === 'TASK_CREATED') return 'TK';
   if (type === 'LEAD_UPDATED') return 'UP';
   if (type === 'LEAD_NOTE_UPDATED') return 'NT';
   if (type === 'LEAD_STATUS_CHANGED') return 'ST';
+  if (type === 'LEAD_WON') return 'WN';
+  if (type === 'LEAD_LOST') return 'LS';
   if (type === 'CALL') return 'CL';
   if (type === 'MESSAGE') return 'MS';
   if (type === 'MEETING') return 'MT';
@@ -278,6 +360,18 @@ export function activityIcon(type: string) {
 export function activityIconBadgeClass(type: string) {
   if (type === 'TASK_DONE') {
     return 'border-[#3BFF8C]/25 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.22),transparent_80%),rgba(59,255,140,0.08)] text-[#C8FFD8]';
+  }
+
+  if (type === 'TASK_REOPENED') {
+    return 'border-white/10 bg-white/[0.05] text-zinc-100';
+  }
+
+  if (type === 'LEAD_WON') {
+    return 'border-[#3BFF8C]/25 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.22),transparent_80%),rgba(59,255,140,0.08)] text-[#C8FFD8]';
+  }
+
+  if (type === 'LEAD_LOST') {
+    return 'border-red-500/20 bg-red-500/10 text-red-300';
   }
 
   if (type === 'LEAD_CREATED') {

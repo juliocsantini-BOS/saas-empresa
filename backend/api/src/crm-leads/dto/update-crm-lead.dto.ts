@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import {
-=======
-﻿import {
->>>>>>> f92b445 (feat(crm): add enterprise lead fields and backend support)
   IsDateString,
   IsEmail,
   IsInt,
@@ -22,12 +18,40 @@ export class UpdateCrmLeadDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  whatsapp?: string;
+
+  @IsOptional()
   @IsEmail()
   email?: string;
 
   @IsOptional()
   @IsString()
   companyName?: string;
+
+  @IsOptional()
+  @IsString()
+  jobTitle?: string | null;
+
+  @IsOptional()
+  @IsString()
+  website?: string | null;
+
+  @IsOptional()
+  @IsString()
+  city?: string | null;
+
+  @IsOptional()
+  @IsString()
+  state?: string | null;
+
+  @IsOptional()
+  @IsString()
+  industry?: string | null;
+
+  @IsOptional()
+  @IsString()
+  companySize?: string | null;
 
   @IsOptional()
   @IsString()
@@ -69,7 +93,19 @@ export class UpdateCrmLeadDto {
 
   @IsOptional()
   @IsString()
+  sourceDetail?: string | null;
+
+  @IsOptional()
+  @IsString()
   priority?: string | null;
+
+  @IsOptional()
+  @IsString()
+  competitor?: string | null;
+
+  @IsOptional()
+  @IsString()
+  wonReason?: string | null;
 
   @IsOptional()
   @IsString()
@@ -81,13 +117,13 @@ export class UpdateCrmLeadDto {
 
   @IsOptional()
   @IsDateString()
+  nextMeetingAt?: string | null;
+
+  @IsOptional()
+  @IsDateString()
   expectedCloseDate?: string | null;
 
   @IsOptional()
   @IsString()
   lostReason?: string | null;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> f92b445 (feat(crm): add enterprise lead fields and backend support)

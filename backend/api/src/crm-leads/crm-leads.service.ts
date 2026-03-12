@@ -1,21 +1,49 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { CrmLeadStatus, Prisma } from "@prisma/client";
+import { CrmLeadStatus, Prisma, Role } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCrmLeadDto } from "./dto/create-crm-lead.dto";
 import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
 import { CreateCrmLeadTaskDto } from "./dto/create-crm-lead-task.dto";
 import { CreateCrmLeadActivityDto } from "./dto/create-crm-lead-activity.dto";
+import { CreateCrmSavedViewDto } from "./dto/create-crm-saved-view.dto";
 import { AutomationEngine } from "../automation/automation.engine";
+import { PermissionsCacheService } from "../common/permissions/permissions-cache.service";
+
+type CrmActor = {
+  id: string;
+  role: Role;
+  companyId?: string | null;
+  branchId?: string | null;
+  departmentId?: string | null;
+};
+
+const CRM_READ_OWN = "crm.read.own";
+const CRM_READ_DEPARTMENT = "crm.read.department";
+const CRM_READ_BRANCH = "crm.read.branch";
+const CRM_READ_COMPANY = "crm.read.company";
+const CRM_VALUES_READ = "crm.values.read";
+const CRM_LOSS_REASONS_READ = "crm.loss_reasons.read";
+const CRM_LEADS_EDIT = "crm.leads.edit";
+const CRM_LEADS_STATUS = "crm.leads.status";
+const CRM_LEADS_CLOSE = "crm.leads.close";
+const CRM_ACTIVITIES_CREATE = "crm.activities.create";
+const CRM_TASKS_CREATE = "crm.tasks.create";
+const CRM_TASKS_UPDATE = "crm.tasks.update";
+const CRM_BULK_UPDATE = "crm.bulk.update";
+const CRM_SAVED_VIEWS_CREATE = "crm.saved_views.create";
+const CRM_SAVED_VIEWS_DELETE = "crm.saved_views.delete";
 
 @Injectable()
 export class CrmLeadsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly automationEngine: AutomationEngine,
+    private readonly permsCache: PermissionsCacheService,
   ) {}
 
   private ensureCompanyId(companyId: string) {
@@ -24,6 +52,110 @@ export class CrmLeadsService {
       throw new BadRequestException("Token sem companyId.");
     }
     return cid;
+  }
+
+  private async getPermissions(actor: CrmActor) {
+    if (actor.role === Role.ADMIN_MASTER) {
+      return new Set<string>([
+        CRM_READ_OWN,
+        CRM_READ_DEPARTMENT,
+        CRM_READ_BRANCH,
+        CRM_READ_COMPANY,
+        CRM_VALUES_READ,
+        CRM_LOSS_REASONS_READ,
+        CRM_LEADS_EDIT,
+        CRM_LEADS_STATUS,
+        CRM_LEADS_CLOSE,
+        CRM_ACTIVITIES_CREATE,
+        CRM_TASKS_CREATE,
+        CRM_TASKS_UPDATE,
+        CRM_BULK_UPDATE,
+        CRM_SAVED_VIEWS_CREATE,
+        CRM_SAVED_VIEWS_DELETE,
+      ]);
+    }
+
+    const companyId = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+      return this.permsCache.getEffectivePermissions({
+      userId: actor.id,
+      role: actor.role,
+      companyId,
+    });
+  }
+
+  private ensurePermission(perms: Set<string>, key: string, message: string) {
+    if (!perms.has(key)) {
+      throw new ForbiddenException(message);
+    }
+  }
+
+  private buildLeadScopeWhere(actor: CrmActor, perms: Set<string>): Prisma.CrmLeadWhereInput {
+    const companyId = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const userId = String(actor.id ?? "").trim();
+    const branchId = String(actor.branchId ?? "").trim();
+    const departmentId = String(actor.departmentId ?? "").trim();
+
+    if (perms.has(CRM_READ_COMPANY)) {
+      return { companyId };
+    }
+
+    if (perms.has(CRM_READ_BRANCH) && branchId) {
+      return {
+        companyId,
+        OR: [{ ownerUserId: userId }, { branchId }],
+      };
+    }
+
+    if (perms.has(CRM_READ_DEPARTMENT) && departmentId) {
+      return {
+        companyId,
+        OR: [{ ownerUserId: userId }, { departmentId }],
+      };
+    }
+
+    if (perms.has(CRM_READ_OWN)) {
+      return {
+        companyId,
+        ownerUserId: userId,
+      };
+    }
+
+    throw new ForbiddenException("VocÃª nÃ£o tem acesso aos leads do CRM.");
+  }
+
+  private sanitizeLead<T extends { dealValue?: unknown; lostReason?: unknown }>(
+    lead: T,
+    perms: Set<string>,
+  ): T {
+    const nextLead = { ...lead };
+
+    if (!perms.has(CRM_VALUES_READ)) {
+      nextLead.dealValue = null;
+    }
+
+    if (!perms.has(CRM_LOSS_REASONS_READ)) {
+      nextLead.lostReason = null;
+    }
+
+    return nextLead;
+  }
+
+  private sanitizeActivity<T extends { type?: unknown; description?: unknown }>(
+    activity: T,
+    perms: Set<string>,
+  ): T {
+    if (
+      !perms.has(CRM_LOSS_REASONS_READ) &&
+      activity.type === "LEAD_LOST" &&
+      typeof activity.description === "string"
+    ) {
+      return {
+        ...activity,
+        description: activity.description.replace(/ · Motivo:.*$/u, ""),
+      };
+    }
+
+    return activity;
   }
 
   private normalizeStatus(status?: string | null): CrmLeadStatus | undefined {
@@ -99,6 +231,33 @@ export class CrmLeadsService {
     return trimmed || null;
   }
 
+  private normalizeSavedViewFilters(input: Record<string, unknown>): Prisma.JsonObject {
+    const asString = (value: unknown) => (typeof value === "string" ? value : "");
+
+    const filters: Prisma.JsonObject = {
+      searchTerm: asString(input.searchTerm),
+      statusFilter: asString(input.statusFilter) || "ALL",
+      temperatureFilter: asString(input.temperatureFilter) || "ALL",
+      priorityFilter: asString(input.priorityFilter) || "ALL",
+      sourceFilter: asString(input.sourceFilter) || "ALL",
+      ownerFilter: asString(input.ownerFilter) || "ALL",
+      departmentFilter: asString(input.departmentFilter) || "ALL",
+      openTasksOnly: asString(input.openTasksOnly) || "ALL",
+      stalledOnly: asString(input.stalledOnly) || "ALL",
+      overdueNextStepOnly: asString(input.overdueNextStepOnly) || "ALL",
+      probabilityMin: asString(input.probabilityMin),
+      probabilityMax: asString(input.probabilityMax),
+      dealValueMin: asString(input.dealValueMin),
+      dealValueMax: asString(input.dealValueMax),
+      createdAtFrom: asString(input.createdAtFrom),
+      createdAtTo: asString(input.createdAtTo),
+      expectedCloseDateFrom: asString(input.expectedCloseDateFrom),
+      expectedCloseDateTo: asString(input.expectedCloseDateTo),
+    };
+
+    return filters;
+  }
+
   private leadInclude() {
     return {
       ownerUser: {
@@ -120,6 +279,14 @@ export class CrmLeadsService {
           name: true,
         },
       },
+      tasks: {
+        where: {
+          completedAt: null,
+        },
+        select: {
+          id: true,
+        },
+      },
     } as const;
   }
 
@@ -135,9 +302,14 @@ export class CrmLeadsService {
     } as const;
   }
 
-  private async ensureLeadExists(id: string, companyId: string) {
+  private async ensureLeadExists(id: string, actor: CrmActor, perms?: Set<string>) {
+    const effectivePerms = perms ?? (await this.getPermissions(actor));
+    const scopedWhere = this.buildLeadScopeWhere(actor, effectivePerms);
+
     const lead = await this.prisma.crmLead.findFirst({
-      where: { id, companyId },
+      where: {
+        AND: [scopedWhere, { id }],
+      },
       select: {
         id: true,
         name: true,
@@ -246,11 +418,12 @@ export class CrmLeadsService {
   }
 
   async create(input: {
-    companyId: string;
-    currentUserId: string;
+    actor: CrmActor;
     body: CreateCrmLeadDto;
   }) {
-    const companyId = this.ensureCompanyId(input.companyId);
+    const companyId = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+    const perms = await this.getPermissions(input.actor);
+    this.ensurePermission(perms, CRM_LEADS_EDIT, "VocÃª nÃ£o pode criar ou editar leads do CRM.");
     const body = input.body;
 
     const name = String(body?.name ?? "").trim();
@@ -260,7 +433,7 @@ export class CrmLeadsService {
 
     const ownerUserId = body?.ownerUserId
       ? String(body.ownerUserId).trim()
-      : input.currentUserId;
+      : input.actor.id;
 
     const branchId = body?.branchId ? String(body.branchId).trim() : null;
     const departmentId = body?.departmentId
@@ -294,8 +467,15 @@ export class CrmLeadsService {
       data: {
         name,
         phone: body?.phone?.trim() || null,
+        whatsapp: this.normalizeOptionalString(body?.whatsapp) ?? null,
         email: body?.email?.trim().toLowerCase() || null,
         companyName: body?.companyName?.trim() || null,
+        jobTitle: this.normalizeOptionalString(body?.jobTitle) ?? null,
+        website: this.normalizeOptionalString(body?.website) ?? null,
+        city: this.normalizeOptionalString(body?.city) ?? null,
+        state: this.normalizeOptionalString(body?.state) ?? null,
+        industry: this.normalizeOptionalString(body?.industry) ?? null,
+        companySize: this.normalizeOptionalString(body?.companySize) ?? null,
         notes: body?.notes?.trim() || null,
         status,
         companyId,
@@ -306,9 +486,13 @@ export class CrmLeadsService {
         currency: this.normalizeOptionalString(body?.currency) ?? "BRL",
         probability,
         source: this.normalizeOptionalString(body?.source) ?? null,
+        sourceDetail: this.normalizeOptionalString(body?.sourceDetail) ?? null,
         priority: this.normalizeOptionalString(body?.priority) ?? null,
+        competitor: this.normalizeOptionalString(body?.competitor) ?? null,
+        wonReason: this.normalizeOptionalString(body?.wonReason) ?? null,
         nextStep: this.normalizeOptionalString(body?.nextStep) ?? null,
         nextStepDueAt: this.normalizeDate(body?.nextStepDueAt) ?? null,
+        nextMeetingAt: this.normalizeDate(body?.nextMeetingAt) ?? null,
         expectedCloseDate: this.normalizeDate(body?.expectedCloseDate) ?? null,
         lostReason: this.normalizeOptionalString(body?.lostReason) ?? null,
         statusChangedAt: new Date(),
@@ -321,7 +505,7 @@ export class CrmLeadsService {
     await this.createActivity({
       companyId,
       leadId: lead.id,
-      userId: input.currentUserId,
+      userId: input.actor.id,
       type: "LEAD_CREATED",
       description: `Lead criado: ${lead.name}`,
     });
@@ -340,32 +524,89 @@ export class CrmLeadsService {
       },
     });
 
-    return lead;
+    return this.sanitizeLead(lead, perms);
   }
 
-  async findAll(companyId: string) {
-    const cid = this.ensureCompanyId(companyId);
-
-    return this.prisma.crmLead.findMany({
-      where: { companyId: cid },
+  async findAll(actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    const leads = await this.prisma.crmLead.findMany({
+      where: this.buildLeadScopeWhere(actor, perms),
       orderBy: { createdAt: "desc" },
       include: this.leadInclude(),
     });
+
+    return leads.map((lead) => this.sanitizeLead(lead, perms));
   }
 
-  async findActivities(id: string, companyId: string) {
-    const cid = this.ensureCompanyId(companyId);
+  async findSavedViews(actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    this.buildLeadScopeWhere(actor, perms);
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
 
-    const exists = await this.prisma.crmLead.findFirst({
-      where: { id, companyId: cid },
+    return this.prisma.crmSavedView.findMany({
+      where: {
+        companyId: cid,
+        userId: actor.id,
+      },
+      orderBy: [{ createdAt: "desc" }],
+    });
+  }
+
+  async createSavedView(input: {
+    actor: CrmActor;
+    body: CreateCrmSavedViewDto;
+  }) {
+    const perms = await this.getPermissions(input.actor);
+    this.ensurePermission(perms, CRM_SAVED_VIEWS_CREATE, "VocÃª nÃ£o pode salvar visualizaÃ§Ãµes do CRM.");
+    const cid = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+    const name = String(input.body?.name ?? "").trim();
+
+    if (!name) {
+      throw new BadRequestException("name é obrigatório");
+    }
+
+    return this.prisma.crmSavedView.create({
+      data: {
+        companyId: cid,
+        userId: input.actor.id,
+        name,
+        filtersJson: this.normalizeSavedViewFilters(input.body.filters ?? {}),
+      },
+    });
+  }
+
+  async removeSavedView(viewId: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    this.ensurePermission(perms, CRM_SAVED_VIEWS_DELETE, "VocÃª nÃ£o pode excluir visualizaÃ§Ãµes do CRM.");
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+
+    const existing = await this.prisma.crmSavedView.findFirst({
+      where: {
+        id: viewId,
+        companyId: cid,
+        userId: actor.id,
+      },
       select: { id: true },
     });
 
-    if (!exists) {
-      throw new NotFoundException("Lead não encontrado");
+    if (!existing) {
+      throw new NotFoundException("Visualização salva não encontrada");
     }
 
-    return this.prisma.crmLeadActivity.findMany({
+    await this.prisma.crmSavedView.delete({
+      where: { id: existing.id },
+    });
+
+    return { ok: true };
+  }
+
+  async findActivities(id: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+
+    await this.ensureLeadExists(id, actor, perms);
+
+    const activities = await this.prisma.crmLeadActivity.findMany({
       where: {
         leadId: id,
         companyId: cid,
@@ -381,16 +622,19 @@ export class CrmLeadsService {
         },
       },
     });
+
+    return activities.map((activity) => this.sanitizeActivity(activity, perms));
   }
 
   async createManualActivity(input: {
     leadId: string;
-    companyId: string;
-    currentUserId: string;
+    actor: CrmActor;
     body: CreateCrmLeadActivityDto;
   }) {
-    const cid = this.ensureCompanyId(input.companyId);
-    await this.ensureLeadExists(input.leadId, cid);
+    const perms = await this.getPermissions(input.actor);
+    this.ensurePermission(perms, CRM_ACTIVITIES_CREATE, "Você não pode registrar atividades no CRM.");
+    const cid = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+    await this.ensureLeadExists(input.leadId, input.actor, perms);
 
     const allowed = ["NOTE", "CALL", "MESSAGE", "MEETING"];
     const type = String(input.body?.type ?? "").trim().toUpperCase();
@@ -407,16 +651,17 @@ export class CrmLeadsService {
     return this.createActivity({
       companyId: cid,
       leadId: input.leadId,
-      userId: input.currentUserId,
+      userId: input.actor.id,
       type,
       description,
     });
   }
 
-  async findTasks(leadId: string, companyId: string) {
-    const cid = this.ensureCompanyId(companyId);
+  async findTasks(leadId: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
 
-    await this.ensureLeadExists(leadId, cid);
+    await this.ensureLeadExists(leadId, actor, perms);
 
     return this.prisma.crmLeadTask.findMany({
       where: {
@@ -434,12 +679,13 @@ export class CrmLeadsService {
 
   async createTask(input: {
     leadId: string;
-    companyId: string;
-    currentUserId: string;
+    actor: CrmActor;
     body: CreateCrmLeadTaskDto;
   }) {
-    const cid = this.ensureCompanyId(input.companyId);
-    const lead = await this.ensureLeadExists(input.leadId, cid);
+    const perms = await this.getPermissions(input.actor);
+    this.ensurePermission(perms, CRM_TASKS_CREATE, "Você não pode criar tarefas no CRM.");
+    const cid = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+    const lead = await this.ensureLeadExists(input.leadId, input.actor, perms);
 
     const title = String(input.body?.title ?? "").trim();
     if (!title) {
@@ -478,7 +724,7 @@ export class CrmLeadsService {
     await this.createActivity({
       companyId: cid,
       leadId: input.leadId,
-      userId: input.currentUserId,
+      userId: input.actor.id,
       type: "TASK_CREATED",
       description: `Tarefa criada: ${title}${task.dueAt ? ` (prazo: ${task.dueAt.toISOString()})` : ""}`,
     });
@@ -502,8 +748,10 @@ export class CrmLeadsService {
     return task;
   }
 
-  async completeTask(taskId: string, companyId: string, currentUserId: string) {
-    const cid = this.ensureCompanyId(companyId);
+  async completeTask(taskId: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    this.ensurePermission(perms, CRM_TASKS_UPDATE, "Voce nao pode concluir tarefas no CRM.");
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
 
     const task = await this.prisma.crmLeadTask.findFirst({
       where: {
@@ -533,6 +781,8 @@ export class CrmLeadsService {
       throw new NotFoundException("Tarefa não encontrada");
     }
 
+    await this.ensureLeadExists(task.leadId, actor, perms);
+
     if (task.completedAt) {
       return this.prisma.crmLeadTask.findUnique({
         where: { id: task.id },
@@ -551,7 +801,7 @@ export class CrmLeadsService {
     await this.createActivity({
       companyId: cid,
       leadId: task.leadId,
-      userId: currentUserId,
+      userId: actor.id,
       type: "TASK_DONE",
       description: `Tarefa concluída: ${task.title}`,
     });
@@ -576,16 +826,78 @@ export class CrmLeadsService {
     return updatedTask;
   }
 
+  async reopenTask(taskId: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    this.ensurePermission(perms, CRM_TASKS_UPDATE, "Voce nao pode reabrir tarefas no CRM.");
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+
+    const task = await this.prisma.crmLeadTask.findFirst({
+      where: {
+        id: taskId,
+        companyId: cid,
+      },
+      select: {
+        id: true,
+        leadId: true,
+        title: true,
+        completedAt: true,
+        dueAt: true,
+        lead: {
+          select: {
+            id: true,
+            name: true,
+            ownerUserId: true,
+            branchId: true,
+            departmentId: true,
+          },
+        },
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException("Tarefa não encontrada");
+    }
+
+    await this.ensureLeadExists(task.leadId, actor, perms);
+
+    if (!task.completedAt) {
+      return this.prisma.crmLeadTask.findUnique({
+        where: { id: task.id },
+        include: this.taskInclude(),
+      });
+    }
+
+    const updatedTask = await this.prisma.crmLeadTask.update({
+      where: { id: task.id },
+      data: {
+        completedAt: null,
+      },
+      include: this.taskInclude(),
+    });
+
+    await this.createActivity({
+      companyId: cid,
+      leadId: task.leadId,
+      userId: actor.id,
+      type: "TASK_REOPENED",
+      description: `Tarefa reaberta: ${task.title}`,
+    });
+
+    return updatedTask;
+  }
+
   async update(
     id: string,
-    companyId: string,
-    currentUserId: string,
+    actor: CrmActor,
     body: UpdateCrmLeadDto,
   ) {
-    const cid = this.ensureCompanyId(companyId);
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const perms = await this.getPermissions(actor);
 
     const exists = await this.prisma.crmLead.findFirst({
-      where: { id, companyId: cid },
+      where: {
+        AND: [this.buildLeadScopeWhere(actor, perms), { id, companyId: cid }],
+      },
     });
 
     if (!exists) {
@@ -620,6 +932,57 @@ export class CrmLeadsService {
       body.departmentId !== undefined
         ? this.normalizeOptionalString(body.departmentId)
         : exists.departmentId;
+
+    const requestedStatus =
+      body.status !== undefined ? this.normalizeStatus(body.status) : undefined;
+    const statusIsChanging =
+      requestedStatus !== undefined && requestedStatus !== exists.status;
+    const wantsClose =
+      statusIsChanging &&
+      (requestedStatus === CrmLeadStatus.WON || requestedStatus === CrmLeadStatus.LOST);
+    const wantsStatusChange = statusIsChanging && !wantsClose;
+    const wantsEdit = [
+      "name",
+      "phone",
+      "whatsapp",
+      "email",
+      "companyName",
+      "jobTitle",
+      "website",
+      "city",
+      "state",
+      "industry",
+      "companySize",
+      "notes",
+      "dealValue",
+      "currency",
+      "probability",
+      "source",
+      "sourceDetail",
+      "priority",
+      "competitor",
+      "wonReason",
+      "nextStep",
+      "nextStepDueAt",
+      "nextMeetingAt",
+      "expectedCloseDate",
+      "lostReason",
+      "ownerUserId",
+      "branchId",
+      "departmentId",
+    ].some((key) => body[key as keyof UpdateCrmLeadDto] !== undefined);
+
+    if (wantsEdit) {
+      this.ensurePermission(perms, CRM_LEADS_EDIT, "VocÃª nÃ£o pode editar leads do CRM.");
+    }
+
+    if (wantsStatusChange) {
+      this.ensurePermission(perms, CRM_LEADS_STATUS, "VocÃª nÃ£o pode alterar o status do lead.");
+    }
+
+    if (wantsClose) {
+      this.ensurePermission(perms, CRM_LEADS_CLOSE, "VocÃª nÃ£o pode marcar leads como ganhos ou perdidos.");
+    }
 
     if (
       body.ownerUserId !== undefined ||
@@ -656,6 +1019,17 @@ export class CrmLeadsService {
       }
     }
 
+    if (body.whatsapp !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.whatsapp);
+      if (nextValue !== exists.whatsapp) {
+        data.whatsapp = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "WhatsApp atualizado",
+        });
+      }
+    }
+
     if (body.email !== undefined) {
       const nextValue = body.email ? String(body.email).trim().toLowerCase() : null;
       if (nextValue !== exists.email) {
@@ -676,6 +1050,72 @@ export class CrmLeadsService {
         activityDescriptions.push({
           type: "LEAD_UPDATED",
           description: "Empresa atualizada",
+        });
+      }
+    }
+
+    if (body.jobTitle !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.jobTitle);
+      if (nextValue !== exists.jobTitle) {
+        data.jobTitle = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Cargo do contato atualizado",
+        });
+      }
+    }
+
+    if (body.website !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.website);
+      if (nextValue !== exists.website) {
+        data.website = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Website atualizado",
+        });
+      }
+    }
+
+    if (body.city !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.city);
+      if (nextValue !== exists.city) {
+        data.city = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Cidade atualizada",
+        });
+      }
+    }
+
+    if (body.state !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.state);
+      if (nextValue !== exists.state) {
+        data.state = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Estado atualizado",
+        });
+      }
+    }
+
+    if (body.industry !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.industry);
+      if (nextValue !== exists.industry) {
+        data.industry = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Segmento atualizado",
+        });
+      }
+    }
+
+    if (body.companySize !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.companySize);
+      if (nextValue !== exists.companySize) {
+        data.companySize = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Porte da empresa atualizado",
         });
       }
     }
@@ -738,6 +1178,17 @@ export class CrmLeadsService {
       }
     }
 
+    if (body.sourceDetail !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.sourceDetail);
+      if (nextValue !== exists.sourceDetail) {
+        data.sourceDetail = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Detalhe da origem atualizado",
+        });
+      }
+    }
+
     if (body.priority !== undefined) {
       const nextValue = this.normalizeOptionalString(body.priority);
       if (nextValue !== exists.priority) {
@@ -745,6 +1196,28 @@ export class CrmLeadsService {
         activityDescriptions.push({
           type: "LEAD_UPDATED",
           description: "Prioridade atualizada",
+        });
+      }
+    }
+
+    if (body.competitor !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.competitor);
+      if (nextValue !== exists.competitor) {
+        data.competitor = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Concorrente atualizado",
+        });
+      }
+    }
+
+    if (body.wonReason !== undefined) {
+      const nextValue = this.normalizeOptionalString(body.wonReason);
+      if (nextValue !== exists.wonReason) {
+        data.wonReason = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Motivo de ganho atualizado",
         });
       }
     }
@@ -770,6 +1243,20 @@ export class CrmLeadsService {
         activityDescriptions.push({
           type: "LEAD_UPDATED",
           description: "Prazo do próximo passo atualizado",
+        });
+      }
+    }
+
+    if (body.nextMeetingAt !== undefined) {
+      const nextValue = this.normalizeDate(body.nextMeetingAt);
+      const currentValue = exists.nextMeetingAt?.toISOString() ?? null;
+      const nextComparable = nextValue?.toISOString() ?? null;
+
+      if (nextComparable !== currentValue) {
+        data.nextMeetingAt = nextValue;
+        activityDescriptions.push({
+          type: "LEAD_UPDATED",
+          description: "Próxima reunião atualizada",
         });
       }
     }
@@ -800,7 +1287,7 @@ export class CrmLeadsService {
     }
 
     if (body.status !== undefined) {
-      const nextStatus = this.normalizeStatus(body.status);
+      const nextStatus = requestedStatus;
       if (nextStatus && nextStatus !== exists.status) {
         data.status = nextStatus;
         data.statusChangedAt = new Date();
@@ -825,6 +1312,23 @@ export class CrmLeadsService {
           type: "LEAD_STATUS_CHANGED",
           description: `Status alterado de ${exists.status} para ${nextStatus}`,
         });
+
+        if (nextStatus === CrmLeadStatus.WON) {
+          activityDescriptions.push({
+            type: "LEAD_WON",
+            description: `Lead marcado como ganho: ${exists.name}`,
+          });
+        }
+
+        if (nextStatus === CrmLeadStatus.LOST) {
+          const lostReason = this.normalizeOptionalString(body.lostReason);
+          activityDescriptions.push({
+            type: "LEAD_LOST",
+            description: lostReason
+              ? `Lead marcado como perdido: ${exists.name} · Motivo: ${lostReason}`
+              : `Lead marcado como perdido: ${exists.name}`,
+          });
+        }
 
         statusChangedPayload = {
           leadId: id,
@@ -883,7 +1387,7 @@ export class CrmLeadsService {
           this.createActivity({
             companyId: cid,
             leadId: id,
-            userId: currentUserId,
+            userId: actor.id,
             type: item.type,
             description: item.description,
           }),
@@ -900,14 +1404,16 @@ export class CrmLeadsService {
       });
     }
 
-    return updatedLead;
+    return this.sanitizeLead(updatedLead, perms);
   }
 
-  async remove(id: string, companyId: string) {
-    const cid = this.ensureCompanyId(companyId);
-
+  async remove(id: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    this.ensurePermission(perms, CRM_LEADS_EDIT, "Voce nao pode remover leads do CRM.");
     const exists = await this.prisma.crmLead.findFirst({
-      where: { id, companyId: cid },
+      where: {
+        AND: [this.buildLeadScopeWhere(actor, perms), { id }],
+      },
     });
 
     if (!exists) {
@@ -921,11 +1427,10 @@ export class CrmLeadsService {
     return { ok: true };
   }
 
-  async pipeline(companyId: string) {
-    const cid = this.ensureCompanyId(companyId);
-
+  async pipeline(actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
     const leads = await this.prisma.crmLead.findMany({
-      where: { companyId: cid },
+      where: this.buildLeadScopeWhere(actor, perms),
       orderBy: { createdAt: "desc" },
       include: this.leadInclude(),
     });
@@ -940,9 +1445,65 @@ export class CrmLeadsService {
     };
 
     for (const lead of leads) {
-      pipeline[lead.status].push(lead);
+      pipeline[lead.status].push(this.sanitizeLead(lead, perms));
     }
 
     return pipeline;
+  }
+
+  async bulkUpdate(
+    actor: CrmActor,
+    body: {
+      leadIds: string[];
+      status?: string;
+      ownerUserId?: string;
+      priority?: string;
+    },
+  ) {
+    const perms = await this.getPermissions(actor);
+    this.ensurePermission(perms, CRM_BULK_UPDATE, "Voce nao pode executar acoes em lote no CRM.");
+
+    const leadIds = Array.from(
+      new Set(
+        (Array.isArray(body.leadIds) ? body.leadIds : [])
+          .map((leadId) => String(leadId ?? "").trim())
+          .filter(Boolean),
+      ),
+    );
+
+    if (leadIds.length === 0) {
+      throw new BadRequestException("leadIds e obrigatorio.");
+    }
+
+    const payload: UpdateCrmLeadDto = {};
+
+    if (body.status !== undefined) payload.status = body.status;
+    if (body.ownerUserId !== undefined) payload.ownerUserId = body.ownerUserId;
+    if (body.priority !== undefined) payload.priority = body.priority;
+
+    if (
+      payload.status === undefined &&
+      payload.ownerUserId === undefined &&
+      payload.priority === undefined
+    ) {
+      throw new BadRequestException("Nenhum campo de atualizacao foi informado.");
+    }
+
+    const scopedLeads = await this.prisma.crmLead.findMany({
+      where: {
+        AND: [this.buildLeadScopeWhere(actor, perms), { id: { in: leadIds } }],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (scopedLeads.length === 0) {
+      throw new NotFoundException("Nenhum lead encontrado para atualizacao em lote.");
+    }
+
+    return Promise.all(
+      scopedLeads.map((lead) => this.update(lead.id, actor, payload)),
+    );
   }
 }

@@ -74,6 +74,7 @@ model Company {
   crmLeads             CrmLead[]
   crmLeadActivities    CrmLeadActivity[]
   crmLeadTasks         CrmLeadTask[]
+  crmSavedViews        CrmSavedView[]
   automationRules      AutomationRule[]
   automationActions    AutomationAction[]
   automationExecutions AutomationExecution[]
@@ -150,6 +151,7 @@ model User {
   ownedCrmLeads        CrmLead[]         @relation("CrmLeadOwner")
   crmLeadActivities    CrmLeadActivity[]
   assignedCrmLeadTasks CrmLeadTask[]     @relation("CrmLeadTaskAssignedUser")
+  crmSavedViews        CrmSavedView[]
 
   @@unique([companyId, email])
   @@index([companyId])
@@ -272,20 +274,31 @@ model CrmLead {
 
   name        String
   phone       String?
+  whatsapp    String?
   email       String?
   companyName String?
+  jobTitle    String?
+  website     String?
+  city        String?
+  state       String?
+  industry    String?
+  companySize String?
   notes       String?
   status      CrmLeadStatus @default(NEW)
 
-  dealValue         Decimal? @db.Decimal(14, 2)
-  currency          String   @default("BRL")
-  probability       Int      @default(10)
+  dealValue         Decimal?  @db.Decimal(14, 2)
+  currency          String    @default("BRL")
+  probability       Int       @default(10)
   source            String?
+  sourceDetail      String?
   priority          String?
+  competitor        String?
+  wonReason         String?
   nextStep          String?
   nextStepDueAt     DateTime?
+  nextMeetingAt     DateTime?
   expectedCloseDate DateTime?
-  statusChangedAt   DateTime @default(now())
+  statusChangedAt   DateTime  @default(now())
   lastActivityAt    DateTime?
   lastContactAt     DateTime?
   wonAt             DateTime?
@@ -369,6 +382,24 @@ model CrmLeadTask {
   @@index([dueAt])
   @@index([completedAt])
   @@index([companyId, leadId, createdAt])
+}
+
+model CrmSavedView {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  filtersJson Json
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([companyId, userId, createdAt])
 }
 
 model AutomationRule {
