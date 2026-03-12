@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import {
+=======
+﻿import {
+>>>>>>> f92b445 (feat(crm): add enterprise lead fields and backend support)
   IsDateString,
   IsEmail,
   IsInt,
@@ -81,4 +85,8 @@ export class CreateCrmLeadDto {
   @IsOptional()
   @IsString()
   lostReason?: string;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f92b445 (feat(crm): add enterprise lead fields and backend support)
