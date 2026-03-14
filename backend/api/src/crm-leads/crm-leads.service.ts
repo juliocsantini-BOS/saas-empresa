@@ -590,19 +590,18 @@ export class CrmLeadsService {
 
   async findAll(
     actor: CrmActor,
-    query: ListCrmLeadsQueryDto = new ListCrmLeadsQueryDto(),
+    query: ListCrmLeadsQueryDto,
   ) {
     const perms = await this.getPermissions(actor);
-    const effectiveQuery = query ?? new ListCrmLeadsQueryDto();
-    const where = this.buildLeadListWhere(actor, perms, effectiveQuery);
-    const page = effectiveQuery.page ?? 1;
-    const pageSize = effectiveQuery.pageSize ?? 20;
+    const where = this.buildLeadListWhere(actor, perms, query);
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
     const skip = (page - 1) * pageSize;
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.crmLead.findMany({
         where,
-        orderBy: this.buildLeadListOrderBy(effectiveQuery),
+        orderBy: this.buildLeadListOrderBy(query),
         skip,
         take: pageSize,
         include: this.leadInclude(),
