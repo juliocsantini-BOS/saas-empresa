@@ -1,4 +1,4 @@
-﻿import {
+import {
   Body,
   Controller,
   Delete,
@@ -6,6 +6,7 @@
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import { Role } from "@prisma/client";
@@ -14,14 +15,23 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { RolesGuard } from "../common/guards/roles.guard";
 import { TenantGuard } from "../common/guards/tenant.guard";
 import { CrmLeadsService } from "./crm-leads.service";
-import { CreateCrmLeadDto } from "./dto/create-crm-lead.dto";
-import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
-import { CreateCrmLeadTaskDto } from "./dto/create-crm-lead-task.dto";
-import { CreateCrmLeadActivityDto } from "./dto/create-crm-lead-activity.dto";
-import { CreateCrmSavedViewDto } from "./dto/create-crm-saved-view.dto";
 import { BulkUpdateCrmLeadsDto } from "./dto/bulk-update-crm-leads.dto";
+import { CreateCrmLeadActivityDto } from "./dto/create-crm-lead-activity.dto";
+import { CreateCrmLeadDto } from "./dto/create-crm-lead.dto";
+import { CreateCrmLeadTaskDto } from "./dto/create-crm-lead-task.dto";
+import { CreateCrmSavedViewDto } from "./dto/create-crm-saved-view.dto";
+import { ListCrmLeadsQueryDto } from "./dto/list-crm-leads.query.dto";
+import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
 
 type CrmCurrentUser = {
+  id: string;
+  role: Role;
+  companyId?: string | null;
+  branchId?: string | null;
+  departmentId?: string | null;
+};
+
+type CrmActor = {
   id: string;
   role: Role;
   companyId?: string | null;
@@ -34,14 +44,26 @@ type CrmCurrentUser = {
 export class CrmLeadsController {
   constructor(private readonly crmLeads: CrmLeadsService) {}
 
+  private toActor(user: CrmCurrentUser): CrmActor {
+    return {
+      id: user.id,
+      role: user.role,
+      companyId: user.companyId ?? null,
+      branchId: user.branchId ?? null,
+      departmentId: user.departmentId ?? null,
+    };
+  }
+
   @Post()
   @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES, Role.SUPPORT)
   async create(
     @Body() body: CreateCrmLeadDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
+    const actor = this.toActor(user);
+
     return this.crmLeads.create({
-      actor: user,
+      actor,
       body,
     });
   }
@@ -49,9 +71,11 @@ export class CrmLeadsController {
   @Get()
   @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES, Role.SUPPORT, Role.USER)
   async findAll(
+    @Query() query: ListCrmLeadsQueryDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.findAll(user);
+    const actor = this.toActor(user);
+    return this.crmLeads.findAll(actor, query);
   }
 
   @Get("pipeline")
@@ -59,7 +83,8 @@ export class CrmLeadsController {
   async pipeline(
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.pipeline(user);
+    const actor = this.toActor(user);
+    return this.crmLeads.pipeline(actor);
   }
 
   @Patch("bulk")
@@ -68,7 +93,51 @@ export class CrmLeadsController {
     @Body() body: BulkUpdateCrmLeadsDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.bulkUpdate(user, body);
+    const actor = this.toActor(user);
+    return this.crmLeads.bulkUpdate(actor, body);
+  }
+
+  @Get("saved-views")
+  @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES, Role.SUPPORT, Role.USER)
+  async findSavedViews(
+    @CurrentUser() user: CrmCurrentUser,
+  ) {
+    const actor = this.toActor(user);
+    return this.crmLeads.findSavedViews(actor);
+  }
+
+  @Post("saved-views")
+  @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES, Role.SUPPORT, Role.USER)
+  async createSavedView(
+    @Body() body: CreateCrmSavedViewDto,
+    @CurrentUser() user: CrmCurrentUser,
+  ) {
+    const actor = this.toActor(user);
+
+    return this.crmLeads.createSavedView({
+      actor,
+      body,
+    });
+  }
+
+  @Delete("saved-views/:viewId")
+  @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES, Role.SUPPORT, Role.USER)
+  async removeSavedView(
+    @Param("viewId") viewId: string,
+    @CurrentUser() user: CrmCurrentUser,
+  ) {
+    const actor = this.toActor(user);
+    return this.crmLeads.removeSavedView(viewId, actor);
+  }
+
+  @Get(":id")
+  @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES, Role.SUPPORT, Role.USER)
+  async findOne(
+    @Param("id") id: string,
+    @CurrentUser() user: CrmCurrentUser,
+  ) {
+    const actor = this.toActor(user);
+    return this.crmLeads.findOneDetailed(id, actor);
   }
 
   @Get(":id/activities")
@@ -77,7 +146,8 @@ export class CrmLeadsController {
     @Param("id") id: string,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.findActivities(id, user);
+    const actor = this.toActor(user);
+    return this.crmLeads.findActivities(id, actor);
   }
 
   @Post(":id/activities")
@@ -87,9 +157,11 @@ export class CrmLeadsController {
     @Body() body: CreateCrmLeadActivityDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
+    const actor = this.toActor(user);
+
     return this.crmLeads.createManualActivity({
       leadId: id,
-      actor: user,
+      actor,
       body,
     });
   }
@@ -100,7 +172,8 @@ export class CrmLeadsController {
     @Param("id") id: string,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.findTasks(id, user);
+    const actor = this.toActor(user);
+    return this.crmLeads.findTasks(id, actor);
   }
 
   @Post(":id/tasks")
@@ -110,9 +183,11 @@ export class CrmLeadsController {
     @Body() body: CreateCrmLeadTaskDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
+    const actor = this.toActor(user);
+
     return this.crmLeads.createTask({
       leadId: id,
-      actor: user,
+      actor,
       body,
     });
   }
@@ -123,7 +198,8 @@ export class CrmLeadsController {
     @Param("taskId") taskId: string,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.completeTask(taskId, user);
+    const actor = this.toActor(user);
+    return this.crmLeads.completeTask(taskId, actor);
   }
 
   @Patch("tasks/:taskId/reopen")
@@ -132,7 +208,8 @@ export class CrmLeadsController {
     @Param("taskId") taskId: string,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.reopenTask(taskId, user);
+    const actor = this.toActor(user);
+    return this.crmLeads.reopenTask(taskId, actor);
   }
 
   @Patch(":id")
@@ -142,7 +219,8 @@ export class CrmLeadsController {
     @Body() body: UpdateCrmLeadDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.update(id, user, body);
+    const actor = this.toActor(user);
+    return this.crmLeads.update(id, actor, body);
   }
 
   @Delete(":id")
@@ -151,6 +229,7 @@ export class CrmLeadsController {
     @Param("id") id: string,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    return this.crmLeads.remove(id, user);
+    const actor = this.toActor(user);
+    return this.crmLeads.remove(id, actor);
   }
 }
