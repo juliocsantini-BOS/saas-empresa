@@ -11,6 +11,7 @@ import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
 import { CreateCrmLeadTaskDto } from "./dto/create-crm-lead-task.dto";
 import { CreateCrmLeadActivityDto } from "./dto/create-crm-lead-activity.dto";
 import { CreateCrmSavedViewDto } from "./dto/create-crm-saved-view.dto";
+import { ListCrmLeadsQueryDto } from "./dto/list-crm-leads.query.dto";
 import { AutomationEngine } from "../automation/automation.engine";
 import { PermissionsCacheService } from "../common/permissions/permissions-cache.service";
 
@@ -258,6 +259,61 @@ export class CrmLeadsService {
     return filters;
   }
 
+  private buildLeadListWhere(
+    actor: CrmActor,
+    perms: Set<string>,
+    query: ListCrmLeadsQueryDto,
+  ): Prisma.CrmLeadWhereInput {
+    const scopedWhere = this.buildLeadScopeWhere(actor, perms);
+    const andFilters: Prisma.CrmLeadWhereInput[] = [scopedWhere];
+
+    if (query.q) {
+      andFilters.push({
+        OR: [
+          { name: { contains: query.q, mode: "insensitive" } },
+          { email: { contains: query.q, mode: "insensitive" } },
+          { phone: { contains: query.q, mode: "insensitive" } },
+          { companyName: { contains: query.q, mode: "insensitive" } },
+        ],
+      });
+    }
+
+    if (query.status) {
+      andFilters.push({ status: query.status });
+    }
+
+    if (query.ownerUserId) {
+      andFilters.push({ ownerUserId: query.ownerUserId });
+    }
+
+    if (query.branchId) {
+      andFilters.push({ branchId: query.branchId });
+    }
+
+    if (query.departmentId) {
+      andFilters.push({ departmentId: query.departmentId });
+    }
+
+    if (query.source) {
+      andFilters.push({ source: query.source });
+    }
+
+    if (query.priority) {
+      andFilters.push({ priority: query.priority });
+    }
+
+    return andFilters.length === 1 ? scopedWhere : { AND: andFilters };
+  }
+
+  private buildLeadListOrderBy(
+    query: ListCrmLeadsQueryDto,
+  ): Prisma.CrmLeadOrderByWithRelationInput[] {
+    const sortBy = query.sortBy ?? "updatedAt";
+    const sortOrder = query.sortOrder ?? "desc";
+
+    return [{ [sortBy]: sortOrder }, { createdAt: "desc" }];
+  }
+
   private leadInclude() {
     return {
       ownerUser: {
@@ -448,6 +504,11 @@ export class CrmLeadsService {
     });
 
     const status = this.normalizeStatus(body?.status) ?? CrmLeadStatus.NEW;
+    const lostReason = this.normalizeOptionalString(body?.lostReason);
+    if (status === CrmLeadStatus.LOST && !lostReason) {
+      throw new BadRequestException("lostReason é obrigatório quando status = LOST.");
+    }
+
     const dealValue = this.normalizeMoney(body?.dealValue);
     const probability =
       this.normalizeProbability(body?.probability) ??
@@ -494,7 +555,7 @@ export class CrmLeadsService {
         nextStepDueAt: this.normalizeDate(body?.nextStepDueAt) ?? null,
         nextMeetingAt: this.normalizeDate(body?.nextMeetingAt) ?? null,
         expectedCloseDate: this.normalizeDate(body?.expectedCloseDate) ?? null,
-        lostReason: this.normalizeOptionalString(body?.lostReason) ?? null,
+        lostReason: lostReason ?? null,
         statusChangedAt: new Date(),
         ...(status === CrmLeadStatus.WON ? { wonAt: new Date(), lostAt: null } : {}),
         ...(status === CrmLeadStatus.LOST ? { lostAt: new Date(), wonAt: null } : {}),
@@ -527,15 +588,95 @@ export class CrmLeadsService {
     return this.sanitizeLead(lead, perms);
   }
 
-  async findAll(actor: CrmActor) {
+  async findAll(
+    actor: CrmActor,
+    query: ListCrmLeadsQueryDto = new ListCrmLeadsQueryDto(),
+  ) {
     const perms = await this.getPermissions(actor);
-    const leads = await this.prisma.crmLead.findMany({
-      where: this.buildLeadScopeWhere(actor, perms),
-      orderBy: { createdAt: "desc" },
-      include: this.leadInclude(),
+    const where = this.buildLeadListWhere(actor, perms, query);
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
+    const skip = (page - 1) * pageSize;
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.crmLead.findMany({
+        where,
+        orderBy: this.buildLeadListOrderBy(query),
+        skip,
+        take: pageSize,
+        include: this.leadInclude(),
+      }),
+      this.prisma.crmLead.count({ where }),
+    ]);
+
+    return {
+      items: items.map((lead) => this.sanitizeLead(lead, perms)),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
+  async findOneDetailed(id: string, companyId: string) {
+    const cid = this.ensureCompanyId(companyId);
+
+    const lead = await this.prisma.crmLead.findFirst({
+      where: {
+        id,
+        companyId: cid,
+      },
+      include: {
+        ownerUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        branch: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        activities: {
+          orderBy: [{ createdAt: "desc" }],
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        tasks: {
+          orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }],
+          include: this.taskInclude(),
+        },
+      },
     });
 
-    return leads.map((lead) => this.sanitizeLead(lead, perms));
+    if (!lead) {
+      throw new NotFoundException("Lead não encontrado");
+    }
+
+    return {
+      ...lead,
+      summary: {
+        activitiesCount: lead.activities.length,
+        openTasksCount: lead.tasks.filter((task) => !task.completedAt).length,
+        completedTasksCount: lead.tasks.filter((task) => !!task.completedAt).length,
+      },
+    };
   }
 
   async findSavedViews(actor: CrmActor) {
@@ -999,6 +1140,9 @@ export class CrmLeadsService {
 
     if (body.name !== undefined) {
       const nextValue = body.name ? String(body.name).trim() : "";
+      if (!nextValue) {
+        throw new BadRequestException("name não pode ser vazio.");
+      }
       if (nextValue !== exists.name) {
         data.name = nextValue;
         activityDescriptions.push({
@@ -1284,6 +1428,16 @@ export class CrmLeadsService {
           description: "Motivo de perda atualizado",
         });
       }
+    }
+
+    const effectiveStatus = requestedStatus ?? exists.status;
+    const effectiveLostReason =
+      body.lostReason !== undefined
+        ? this.normalizeOptionalString(body.lostReason)
+        : exists.lostReason;
+
+    if (effectiveStatus === CrmLeadStatus.LOST && !effectiveLostReason) {
+      throw new BadRequestException("lostReason é obrigatório quando status = LOST.");
     }
 
     if (body.status !== undefined) {
