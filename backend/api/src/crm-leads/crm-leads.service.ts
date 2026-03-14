@@ -593,15 +593,16 @@ export class CrmLeadsService {
     query: ListCrmLeadsQueryDto = new ListCrmLeadsQueryDto(),
   ) {
     const perms = await this.getPermissions(actor);
-    const where = this.buildLeadListWhere(actor, perms, query);
-    const page = query.page ?? 1;
-    const pageSize = query.pageSize ?? 20;
+    const effectiveQuery = query ?? new ListCrmLeadsQueryDto();
+    const where = this.buildLeadListWhere(actor, perms, effectiveQuery);
+    const page = effectiveQuery.page ?? 1;
+    const pageSize = effectiveQuery.pageSize ?? 20;
     const skip = (page - 1) * pageSize;
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.crmLead.findMany({
         where,
-        orderBy: this.buildLeadListOrderBy(query),
+        orderBy: this.buildLeadListOrderBy(effectiveQuery),
         skip,
         take: pageSize,
         include: this.leadInclude(),
@@ -618,13 +619,13 @@ export class CrmLeadsService {
     };
   }
 
-  async findOneDetailed(id: string, companyId: string) {
-    const cid = this.ensureCompanyId(companyId);
+  async findOneDetailed(id: string, actor: CrmActor) {
+    const perms = await this.getPermissions(actor);
+    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
 
     const lead = await this.prisma.crmLead.findFirst({
       where: {
-        id,
-        companyId: cid,
+        AND: [this.buildLeadScopeWhere(actor, perms), { id, companyId: cid }],
       },
       include: {
         ownerUser: {
@@ -669,8 +670,14 @@ export class CrmLeadsService {
       throw new NotFoundException("Lead não encontrado");
     }
 
+    const sanitizedLead = this.sanitizeLead(lead, perms);
+    const sanitizedActivities = lead.activities.map((activity) =>
+      this.sanitizeActivity(activity, perms),
+    );
+
     return {
-      ...lead,
+      ...sanitizedLead,
+      activities: sanitizedActivities,
       summary: {
         activitiesCount: lead.activities.length,
         openTasksCount: lead.tasks.filter((task) => !task.completedAt).length,
