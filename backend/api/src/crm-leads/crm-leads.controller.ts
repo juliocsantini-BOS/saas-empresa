@@ -74,8 +74,7 @@ export class CrmLeadsController {
     @Query() query: ListCrmLeadsQueryDto,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    const actor = this.toActor(user);
-    return this.crmLeads.findAll(actor, query);
+    return this.crmLeads.findAll(user, query);
   }
 
   @Get("pipeline")
@@ -136,8 +135,7 @@ export class CrmLeadsController {
     @Param("id") id: string,
     @CurrentUser() user: CrmCurrentUser,
   ) {
-    const actor = this.toActor(user);
-    return this.crmLeads.findOneDetailed(id, actor);
+    return this.crmLeads.findOneDetailed(id, user);
   }
 
   @Get(":id/activities")
