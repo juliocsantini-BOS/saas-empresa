@@ -788,7 +788,19 @@ export async function listCrmInbox(headers: AuthHeaders): Promise<CrmEmailMessag
 
 export async function createCrmEmailMessage(
   headers: AuthHeaders,
-  input: Partial<CrmEmailMessage> & { subject: string; body: string },
+  input: {
+    subject: string;
+    body: string;
+    leadId?: string;
+    accountId?: string;
+    contactId?: string;
+    direction?: string;
+    syncSource?: string;
+    fromEmail?: string;
+    toEmail?: string;
+    sentAt?: string;
+    receivedAt?: string;
+  },
 ) {
   const response = await axios.post<CrmEmailMessage>(
     `${API_URL}/v1/crm/engagement/messages`,

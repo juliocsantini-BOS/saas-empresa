@@ -1008,7 +1008,7 @@ export default function CrmPage() {
     if (!selectedLead) return;
 
     if (preset.mode === 'activity') {
-      setActivityType(preset.activityType);
+      setActivityType(preset.activityType ?? 'NOTE');
       setActivityText(preset.template);
       return;
     }
