@@ -1,6 +1,7 @@
 import { PRIORITY_LABELS, STATUS_BASE_PROBABILITY, STATUS_LABELS } from './constants';
 import type {
   LeadActivity,
+  LeadGuidance,
   LeadItem,
   LeadPriority,
   LeadStatus,
@@ -129,6 +130,7 @@ export function parseMoney(value?: string | number | null) {
 
 export function formatMoney(value?: string | number | null, currency = 'BRL') {
   const amount = parseMoney(value);
+
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: currency || 'BRL',
@@ -150,18 +152,22 @@ export function getLeadPriorityLabel(priority?: string | null) {
 
 export function formatPriority(priority?: string | null) {
   const value = String(priority ?? '').trim().toUpperCase();
+
   if (value === 'HIGH' || value === 'ALTA') return 'Alta';
   if (value === 'LOW' || value === 'BAIXA') return 'Baixa';
   if (value === 'URGENT' || value === 'URGENTE') return 'Urgente';
-  if (value === 'MEDIUM' || value === 'MÃ‰DIA' || value === 'MEDIA') return 'MÃ©dia';
-  return value ? normalizeUiText(value) : 'MÃ©dia';
+  if (value === 'MEDIUM' || value === 'MÉDIA' || value === 'MEDIA') return 'Média';
+
+  return value ? normalizeUiText(value) : 'Média';
 }
 
 export function priorityClass(priority?: string | null) {
   const label = formatPriority(priority);
+
   if (label === 'Urgente') return 'border-red-400/25 bg-red-400/10 text-red-200';
   if (label === 'Alta') return 'border-amber-300/25 bg-amber-300/10 text-amber-100';
   if (label === 'Baixa') return 'border-sky-300/25 bg-sky-300/10 text-sky-100';
+
   return 'border-white/10 bg-white/5 text-zinc-200';
 }
 
@@ -171,11 +177,9 @@ export function getLeadPriorityClass(priority?: string | null) {
   if (normalized === 'URGENT') {
     return 'border-red-500/20 bg-red-500/10 text-red-300';
   }
-
   if (normalized === 'HIGH') {
     return 'border-amber-400/20 bg-amber-400/10 text-amber-200';
   }
-
   if (normalized === 'MEDIUM') {
     return 'border-sky-400/20 bg-sky-400/10 text-sky-200';
   }
@@ -185,6 +189,7 @@ export function getLeadPriorityClass(priority?: string | null) {
 
 export function getLeadSourceLabel(source?: string | null) {
   if (!source) return 'Sem origem';
+
   return sanitizeText(source)
     .split(/[-_\s]+/)
     .filter(Boolean)
@@ -192,7 +197,10 @@ export function getLeadSourceLabel(source?: string | null) {
     .join(' ');
 }
 
-export function temperatureFilterMatch(temperature: string, filter: 'ALL' | 'HOT' | 'WARM' | 'COLD') {
+export function temperatureFilterMatch(
+  temperature: string,
+  filter: 'ALL' | 'HOT' | 'WARM' | 'COLD',
+) {
   if (filter === 'ALL') return true;
   if (filter === 'HOT') return temperature === 'Quente';
   if (filter === 'WARM') return temperature === 'Morno';
@@ -209,7 +217,10 @@ export function getLastActivity(lead: LeadItem) {
   return lead.lastActivityAt || lead.updatedAt || lead.createdAt;
 }
 
-export function getPipelineStageSummary(status: LeadStatus, leads: LeadItem[]): PipelineStageSummary {
+export function getPipelineStageSummary(
+  status: LeadStatus,
+  leads: LeadItem[],
+): PipelineStageSummary {
   const value = leads.reduce((sum, lead) => sum + (toNumber(lead.dealValue) ?? 0), 0);
   const forecast = leads.reduce((sum, lead) => sum + getLeadForecastValue(lead), 0);
 
@@ -248,7 +259,6 @@ export function getLeadScore(
   if (lead.dealValue) score += 10;
   if (lead.expectedCloseDate) score += 5;
   if (lead.nextStep) score += 5;
-
   if (activities.length > 0) score += 10;
   if (activities.some((a) => a.type === 'CALL')) score += 10;
   if (activities.some((a) => a.type === 'MEETING')) score += 15;
@@ -298,11 +308,9 @@ export function getTemperatureChipClass(label: string) {
   if (label === 'Quente') {
     return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200';
   }
-
   if (label === 'Morno') {
     return 'border-amber-400/20 bg-amber-400/10 text-amber-200';
   }
-
   return 'border-sky-400/20 bg-sky-400/10 text-sky-200';
 }
 
@@ -323,22 +331,128 @@ export function getLeadHealthClass(updatedAt?: string | null, status?: LeadStatu
   const health = getLeadHealth(updatedAt, status);
 
   if (health === 'Concluído') {
-    return 'border-[#3BFF8C]/20 bg-[#3BFF8C]/10 text-[#9CFFC2]';
+    return 'border-[#8B5CF6]/20 bg-[#8B5CF6]/10 text-[#D8B4FE]';
   }
-
   if (health === 'Encerrado') {
     return 'border-red-500/20 bg-red-500/10 text-red-300';
   }
-
   if (health === 'Saudável') {
     return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200';
   }
-
   if (health === 'Atenção') {
     return 'border-amber-400/20 bg-amber-400/10 text-amber-200';
   }
-
   return 'border-red-500/20 bg-red-500/10 text-red-300';
+}
+
+export function getLeadGuidance(
+  lead: LeadItem | null,
+  activities: LeadActivity[] = [],
+  tasks: LeadTask[] = [],
+): LeadGuidance {
+  if (!lead) {
+    return {
+      score: 0,
+      level: 'low',
+      title: 'Sem lead selecionado',
+      reason: 'Escolha uma oportunidade para ver a recomendação operacional.',
+      action: 'Abrir um lead do pipeline',
+      signal: 'idle',
+    };
+  }
+
+  const probability = getLeadProbability(lead);
+  const lastActivityDays = daysSince(getLastActivity(lead));
+  const nextStepDueDays = lead.nextStepDueAt ? daysSince(lead.nextStepDueAt) : null;
+  const expectedCloseDays = lead.expectedCloseDate ? daysSince(lead.expectedCloseDate) : null;
+  const openTasks = tasks.filter((task) => !task.completedAt).length;
+  const hasMeetingSoon =
+    !!lead.nextMeetingAt &&
+    new Date(lead.nextMeetingAt).getTime() > Date.now() &&
+    new Date(lead.nextMeetingAt).getTime() - Date.now() <= 1000 * 60 * 60 * 24 * 3;
+  const dealValue = parseMoney(lead.dealValue);
+
+  let score = 25;
+  let title = 'Manter cadência comercial';
+  let reason = 'O lead está saudável, mas ainda pede ritmo de execução.';
+  let action = lead.nextStep ? `Executar: ${normalizeUiText(lead.nextStep)}` : 'Registrar próximo passo';
+  let signal = 'cadência';
+
+  if (lead.status === 'NEGOTIATION' && probability >= 70 && (!lead.nextStep || openTasks === 0)) {
+    score = 97;
+    title = 'Fechamento sem próxima ação';
+    reason = 'Negociação quente sem tarefa ou próximo passo claro aumenta risco de perda.';
+    action = 'Criar follow-up de fechamento hoje';
+    signal = 'close-now';
+  } else if (nextStepDueDays !== null && nextStepDueDays > 0) {
+    score = 95;
+    title = 'Follow-up vencido';
+    reason = `A próxima ação está atrasada há ${nextStepDueDays} dia(s).`;
+    action = 'Retomar o lead imediatamente';
+    signal = 'overdue';
+  } else if (lastActivityDays >= 7 && dealValue >= 10000) {
+    score = 92;
+    title = 'Valor alto parado';
+    reason = 'Lead com valor relevante está sem movimentação recente.';
+    action = 'Agendar contato executivo ainda hoje';
+    signal = 'high-value-stalled';
+  } else if (lastActivityDays >= 5) {
+    score = 84;
+    title = 'Lead esfriando';
+    reason = `Sem atividade relevante há ${lastActivityDays} dia(s).`;
+    action = 'Enviar mensagem ou ligar para reativar';
+    signal = 'stalled';
+  } else if (hasMeetingSoon) {
+    score = 78;
+    title = 'Reunião próxima';
+    reason = 'Existe uma reunião próxima e o lead precisa entrar bem preparado.';
+    action = 'Revisar objeções, proposta e próximo passo';
+    signal = 'meeting';
+  } else if (expectedCloseDays !== null && expectedCloseDays > 0 && probability < 50) {
+    score = 76;
+    title = 'Fechamento em risco';
+    reason = 'A data prevista está próxima, mas a probabilidade ainda está baixa.';
+    action = 'Atualizar estratégia e validar decisor';
+    signal = 'risk-close';
+  } else if (openTasks === 0 && activities.length === 0) {
+    score = 72;
+    title = 'Lead sem cadência';
+    reason = 'Ainda não há atividades nem tarefas suficientes para sustentar avanço.';
+    action = 'Criar tarefa inicial e registrar contato';
+    signal = 'no-cadence';
+  } else if (lead.status === 'PROPOSAL' && probability >= 50) {
+    score = 68;
+    title = 'Proposta em momento de avanço';
+    reason = 'A oportunidade já tem boa chance e precisa de ritmo para não travar.';
+    action = 'Validar retorno da proposta e próximos decisores';
+    signal = 'proposal-push';
+  } else if (lead.status === 'NEW') {
+    score = 62;
+    title = 'Primeiro contato pendente';
+    reason = 'Lead novo precisa entrar rápido em cadência para não esfriar.';
+    action = 'Fazer primeiro contato e qualificar';
+    signal = 'new';
+  }
+
+  let level: LeadGuidance['level'] = 'low';
+  if (score >= 90) level = 'critical';
+  else if (score >= 78) level = 'high';
+  else if (score >= 60) level = 'medium';
+
+  return { score, level, title, reason, action, signal };
+}
+
+export function getLeadGuidanceClass(level: LeadGuidance['level']) {
+  if (level === 'critical') {
+    return 'border-red-500/20 bg-red-500/10 text-red-200';
+  }
+  if (level === 'high') {
+    return 'border-amber-400/20 bg-amber-400/10 text-amber-100';
+  }
+  if (level === 'medium') {
+    return 'border-[#8B5CF6]/20 bg-[#8B5CF6]/10 text-[#E9DDFF]';
+  }
+  return 'border-white/10 bg-white/5 text-zinc-200';
 }
 
 export function activityIcon(type: string) {
@@ -359,54 +473,44 @@ export function activityIcon(type: string) {
 
 export function activityIconBadgeClass(type: string) {
   if (type === 'TASK_DONE') {
-    return 'border-[#3BFF8C]/25 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.22),transparent_80%),rgba(59,255,140,0.08)] text-[#C8FFD8]';
+    return 'border-[#8B5CF6]/25 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.22),transparent_80%),rgba(139,92,246,0.08)] text-[#E9DDFF]';
   }
-
   if (type === 'TASK_REOPENED') {
     return 'border-white/10 bg-white/[0.05] text-zinc-100';
   }
-
   if (type === 'LEAD_WON') {
-    return 'border-[#3BFF8C]/25 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.22),transparent_80%),rgba(59,255,140,0.08)] text-[#C8FFD8]';
+    return 'border-[#8B5CF6]/25 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.22),transparent_80%),rgba(139,92,246,0.08)] text-[#E9DDFF]';
   }
-
   if (type === 'LEAD_LOST') {
     return 'border-red-500/20 bg-red-500/10 text-red-300';
   }
-
   if (type === 'LEAD_CREATED') {
-    return 'border-[#3BFF8C]/18 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.16),transparent_80%),rgba(255,255,255,0.04)] text-white';
+    return 'border-[#8B5CF6]/18 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.16),transparent_80%),rgba(255,255,255,0.04)] text-white';
   }
-
   if (type === 'CALL') {
     return 'border-amber-300/20 bg-amber-300/10 text-amber-100';
   }
-
   if (type === 'MESSAGE') {
     return 'border-sky-300/20 bg-sky-300/10 text-sky-100';
   }
-
   if (type === 'MEETING') {
     return 'border-violet-300/20 bg-violet-300/10 text-violet-100';
   }
-
   return 'border-white/10 bg-white/[0.05] text-zinc-100';
 }
 
 export function statusBadge(status: LeadStatus) {
   if (status === 'WON') {
-    return 'rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]';
+    return 'rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]';
   }
-
   if (status === 'LOST') {
     return 'rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs text-red-300';
   }
-
   return 'rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white';
 }
 
 export function statusDotClass(status: LeadStatus) {
-  if (status === 'WON') return 'bg-[#3BFF8C] shadow-[0_0_12px_rgba(59,255,140,0.5)]';
+  if (status === 'WON') return 'bg-[#8B5CF6] shadow-[0_0_12px_rgba(139,92,246,0.5)]';
   if (status === 'LOST') return 'bg-red-400 shadow-[0_0_12px_rgba(248,113,113,0.45)]';
   return 'bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.18)]';
 }

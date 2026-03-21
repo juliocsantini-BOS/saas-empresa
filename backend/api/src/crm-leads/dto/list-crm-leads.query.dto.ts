@@ -57,6 +57,21 @@ export class ListCrmLeadsQueryDto {
   @IsString()
   priority?: string;
 
+  @IsOptional()
+  @Transform(({ value }) => toStrOrUndef(value))
+  @IsString()
+  accountId?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => toStrOrUndef(value))
+  @IsString()
+  contactId?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => toStrOrUndef(value))
+  @IsString()
+  forecastCategory?: string;
+
   @Transform(({ value }) => toIntOrUndef(value) ?? 1)
   @IsInt()
   @Min(1)

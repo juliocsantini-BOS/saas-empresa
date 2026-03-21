@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { createCrmLeadTask } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { CreateLeadTaskForm, ExtendedLeadItem } from './types';
@@ -8,6 +7,7 @@ const emptyTaskForm: CreateLeadTaskForm = {
   title: '',
   description: '',
   dueAt: '',
+  assignedUserId: '',
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -51,7 +51,7 @@ export function useLeadTaskCreate({
 
   const submitTask = useCallback(
     async (lead: ExtendedLeadItem | null) => {
-      if (!lead || savingTask || taskForm.title.trim().length < 2) return;
+      if (!lead || taskForm.title.trim().length < 2) return;
 
       try {
         setSavingTask(true);
@@ -63,6 +63,7 @@ export function useLeadTaskCreate({
 
         setTaskForm(emptyTaskForm);
         await loadLeads();
+
         await refreshLeadDetails({
           ...lead,
           lastActivityAt: now,
@@ -74,7 +75,7 @@ export function useLeadTaskCreate({
         setSavingTask(false);
       }
     },
-    [authHeaders, loadLeads, refreshLeadDetails, savingTask, setError, taskForm],
+    [authHeaders, loadLeads, refreshLeadDetails, setError, taskForm],
   );
 
   return {

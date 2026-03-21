@@ -24,6 +24,15 @@ import { PermissionsModule } from "./common/permissions/permissions.module";
 import { RbacModule } from "./modules/rbac/rbac.module";
 import { CrmLeadsModule } from "./crm-leads/crm-leads.module";
 import { AutomationModule } from "./automation/automation.module";
+import { CrmSalesTargetsModule } from "./crm-sales-targets/crm-sales-targets.module";
+import { CrmPipelinesModule } from "./crm-pipelines/crm-pipelines.module";
+import { CrmAccountsModule } from "./crm-accounts/crm-accounts.module";
+import { CrmEngagementModule } from "./crm-engagement/crm-engagement.module";
+import { CrmDocumentsModule } from "./crm-documents/crm-documents.module";
+import { CrmRoutingModule } from "./crm-routing/crm-routing.module";
+import { CrmForecastModule } from "./crm-forecast/crm-forecast.module";
+import { CrmIntegrationsModule } from "./crm-integrations/crm-integrations.module";
+import { FinanceModule } from "./finance/finance.module";
 
 @Module({
   imports: [
@@ -73,6 +82,15 @@ import { AutomationModule } from "./automation/automation.module";
     RbacModule,
     PermissionsModule,
     CrmLeadsModule,
+    CrmSalesTargetsModule,
+    CrmPipelinesModule,
+    CrmAccountsModule,
+    CrmEngagementModule,
+    CrmDocumentsModule,
+    CrmRoutingModule,
+    CrmForecastModule,
+    CrmIntegrationsModule,
+    FinanceModule,
     AutomationModule,
   ],
   controllers: [AppController],

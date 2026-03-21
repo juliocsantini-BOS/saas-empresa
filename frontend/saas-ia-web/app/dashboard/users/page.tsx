@@ -390,7 +390,7 @@ export default function UsersPage() {
           {canCreateUsers ? (
             <button
               onClick={openCreateModal}
-              className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+              className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
             >
               Criar usuário
             </button>
@@ -406,7 +406,7 @@ export default function UsersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nome, e-mail ou role..."
-            className="w-full rounded-2xl border border-white/10 bg-[#111113] px-4 py-3 text-sm text-white outline-none transition focus:border-[#3BFF8C]/40"
+            className="w-full rounded-2xl border border-white/10 bg-[#111113] px-4 py-3 text-sm text-white outline-none transition focus:border-[#8B5CF6]/40"
           />
         </div>
       </div>
@@ -420,7 +420,7 @@ export default function UsersPage() {
 
         <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
           <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Ativos</div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">
+          <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">
             {users.filter((u) => u.isActive).length}
           </div>
           <div className="mt-2 text-sm text-zinc-400">Contas habilitadas</div>
@@ -441,7 +441,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
         {loading ? (
           <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-zinc-300">
             Carregando usuários...
@@ -489,7 +489,7 @@ export default function UsersPage() {
 
                     <td className="px-4 py-4">
                       {user.isActive ? (
-                        <span className="rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]">
+                        <span className="rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]">
                           Ativo
                         </span>
                       ) : (
@@ -545,7 +545,7 @@ export default function UsersPage() {
 
       {showCreateModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-2xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-2xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Criar usuário</h3>
@@ -569,7 +569,7 @@ export default function UsersPage() {
                   <input
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                     placeholder="Nome do usuário"
                     required
                   />
@@ -581,7 +581,7 @@ export default function UsersPage() {
                     type="email"
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                     placeholder="email@empresa.com"
                     required
                   />
@@ -593,7 +593,7 @@ export default function UsersPage() {
                     type="password"
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                     placeholder="Senha forte"
                     required
                   />
@@ -604,7 +604,7 @@ export default function UsersPage() {
                   <select
                     value={formRole}
                     onChange={(e) => setFormRole(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   >
                     {ROLE_OPTIONS.map((role) => (
                       <option key={role} value={role}>
@@ -622,7 +622,7 @@ export default function UsersPage() {
                       setFormBranchId(e.target.value);
                       setFormDepartmentId('');
                     }}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   >
                     <option value="">Sem filial</option>
                     {branches.map((branch) => (
@@ -638,7 +638,7 @@ export default function UsersPage() {
                   <select
                     value={formDepartmentId}
                     onChange={(e) => setFormDepartmentId(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   >
                     <option value="">Sem departamento</option>
                     {filteredDepartments.map((department) => (
@@ -668,7 +668,7 @@ export default function UsersPage() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
                   {creating ? 'Criando...' : 'Criar usuário'}
                 </button>
@@ -680,7 +680,7 @@ export default function UsersPage() {
 
       {showRoleModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Alterar role</h3>
@@ -703,7 +703,7 @@ export default function UsersPage() {
                 <select
                   value={roleValue}
                   onChange={(e) => setRoleValue(e.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                 >
                   {ROLE_OPTIONS.map((role) => (
                     <option key={role} value={role}>
@@ -731,7 +731,7 @@ export default function UsersPage() {
                 <button
                   type="submit"
                   disabled={savingRole}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
                   {savingRole ? 'Salvando...' : 'Salvar role'}
                 </button>
@@ -743,7 +743,7 @@ export default function UsersPage() {
 
       {showStatusModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">
@@ -787,7 +787,7 @@ export default function UsersPage() {
                 <button
                   type="submit"
                   disabled={savingStatus}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
                   {savingStatus ? 'Salvando...' : statusValue ? 'Ativar' : 'Desativar'}
                 </button>
@@ -799,7 +799,7 @@ export default function UsersPage() {
 
       {showPasswordModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Resetar senha</h3>
@@ -823,7 +823,7 @@ export default function UsersPage() {
                   type="password"
                   value={passwordValue}
                   onChange={(e) => setPasswordValue(e.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   placeholder="Digite a nova senha"
                   required
                 />
@@ -847,7 +847,7 @@ export default function UsersPage() {
                 <button
                   type="submit"
                   disabled={savingPassword}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
                   {savingPassword ? 'Salvando...' : 'Resetar senha'}
                 </button>

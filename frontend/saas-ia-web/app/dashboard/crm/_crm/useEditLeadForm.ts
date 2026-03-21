@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { updateCrmLead } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { EditLeadForm, ExtendedLeadItem } from './types';
@@ -17,16 +16,25 @@ const emptyForm: EditLeadForm = {
   industry: '',
   companySize: '',
   notes: '',
+  accountId: '',
+  contactId: '',
+  forecastCategory: 'PIPELINE',
   dealValue: '',
+  currency: 'BRL',
   probability: '',
   source: '',
   sourceDetail: '',
   priority: 'MEDIUM',
   competitor: '',
   wonReason: '',
+  lostReason: '',
   nextStep: '',
+  nextStepDueAt: '',
   nextMeetingAt: '',
   expectedCloseDate: '',
+  ownerUserId: '',
+  branchId: '',
+  departmentId: '',
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -76,16 +84,25 @@ function buildEditForm(lead: ExtendedLeadItem): EditLeadForm {
     industry: lead.industry || '',
     companySize: lead.companySize || '',
     notes: lead.notes || '',
+    accountId: lead.accountId || '',
+    contactId: lead.contactId || '',
+    forecastCategory: lead.forecastCategory || 'PIPELINE',
     dealValue: toInputValue(lead.dealValue),
+    currency: lead.currency || 'BRL',
     probability: toInputValue(lead.probability),
     source: lead.source || '',
     sourceDetail: lead.sourceDetail || '',
     priority: lead.priority || 'MEDIUM',
     competitor: lead.competitor || '',
     wonReason: lead.wonReason || '',
+    lostReason: lead.lostReason || '',
     nextStep: lead.nextStep || '',
+    nextStepDueAt: toDateInputValue(lead.nextStepDueAt),
     nextMeetingAt: toDateInputValue(lead.nextMeetingAt),
     expectedCloseDate: toDateInputValue(lead.expectedCloseDate),
+    ownerUserId: lead.ownerUserId || '',
+    branchId: lead.branchId || '',
+    departmentId: lead.departmentId || '',
   };
 }
 
@@ -123,17 +140,30 @@ export function useEditLeadForm({
       setSavingEditLead(true);
       setError(null);
 
-      const updatedLead = await updateCrmLead(authHeaders, editingLead.id, editForm);
+      const updatedLead = await updateCrmLead(
+        authHeaders,
+        editingLead.id,
+        editForm,
+      );
 
       await loadLeads();
       await onLeadUpdated(updatedLead);
+
       closeEditLead();
     } catch (error: unknown) {
       setError(getErrorMessage(error, 'Não foi possível atualizar o lead.'));
     } finally {
       setSavingEditLead(false);
     }
-  }, [authHeaders, closeEditLead, editForm, editingLead, loadLeads, onLeadUpdated, setError]);
+  }, [
+    authHeaders,
+    closeEditLead,
+    editForm,
+    editingLead,
+    loadLeads,
+    onLeadUpdated,
+    setError,
+  ]);
 
   return {
     closeEditLead,

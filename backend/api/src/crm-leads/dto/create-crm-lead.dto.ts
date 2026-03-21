@@ -1,4 +1,4 @@
-import {
+﻿import {
   IsDateString,
   IsEmail,
   IsInt,
@@ -71,6 +71,26 @@ export class CreateCrmLeadDto {
   @IsOptional()
   @IsString()
   departmentId?: string;
+
+  @IsOptional()
+  @IsString()
+  accountId?: string;
+
+  @IsOptional()
+  @IsString()
+  contactId?: string;
+
+  @IsOptional()
+  @IsString()
+  forecastCategory?: string;
+
+  @IsOptional()
+  @IsString()
+  pipelineId?: string;
+
+  @IsOptional()
+  @IsString()
+  stageId?: string;
 
   @IsOptional()
   @IsString()

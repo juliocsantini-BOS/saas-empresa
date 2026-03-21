@@ -1,16 +1,14 @@
-export const PERMISSIONS = [
+﻿export const PERMISSIONS = [
   { key: "users.read", description: "Listar usuarios" },
   { key: "users.create", description: "Criar usuarios" },
   { key: "users.update", description: "Atualizar usuarios" },
   { key: "users.disable", description: "Desativar usuarios" },
-
   { key: "branches.read", description: "Listar branches" },
   { key: "branches.create", description: "Criar branches" },
-
   { key: "company.create", description: "Criar company" },
   { key: "company.read", description: "Ver company" },
-
   { key: "audit.read", description: "Ler audit logs" },
+
   { key: "crm.read.own", description: "Ver apenas os proprios leads do CRM" },
   { key: "crm.read.department", description: "Ver leads do proprio departamento no CRM" },
   { key: "crm.read.branch", description: "Ver leads da propria filial no CRM" },
@@ -26,6 +24,53 @@ export const PERMISSIONS = [
   { key: "crm.bulk.update", description: "Executar acoes em lote no CRM" },
   { key: "crm.saved_views.create", description: "Criar visualizacoes salvas do CRM" },
   { key: "crm.saved_views.delete", description: "Excluir visualizacoes salvas do CRM" },
+  { key: "crm.sales_targets.read", description: "Ver metas comerciais do CRM" },
+  { key: "crm.sales_targets.create", description: "Criar metas comerciais do CRM" },
+  { key: "crm.sales_targets.update", description: "Atualizar metas comerciais do CRM" },
+  { key: "crm.sales_targets.delete", description: "Excluir metas comerciais do CRM" },
+
+  { key: "crm.pipelines.read", description: "Ver pipelines do CRM" },
+  { key: "crm.pipelines.create", description: "Criar pipelines do CRM" },
+  { key: "crm.pipelines.update", description: "Atualizar pipelines do CRM" },
+  { key: "crm.pipelines.delete", description: "Excluir pipelines do CRM" },
+
+  { key: "crm.pipeline_stages.read", description: "Ver etapas dos pipelines do CRM" },
+  { key: "crm.pipeline_stages.create", description: "Criar etapas dos pipelines do CRM" },
+  { key: "crm.pipeline_stages.update", description: "Atualizar etapas dos pipelines do CRM" },
+  { key: "crm.pipeline_stages.delete", description: "Excluir etapas dos pipelines do CRM" },
+  { key: "crm.pipeline_stages.reorder", description: "Reordenar etapas dos pipelines do CRM" },
+
+  { key: "finance.read", description: "Ver o modulo financeiro" },
+  { key: "finance.write", description: "Criar e editar dados financeiros" },
+  { key: "finance.approve", description: "Aprovar operacoes financeiras" },
+  { key: "finance.export", description: "Exportar dados financeiros" },
+  { key: "finance.accounts.read", description: "Ver plano de contas" },
+  { key: "finance.accounts.write", description: "Gerir plano de contas" },
+  { key: "finance.bank_accounts.read", description: "Ver contas bancarias e caixas" },
+  { key: "finance.bank_accounts.write", description: "Gerir contas bancarias e caixas" },
+  { key: "finance.cost_centers.read", description: "Ver centros de custo" },
+  { key: "finance.cost_centers.write", description: "Gerir centros de custo" },
+  { key: "finance.categories.read", description: "Ver categorias financeiras" },
+  { key: "finance.categories.write", description: "Gerir categorias financeiras" },
+  { key: "finance.payables.read", description: "Ver contas a pagar" },
+  { key: "finance.payables.write", description: "Gerir contas a pagar" },
+  { key: "finance.payables.pay", description: "Executar pagamentos" },
+  { key: "finance.payables.batch", description: "Executar pagamentos em lote" },
+  { key: "finance.receivables.read", description: "Ver contas a receber" },
+  { key: "finance.receivables.write", description: "Gerir contas a receber" },
+  { key: "finance.receivables.collect", description: "Registrar recebimentos" },
+  { key: "finance.receivables.remind", description: "Disparar cobrancas e reminders" },
+  { key: "finance.transactions.read", description: "Ver lancamentos financeiros" },
+  { key: "finance.transactions.write", description: "Criar lancamentos financeiros" },
+  { key: "finance.reconciliation.read", description: "Ver conciliacoes e extratos" },
+  { key: "finance.reconciliation.write", description: "Executar conciliacao" },
+  { key: "finance.approvals.read", description: "Ver politicas e solicitacoes de aprovacao" },
+  { key: "finance.approvals.write", description: "Gerir politicas e solicitacoes de aprovacao" },
+  { key: "finance.approvals.decide", description: "Aprovar ou rejeitar solicitacoes financeiras" },
+  { key: "finance.close.read", description: "Ver fechamento financeiro" },
+  { key: "finance.close.write", description: "Gerir fechamento financeiro" },
+  { key: "finance.budgets.read", description: "Ver budgets e forecast financeiro" },
+  { key: "finance.budgets.write", description: "Gerir budgets e forecast financeiro" },
 ] as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[number]["key"];

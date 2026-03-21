@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
@@ -22,6 +22,39 @@ type AuthMe = {
   id: string;
   role: string;
 };
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as { response?: unknown }).response === 'object'
+  ) {
+    const response = (error as {
+      response?: {
+        data?: {
+          message?: string | string[];
+        };
+      };
+    }).response;
+
+    const message = response?.data?.message;
+
+    if (Array.isArray(message)) {
+      return message.join(', ');
+    }
+
+    if (typeof message === 'string' && message.trim()) {
+      return message;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+}
 
 export default function DepartmentsPage() {
   const [departments, setDepartments] = useState<DepartmentItem[]>([]);
@@ -48,7 +81,7 @@ export default function DepartmentsPage() {
   const [editError, setEditError] = useState('');
   const [deleteError, setDeleteError] = useState('');
 
-  const canCreateDepartments =
+  const canManageDepartments =
     viewer?.role === 'ADMIN_MASTER' ||
     viewer?.role === 'ADMIN' ||
     viewer?.role === 'CEO';
@@ -57,7 +90,7 @@ export default function DepartmentsPage() {
     const token = localStorage.getItem('access_token');
 
     if (!token) {
-      setError('Token não encontrado.');
+      setError('Token nao encontrado.');
       setLoading(false);
       return;
     }
@@ -79,12 +112,8 @@ export default function DepartmentsPage() {
       setDepartments(Array.isArray(departmentsRes.data) ? departmentsRes.data : []);
       setBranches(Array.isArray(branchesRes.data) ? branchesRes.data : []);
       setError('');
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Falha ao carregar departamentos.';
-      setError(Array.isArray(msg) ? msg.join(', ') : String(msg));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Falha ao carregar departamentos.'));
     } finally {
       setLoading(false);
     }
@@ -94,18 +123,30 @@ export default function DepartmentsPage() {
     loadData();
   }, []);
 
+  const branchNameById = useMemo(() => {
+    return new Map(branches.map((branch) => [branch.id, branch.name]));
+  }, [branches]);
+
+  const departmentCards = useMemo(() => {
+    return departments.map((department) => ({
+      ...department,
+      branchName: branchNameById.get(department.branchId) || 'Filial nao encontrada',
+    }));
+  }, [branchNameById, departments]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return departments;
+    if (!q) return departmentCards;
 
-    return departments.filter((department) => {
+    return departmentCards.filter((department) => {
       return (
         String(department.name ?? '').toLowerCase().includes(q) ||
         String(department.companyId ?? '').toLowerCase().includes(q) ||
-        String(department.branchId ?? '').toLowerCase().includes(q)
+        String(department.branchId ?? '').toLowerCase().includes(q) ||
+        String(department.branchName ?? '').toLowerCase().includes(q)
       );
     });
-  }, [departments, search]);
+  }, [departmentCards, search]);
 
   function closeCreateModal() {
     setShowCreateModal(false);
@@ -150,7 +191,7 @@ export default function DepartmentsPage() {
 
     const token = localStorage.getItem('access_token');
     if (!token) {
-      setFormError('Token não encontrado.');
+      setFormError('Token nao encontrado.');
       return;
     }
 
@@ -173,12 +214,8 @@ export default function DepartmentsPage() {
 
       closeCreateModal();
       await refreshList();
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Falha ao criar departamento.';
-      setFormError(Array.isArray(msg) ? msg.join(', ') : String(msg));
+    } catch (err: unknown) {
+      setFormError(getErrorMessage(err, 'Falha ao criar departamento.'));
     } finally {
       setCreating(false);
     }
@@ -191,7 +228,7 @@ export default function DepartmentsPage() {
 
     const token = localStorage.getItem('access_token');
     if (!token) {
-      setEditError('Token não encontrado.');
+      setEditError('Token nao encontrado.');
       return;
     }
 
@@ -211,12 +248,8 @@ export default function DepartmentsPage() {
 
       closeEditModal();
       await refreshList();
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Falha ao editar departamento.';
-      setEditError(Array.isArray(msg) ? msg.join(', ') : String(msg));
+    } catch (err: unknown) {
+      setEditError(getErrorMessage(err, 'Falha ao editar departamento.'));
     } finally {
       setEditing(false);
     }
@@ -227,7 +260,7 @@ export default function DepartmentsPage() {
 
     const token = localStorage.getItem('access_token');
     if (!token) {
-      setDeleteError('Token não encontrado.');
+      setDeleteError('Token nao encontrado.');
       return;
     }
 
@@ -243,12 +276,8 @@ export default function DepartmentsPage() {
 
       closeDeleteModal();
       await refreshList();
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Falha ao excluir departamento.';
-      setDeleteError(Array.isArray(msg) ? msg.join(', ') : String(msg));
+    } catch (err: unknown) {
+      setDeleteError(getErrorMessage(err, 'Falha ao excluir departamento.'));
     } finally {
       setDeleting(false);
     }
@@ -256,53 +285,69 @@ export default function DepartmentsPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          {canCreateDepartments ? (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
-            >
-              Criar departamento
-            </button>
-          ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-400">
-              Apenas ADMIN, ADMIN_MASTER e CEO podem criar departamentos
+      <div className="rounded-[36px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.15),transparent_32%),#0B1118] p-6 shadow-[0_0_70px_rgba(139,92,246,0.06)]">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="inline-flex rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-[#DDD6FE]">
+              Organization map
             </div>
-          )}
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white">
+              Departamentos traduzem a estrutura da empresa para dentro do sistema.
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">
+              Eles conectam pessoas, rotinas e responsabilidades por unidade. Quanto melhor essa camada estiver, mais forte fica o onboarding, o RBAC e a operacao dos modulos.
+            </p>
+          </div>
+
+          <div>
+            {canManageDepartments ? (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+              >
+                Criar departamento
+              </button>
+            ) : (
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-400">
+                Apenas ADMIN, ADMIN_MASTER e CEO podem criar departamentos
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
+            <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Total</div>
+            <div className="mt-4 text-3xl font-semibold text-white">{departments.length}</div>
+            <div className="mt-2 text-sm text-zinc-400">Departamentos retornados pela API</div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
+            <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Filiais</div>
+            <div className="mt-4 text-3xl font-semibold text-white">{branches.length}</div>
+            <div className="mt-2 text-sm text-zinc-400">Unidades com contexto organizacional</div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
+            <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Status</div>
+            <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">OK</div>
+            <div className="mt-2 text-sm text-zinc-400">Integracao com backend ativa</div>
+          </div>
         </div>
 
         <div className="w-full md:w-[340px]">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nome, companyId ou branchId..."
-            className="w-full rounded-2xl border border-white/10 bg-[#111113] px-4 py-3 text-sm text-white outline-none transition focus:border-[#3BFF8C]/40"
+            placeholder="Buscar por nome, filial ou IDs..."
+            className="w-full rounded-2xl border border-white/10 bg-[#111113] px-4 py-3 text-sm text-white outline-none transition focus:border-[#8B5CF6]/40"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Total</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{departments.length}</div>
-          <div className="mt-2 text-sm text-zinc-400">Departamentos retornados pela API</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Filtro</div>
-          <div className="mt-4 text-3xl font-semibold text-white">{filtered.length}</div>
-          <div className="mt-2 text-sm text-zinc-400">Resultado da busca atual</div>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
-          <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Status</div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">OK</div>
-          <div className="mt-2 text-sm text-zinc-400">Integração com backend ativa</div>
-        </div>
-      </div>
-
-      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
         {loading ? (
           <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-zinc-300">
             Carregando departamentos...
@@ -316,63 +361,68 @@ export default function DepartmentsPage() {
             Nenhum departamento encontrado.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-y-3">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-[0.18em] text-zinc-500">
-                  <th className="px-4">Nome</th>
-                  <th className="px-4">Branch ID</th>
-                  <th className="px-4">Company ID</th>
-                  <th className="px-4">Criado em</th>
-                  <th className="px-4">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((department) => (
-                  <tr
-                    key={department.id}
-                    className="rounded-2xl border border-white/10 bg-black/20 text-sm text-zinc-300"
-                  >
-                    <td className="rounded-l-2xl px-4 py-4">
-                      <div className="font-medium text-white">{department.name}</div>
-                      <div className="mt-1 break-all text-xs text-zinc-500">{department.id}</div>
-                    </td>
-                    <td className="px-4 py-4 break-all text-xs text-zinc-400">{department.branchId}</td>
-                    <td className="px-4 py-4 break-all text-xs text-zinc-400">{department.companyId}</td>
-                    <td className="px-4 py-4 text-xs text-zinc-400">
-                      {department.createdAt ? new Date(department.createdAt).toLocaleString('pt-BR') : 'N/A'}
-                    </td>
-                    <td className="rounded-r-2xl px-4 py-4">
-                      {canCreateDepartments ? (
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            onClick={() => openEditModal(department)}
-                            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white transition hover:bg-white/10"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(department)}
-                            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white transition hover:bg-white/10"
-                          >
-                            Excluir
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-zinc-500">Sem acesso</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            {filtered.map((department) => (
+              <div
+                key={department.id}
+                className="rounded-3xl border border-white/10 bg-black/20 p-5"
+              >
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-white">{department.name}</div>
+                    <div className="mt-1 text-sm text-zinc-400">{department.branchName}</div>
+                    <div className="mt-1 break-all text-xs text-zinc-500">{department.id}</div>
+                  </div>
+
+                  <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+                    {department.createdAt ? new Date(department.createdAt).toLocaleDateString('pt-BR') : 'Sem data'}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl border border-white/10 bg-[#111113] p-4">
+                    <div className="text-xs text-zinc-500">Branch ID</div>
+                    <div className="mt-2 truncate text-sm font-medium text-white">
+                      {department.branchId}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-[#111113] p-4">
+                    <div className="text-xs text-zinc-500">Company ID</div>
+                    <div className="mt-2 truncate text-sm font-medium text-white">
+                      {department.companyId}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {canManageDepartments ? (
+                    <>
+                      <button
+                        onClick={() => openEditModal(department)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white transition hover:bg-white/10"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => openDeleteModal(department)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white transition hover:bg-white/10"
+                      >
+                        Excluir
+                      </button>
+                    </>
+                  ) : (
+                    <span className="text-xs text-zinc-500">Sem acesso de gestao</span>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {showCreateModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Criar departamento</h3>
@@ -395,8 +445,8 @@ export default function DepartmentsPage() {
                 <input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
-                  placeholder="Ex.: Financeiro, Comercial, Operações"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
+                  placeholder="Ex.: Financeiro, Comercial, Operacoes"
                   required
                 />
               </div>
@@ -406,7 +456,7 @@ export default function DepartmentsPage() {
                 <select
                   value={formBranchId}
                   onChange={(e) => setFormBranchId(e.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   required
                 >
                   <option value="">Selecione uma filial</option>
@@ -436,7 +486,7 @@ export default function DepartmentsPage() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
                   {creating ? 'Criando...' : 'Criar departamento'}
                 </button>
@@ -448,7 +498,7 @@ export default function DepartmentsPage() {
 
       {showEditModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Editar departamento</h3>
@@ -469,7 +519,7 @@ export default function DepartmentsPage() {
                 <input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                  className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   placeholder="Novo nome do departamento"
                   required
                 />
@@ -493,9 +543,9 @@ export default function DepartmentsPage() {
                 <button
                   type="submit"
                   disabled={editing}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
-                  {editing ? 'Salvando...' : 'Salvar alteração'}
+                  {editing ? 'Salvando...' : 'Salvar alteracao'}
                 </button>
               </div>
             </form>
@@ -505,7 +555,7 @@ export default function DepartmentsPage() {
 
       {showDeleteModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Excluir departamento</h3>
@@ -522,7 +572,7 @@ export default function DepartmentsPage() {
 
             <div className="space-y-4">
               <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-zinc-300">
-                Esta ação tentará excluir o departamento selecionado.
+                Esta acao tentara excluir o departamento selecionado.
               </div>
 
               {deleteError ? (

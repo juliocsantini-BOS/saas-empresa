@@ -63,7 +63,7 @@ export default function Page() {
 
   if (loading) {
     return (
-      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
         <div className="text-sm text-zinc-300">Carregando configurações...</div>
       </div>
     );
@@ -71,7 +71,7 @@ export default function Page() {
 
   if (error) {
     return (
-      <div className="rounded-[32px] border border-red-500/20 bg-red-500/10 p-6 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+      <div className="rounded-[32px] border border-red-500/20 bg-red-500/10 p-6 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
         <div className="text-sm text-red-300">{error}</div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function Page() {
 
         <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
           <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Role</div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">
+          <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">
             {user?.role || 'N/A'}
           </div>
           <div className="mt-2 text-sm text-zinc-400">Perfil atual carregado</div>
@@ -104,7 +104,7 @@ export default function Page() {
           <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Backend</div>
           <div className="mt-4">
             {backendStatus === 'online' ? (
-              <span className="rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]">
+              <span className="rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]">
                 online
               </span>
             ) : (
@@ -119,7 +119,7 @@ export default function Page() {
 
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
         <div className="xl:col-span-8">
-          <div className="rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+          <div className="rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
             <div className="mb-6">
               <div className="text-lg font-semibold text-white">Informações da sessão</div>
               <div className="mt-1 text-sm text-zinc-500">
@@ -156,7 +156,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="mt-5 rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+          <div className="mt-5 rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
             <div className="mb-6">
               <div className="text-lg font-semibold text-white">Parâmetros atuais</div>
               <div className="mt-1 text-sm text-zinc-500">

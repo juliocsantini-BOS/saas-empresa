@@ -193,7 +193,7 @@ export default function RbacPage() {
 
             <div className="rounded-3xl border border-white/10 bg-[#111113] p-5">
               <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Role selecionado</div>
-              <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">
+              <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">
                 {selectedRole || 'N/A'}
               </div>
               <div className="mt-2 text-sm text-zinc-400">Perfil visualizado no momento</div>
@@ -214,7 +214,7 @@ export default function RbacPage() {
             </div>
           </div>
 
-          <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+          <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="rounded-3xl border border-white/10 bg-black/20 p-4">
                 <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">Arquitetura</div>
@@ -244,7 +244,7 @@ export default function RbacPage() {
 
           <div className="grid grid-cols-1 gap-5 xl:grid-cols-12">
             <div className="xl:col-span-4">
-              <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+              <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
                 <div className="mb-5">
                   <div className="text-lg font-semibold text-white">Roles</div>
                   <div className="mt-1 text-sm text-zinc-500">
@@ -262,7 +262,7 @@ export default function RbacPage() {
                         onClick={() => setSelectedRole(role)}
                         className={
                           active
-                            ? 'w-full rounded-2xl border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-4 py-3 text-left text-sm font-medium text-white'
+                            ? 'w-full rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-4 py-3 text-left text-sm font-medium text-white'
                             : 'w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm text-zinc-300 transition hover:bg-white/5'
                         }
                       >
@@ -275,7 +275,7 @@ export default function RbacPage() {
             </div>
 
             <div className="xl:col-span-8">
-              <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+              <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
                 <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <div className="text-lg font-semibold text-white">
@@ -291,7 +291,7 @@ export default function RbacPage() {
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Buscar permission..."
-                      className="w-full rounded-2xl border border-white/10 bg-[#0F1012] px-4 py-3 text-sm text-white outline-none transition focus:border-[#3BFF8C]/40"
+                      className="w-full rounded-2xl border border-white/10 bg-[#0F1012] px-4 py-3 text-sm text-white outline-none transition focus:border-[#8B5CF6]/40"
                     />
                   </div>
                 </div>
@@ -327,7 +327,7 @@ export default function RbacPage() {
                             <span
                               className={
                                 enabled
-                                  ? 'rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]'
+                                  ? 'rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]'
                                   : 'rounded-full border border-zinc-700 bg-zinc-800 px-3 py-1 text-xs text-zinc-300'
                               }
                             >

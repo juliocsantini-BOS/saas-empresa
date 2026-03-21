@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #07080d;
+  --background-soft: #0f1119;
+  --surface: rgba(15, 17, 25, 0.82);
+  --surface-strong: rgba(10, 11, 18, 0.94);
+  --foreground: #eef2ff;
+  --muted: #9ca3b7;
+  --line: rgba(177, 156, 255, 0.12);
+  --accent: #8b5cf6;
+  --accent-strong: #c4b5fd;
 }
 
 @theme inline {
@@ -14,13 +21,50 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #07080d;
+    --background-soft: #0f1119;
+    --surface: rgba(15, 17, 25, 0.82);
+    --surface-strong: rgba(10, 11, 18, 0.94);
+    --foreground: #eef2ff;
+    --muted: #9ca3b7;
+    --line: rgba(177, 156, 255, 0.12);
+    --accent: #8b5cf6;
+    --accent-strong: #c4b5fd;
   }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(139, 92, 246, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(109, 40, 217, 0.12), transparent 24%),
+    linear-gradient(180deg, #07080d 0%, #0b0d16 52%, #07080d 100%);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.28);
+  color: #f8f5ff;
 }

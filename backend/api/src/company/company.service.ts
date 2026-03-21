@@ -1,17 +1,41 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { Role } from "@prisma/client";
-import * as bcrypt from "bcrypt";
-import { CreateCompanyDto } from "./dto/create-company.dto";
-import { RequestContext } from "../common/request-context/request-context";
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Role } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { RequestContext } from '../common/request-context/request-context';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateCompanyDto } from './dto/create-company.dto';
 
 @Injectable()
 export class CompanyService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findCurrent(companyId: string) {
+    const currentCompanyId = String(companyId ?? '').trim();
+    if (!currentCompanyId) {
+      throw new BadRequestException('companyId e obrigatorio');
+    }
+
+    return this.prisma.company.findUnique({
+      where: { id: currentCompanyId },
+      select: {
+        id: true,
+        name: true,
+        sector: true,
+        teamSize: true,
+        operationModel: true,
+        hasInventory: true,
+        salesModel: true,
+        financeMaturity: true,
+        multiUnit: true,
+        mainGoal: true,
+        createdAt: true,
+      },
+    });
+  }
+
   async create(name: string) {
-    const companyName = (name ?? "").trim();
-    if (!companyName) throw new BadRequestException("name é obrigatório");
+    const companyName = (name ?? '').trim();
+    if (!companyName) throw new BadRequestException('name Ã© obrigatÃ³rio');
 
     const ctx = RequestContext.get();
     const prevCompanyId = ctx.companyId ?? null;
@@ -27,7 +51,7 @@ export class CompanyService {
 
         const branch = await tx.branch.create({
           data: {
-            name: "Matriz",
+            name: 'Matriz',
             companyId: company.id,
             requestId: ctx?.requestId,
           },
@@ -44,26 +68,40 @@ export class CompanyService {
   }
 
   async createWithOwner(dto: CreateCompanyDto) {
-    const name = (dto?.name ?? "").trim();
-    const ownerEmail = (dto?.ownerEmail ?? "").trim().toLowerCase();
-    const ownerName = (dto?.ownerName ?? "").trim();
-    const ownerPassword = dto?.ownerPassword ?? "";
-    const ownerRoleRaw = (dto?.ownerRole ?? "CEO")
+    const name = (dto?.name ?? '').trim();
+    const ownerEmail = (dto?.ownerEmail ?? '').trim().toLowerCase();
+    const ownerName = (dto?.ownerName ?? '').trim();
+    const ownerPassword = dto?.ownerPassword ?? '';
+    const ownerRoleRaw = (dto?.ownerRole ?? 'CEO')
       .toString()
       .trim()
       .toUpperCase();
-    const branchName = (dto?.branchName ?? "Matriz").trim() || "Matriz";
+    const branchName = (dto?.branchName ?? 'Matriz').trim() || 'Matriz';
+    const sector = (dto?.sector ?? '').trim() || null;
+    const teamSize = (dto?.teamSize ?? '').trim() || null;
+    const operationModel = (dto?.operationModel ?? '').trim() || null;
+    const hasInventory = (dto?.hasInventory ?? '').trim() || null;
+    const salesModel = (dto?.salesModel ?? '').trim() || null;
+    const financeMaturity = (dto?.financeMaturity ?? '').trim() || null;
+    const multiUnit = (dto?.multiUnit ?? '').trim() || null;
+    const mainGoal = (dto?.mainGoal ?? '').trim() || null;
 
-    if (!name) throw new BadRequestException("name é obrigatório");
-    if (!ownerEmail) throw new BadRequestException("ownerEmail é obrigatório");
-    if (!ownerName) throw new BadRequestException("ownerName é obrigatório");
-    if (!ownerPassword) throw new BadRequestException("ownerPassword é obrigatório");
-    if (!branchName) throw new BadRequestException("branchName é obrigatório");
+    if (!name) throw new BadRequestException('name Ã© obrigatÃ³rio');
+    if (!ownerEmail) {
+      throw new BadRequestException('ownerEmail Ã© obrigatÃ³rio');
+    }
+    if (!ownerName) throw new BadRequestException('ownerName Ã© obrigatÃ³rio');
+    if (!ownerPassword) {
+      throw new BadRequestException('ownerPassword Ã© obrigatÃ³rio');
+    }
+    if (!branchName) {
+      throw new BadRequestException('branchName Ã© obrigatÃ³rio');
+    }
 
     const allowedOwnerRoles = [Role.CEO, Role.ADMIN] as string[];
     if (!allowedOwnerRoles.includes(ownerRoleRaw)) {
       throw new BadRequestException(
-        `ownerRole inválido. Use apenas: ${allowedOwnerRoles.join(", ")}`,
+        `ownerRole invÃ¡lido. Use apenas: ${allowedOwnerRoles.join(', ')}`,
       );
     }
 
@@ -74,7 +112,7 @@ export class CompanyService {
       select: { id: true },
     });
 
-    if (exists) throw new BadRequestException("ownerEmail já existe");
+    if (exists) throw new BadRequestException('ownerEmail jÃ¡ existe');
 
     const passwordHash = await bcrypt.hash(ownerPassword, 10);
 
@@ -84,8 +122,31 @@ export class CompanyService {
     try {
       const result = await this.prisma.$transaction(async (tx) => {
         const company = await tx.company.create({
-          data: { name, requestId: ctx?.requestId },
-          select: { id: true, name: true, createdAt: true },
+          data: {
+            name,
+            sector,
+            teamSize,
+            operationModel,
+            hasInventory,
+            salesModel,
+            financeMaturity,
+            multiUnit,
+            mainGoal,
+            requestId: ctx?.requestId,
+          },
+          select: {
+            id: true,
+            name: true,
+            sector: true,
+            teamSize: true,
+            operationModel: true,
+            hasInventory: true,
+            salesModel: true,
+            financeMaturity: true,
+            multiUnit: true,
+            mainGoal: true,
+            createdAt: true,
+          },
         });
 
         RequestContext.set({ companyId: company.id });

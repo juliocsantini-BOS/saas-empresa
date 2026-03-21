@@ -15,7 +15,7 @@ export const STATUS_LABELS: Record<LeadStatus, string> = {
   NEW: 'Novo lead',
   CONTACTED: 'Contato feito',
   PROPOSAL: 'Proposta enviada',
-  NEGOTIATION: 'NegociaÃ§Ã£o',
+  NEGOTIATION: 'Negociação',
   WON: 'Fechado',
   LOST: 'Perdido',
 };
@@ -25,7 +25,7 @@ export const FILTER_STATUS_LABELS: Record<'ALL' | LeadStatus, string> = {
   NEW: 'Novo lead',
   CONTACTED: 'Contato feito',
   PROPOSAL: 'Proposta enviada',
-  NEGOTIATION: 'NegociaÃ§Ã£o',
+  NEGOTIATION: 'Negociação',
   WON: 'Fechado',
   LOST: 'Perdido',
 };
@@ -39,7 +39,7 @@ export const TEMPERATURE_LABELS: Record<TemperatureFilter, string> = {
 
 export const PRIORITY_LABELS: Record<LeadPriority, string> = {
   LOW: 'Baixa',
-  MEDIUM: 'MÃ©dia',
+  MEDIUM: 'Média',
   HIGH: 'Alta',
   URGENT: 'Urgente',
 };
@@ -59,23 +59,23 @@ export const INTERACTION_OPTIONS: Array<{
   badge: string;
 }> = [
   { type: 'NOTE', label: 'Nota', badge: 'NT' },
-  { type: 'CALL', label: 'LigaÃ§Ã£o', badge: 'CL' },
+  { type: 'CALL', label: 'Ligação', badge: 'CL' },
   { type: 'MESSAGE', label: 'Mensagem', badge: 'MS' },
-  { type: 'MEETING', label: 'ReuniÃ£o', badge: 'MT' },
+  { type: 'MEETING', label: 'Reunião', badge: 'MT' },
 ];
 
 export const ACTIVITY_LABELS: Record<string, string> = {
   LEAD_CREATED: 'Lead criado',
   LEAD_UPDATED: 'Lead atualizado',
-  LEAD_NOTE_UPDATED: 'ObservaÃ§Ãµes atualizadas',
+  LEAD_NOTE_UPDATED: 'Observações atualizadas',
   LEAD_STATUS_CHANGED: 'Status alterado',
   LEAD_WON: 'Lead ganho',
   LEAD_LOST: 'Lead perdido',
   TASK_CREATED: 'Tarefa criada',
-  TASK_DONE: 'Tarefa concluÃ­da',
+  TASK_DONE: 'Tarefa concluída',
   TASK_REOPENED: 'Tarefa reaberta',
   NOTE: 'Nota',
-  CALL: 'LigaÃ§Ã£o',
+  CALL: 'Ligação',
   MESSAGE: 'Mensagem',
-  MEETING: 'ReuniÃ£o',
+  MEETING: 'Reunião',
 };

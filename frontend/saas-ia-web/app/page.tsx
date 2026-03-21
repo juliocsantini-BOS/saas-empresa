@@ -41,10 +41,14 @@ export default function Home() {
 
       localStorage.setItem('access_token', token);
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const maybeAxios = err as {
+        response?: { data?: { message?: string | string[] } };
+        message?: string;
+      };
       const msg =
-        err?.response?.data?.message ||
-        err?.message ||
+        maybeAxios?.response?.data?.message ||
+        maybeAxios?.message ||
         'Falha ao fazer login';
 
       setError(Array.isArray(msg) ? msg.join(', ') : String(msg));
@@ -55,14 +59,14 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0B0B0C] text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#111113] p-8 shadow-[0_0_60px_rgba(59,255,140,0.06)]">
+      <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#111113] p-8 shadow-[0_0_60px_rgba(139,92,246,0.06)]">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#3BFF8C]/15 shadow-[0_0_30px_rgba(59,255,140,0.18)]">
-            <div className="h-6 w-6 rounded-full bg-[#3BFF8C]" />
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8B5CF6]/15 shadow-[0_0_30px_rgba(139,92,246,0.18)]">
+            <div className="h-6 w-6 rounded-full bg-[#8B5CF6]" />
           </div>
 
           <h1 className="text-3xl font-bold tracking-tight">
-            IA Business OS
+            ELYON OS
           </h1>
 
           <p className="mt-2 text-sm text-zinc-400">
@@ -77,7 +81,7 @@ export default function Home() {
             </label>
             <input
               type="email"
-              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-[#3BFF8C]/40"
+              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-[#8B5CF6]/40"
               placeholder="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -90,7 +94,7 @@ export default function Home() {
             </label>
             <input
               type="password"
-              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-[#3BFF8C]/40"
+              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-[#8B5CF6]/40"
               placeholder="senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

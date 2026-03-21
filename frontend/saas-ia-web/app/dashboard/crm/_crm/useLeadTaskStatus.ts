@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { completeCrmLeadTask, reopenCrmLeadTask } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { ExtendedLeadItem, LeadTask } from './types';
@@ -44,7 +43,7 @@ export function useLeadTaskStatus({
 
   const toggleTaskStatus = useCallback(
     async (lead: ExtendedLeadItem | null, task: LeadTask) => {
-      if (!lead || updatingTaskId) return;
+      if (!lead) return;
 
       try {
         setUpdatingTaskId(task.id);
@@ -59,6 +58,7 @@ export function useLeadTaskStatus({
         }
 
         await loadLeads();
+
         await refreshLeadDetails({
           ...lead,
           lastActivityAt: now,
@@ -77,7 +77,7 @@ export function useLeadTaskStatus({
         setUpdatingTaskId(null);
       }
     },
-    [authHeaders, loadLeads, refreshLeadDetails, setError, updatingTaskId],
+    [authHeaders, loadLeads, refreshLeadDetails, setError],
   );
 
   return {

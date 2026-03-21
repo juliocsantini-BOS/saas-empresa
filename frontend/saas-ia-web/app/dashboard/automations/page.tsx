@@ -258,7 +258,7 @@ export default function AutomationsPage() {
 
   function executionBadge(status: AutomationExecution['status']) {
     if (status === 'SUCCESS') {
-      return 'rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]';
+      return 'rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]';
     }
 
     if (status === 'FAILED') {
@@ -295,7 +295,7 @@ export default function AutomationsPage() {
           <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
             Ativas
           </div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">
+          <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">
             {stats.activeRules}
           </div>
           <div className="mt-2 text-sm text-zinc-400">
@@ -319,7 +319,7 @@ export default function AutomationsPage() {
           <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
             Sucesso
           </div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">
+          <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">
             {stats.successExecutions}
           </div>
           <div className="mt-2 text-sm text-zinc-400">
@@ -358,7 +358,7 @@ export default function AutomationsPage() {
 
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="rounded-2xl bg-[#3BFF8C] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+                  className="rounded-2xl bg-[#8B5CF6] px-4 py-3 text-sm font-semibold text-black transition hover:opacity-90"
                 >
                   Nova regra
                 </button>
@@ -393,7 +393,7 @@ export default function AutomationsPage() {
                         <span
                           className={
                             rule.isActive
-                              ? 'rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]'
+                              ? 'rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]'
                               : 'rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300'
                           }
                         >
@@ -526,7 +526,7 @@ export default function AutomationsPage() {
             </div>
 
             <div className="space-y-3">
-              <div className="rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(59,255,140,0.14),transparent_70%),rgba(255,255,255,0.02)] p-5">
+              <div className="rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.14),transparent_70%),rgba(255,255,255,0.02)] p-5">
                 <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
                   Automação enterprise
                 </div>
@@ -563,7 +563,7 @@ export default function AutomationsPage() {
 
       {showCreateModal ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-3xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="w-full max-w-3xl rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Nova regra</h3>
@@ -587,7 +587,7 @@ export default function AutomationsPage() {
                   <input
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   />
                 </div>
 
@@ -596,7 +596,7 @@ export default function AutomationsPage() {
                   <select
                     value={formTriggerType}
                     onChange={(e) => setFormTriggerType(e.target.value as AutomationTriggerType)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   >
                     <option value="LEAD_STATUS_CHANGED">Status do lead alterado</option>
                     <option value="LEAD_CREATED">Lead criado</option>
@@ -612,7 +612,7 @@ export default function AutomationsPage() {
                   <input
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   />
                 </div>
 
@@ -622,7 +622,7 @@ export default function AutomationsPage() {
                     <select
                       value={formToStatus}
                       onChange={(e) => setFormToStatus(e.target.value)}
-                      className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                      className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                     >
                       <option value="NEW">NEW</option>
                       <option value="CONTACTED">CONTACTED</option>
@@ -639,7 +639,7 @@ export default function AutomationsPage() {
                   <input
                     value={formTaskDueInDays}
                     onChange={(e) => setFormTaskDueInDays(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   />
                 </div>
 
@@ -648,7 +648,7 @@ export default function AutomationsPage() {
                   <input
                     value={formTaskTitle}
                     onChange={(e) => setFormTaskTitle(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   />
                 </div>
 
@@ -657,7 +657,7 @@ export default function AutomationsPage() {
                   <textarea
                     value={formTaskDescription}
                     onChange={(e) => setFormTaskDescription(e.target.value)}
-                    className="min-h-[100px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                    className="min-h-[100px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                   />
                 </div>
 
@@ -678,7 +678,7 @@ export default function AutomationsPage() {
                     <textarea
                       value={formActivityDescription}
                       onChange={(e) => setFormActivityDescription(e.target.value)}
-                      className="min-h-[100px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#3BFF8C]/40"
+                      className="min-h-[100px] w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-[#8B5CF6]/40"
                     />
                   </div>
                 ) : null}
@@ -696,7 +696,7 @@ export default function AutomationsPage() {
                 <button
                   type="submit"
                   disabled={creatingRule}
-                  className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
+                  className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90 disabled:opacity-60"
                 >
                   {creatingRule ? 'Criando...' : 'Criar regra'}
                 </button>

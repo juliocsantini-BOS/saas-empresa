@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-
 import { getMyCrmPermissions } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 
@@ -15,6 +14,9 @@ type UseCrmPermissionsResult = {
   canDeleteSavedViews: boolean;
   canSeeValues: boolean;
   canSeeLostReasons: boolean;
+  canReadSalesTargets: boolean;
+  canCreateSalesTargets: boolean;
+  canDeleteSalesTargets: boolean;
 };
 
 export function useCrmPermissions(authHeaders: AuthHeaders): UseCrmPermissionsResult {
@@ -58,6 +60,9 @@ export function useCrmPermissions(authHeaders: AuthHeaders): UseCrmPermissionsRe
       canDeleteSavedViews: permissionSet.has('crm.saved_views.delete'),
       canSeeValues: permissionSet.has('crm.values.read'),
       canSeeLostReasons: permissionSet.has('crm.loss_reasons.read'),
+      canReadSalesTargets: permissionSet.has('crm.sales_targets.read'),
+      canCreateSalesTargets: permissionSet.has('crm.sales_targets.create'),
+      canDeleteSalesTargets: permissionSet.has('crm.sales_targets.delete'),
     };
   }, [permissionKeys]);
 }

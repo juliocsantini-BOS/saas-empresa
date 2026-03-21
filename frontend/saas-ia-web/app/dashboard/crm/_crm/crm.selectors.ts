@@ -1,10 +1,9 @@
 import { STATUS_ORDER } from './constants';
 import type {
-  BooleanFilter,
   BranchOption,
+  CrmSavedViewFilters,
   CrmStats,
   DepartmentOption,
-  CrmSavedViewFilters,
   ExtendedLeadItem,
   LeadStatus,
   UserOption,
@@ -20,9 +19,7 @@ import {
   temperatureFilterMatch,
 } from './utils';
 
-export type CrmFiltersState = CrmSavedViewFilters & {
-  branchFilter: string;
-};
+export type CrmFiltersState = CrmSavedViewFilters;
 
 export type PipelineTotal = {
   status: LeadStatus;
@@ -52,6 +49,7 @@ function sortByName<T extends { name: string }>(items: T[]) {
 
 export function getOwnerOptions(leads: ExtendedLeadItem[]): UserOption[] {
   const map = new Map<string, string>();
+
   leads.forEach((lead) => {
     if (lead.ownerUser?.id && lead.ownerUser?.name) {
       map.set(lead.ownerUser.id, normalizeUiText(lead.ownerUser.name));
@@ -63,6 +61,7 @@ export function getOwnerOptions(leads: ExtendedLeadItem[]): UserOption[] {
 
 export function getBranchOptions(leads: ExtendedLeadItem[]): BranchOption[] {
   const map = new Map<string, string>();
+
   leads.forEach((lead) => {
     if (lead.branch?.id && lead.branch?.name) {
       map.set(lead.branch.id, normalizeUiText(lead.branch.name));
@@ -74,6 +73,7 @@ export function getBranchOptions(leads: ExtendedLeadItem[]): BranchOption[] {
 
 export function getDepartmentOptions(leads: ExtendedLeadItem[]): DepartmentOption[] {
   const map = new Map<string, string>();
+
   leads.forEach((lead) => {
     if (lead.department?.id && lead.department?.name) {
       map.set(lead.department.id, normalizeUiText(lead.department.name));
@@ -85,6 +85,7 @@ export function getDepartmentOptions(leads: ExtendedLeadItem[]): DepartmentOptio
 
 export function getSourceOptions(leads: ExtendedLeadItem[]) {
   const values = new Set<string>();
+
   leads.forEach((lead) => {
     const source = normalizeUiText(lead.source || '').trim();
     if (source) values.add(source);
@@ -95,7 +96,7 @@ export function getSourceOptions(leads: ExtendedLeadItem[]) {
     .map((value) => ({ id: value, name: value }));
 }
 
-function isTruthyFilter(filter: BooleanFilter) {
+function isTruthyFilter(filter: 'ALL' | 'YES') {
   return filter === 'YES';
 }
 
@@ -137,6 +138,7 @@ export function getFilteredLeads(leads: ExtendedLeadItem[], filters: CrmFiltersS
     const probability = normalizeProbability(lead);
     const dealValue = parseMoney(lead.dealValue);
     const openTasksCount = lead.tasks?.length || 0;
+
     const searchable = [
       lead.name,
       lead.companyName,
@@ -156,22 +158,33 @@ export function getFilteredLeads(leads: ExtendedLeadItem[], filters: CrmFiltersS
     if (filters.sourceFilter !== 'ALL' && source !== filters.sourceFilter) return false;
     if (filters.ownerFilter !== 'ALL' && lead.ownerUser?.id !== filters.ownerFilter) return false;
     if (filters.branchFilter !== 'ALL' && lead.branch?.id !== filters.branchFilter) return false;
-    if (filters.departmentFilter !== 'ALL' && lead.department?.id !== filters.departmentFilter) {
+
+    if (
+      filters.departmentFilter !== 'ALL' &&
+      lead.department?.id !== filters.departmentFilter
+    ) {
       return false;
     }
+
     if (isTruthyFilter(filters.openTasksOnly) && openTasksCount === 0) return false;
     if (isTruthyFilter(filters.stalledOnly) && daysSince(getLastActivity(lead)) <= 5) return false;
+
     if (
       isTruthyFilter(filters.overdueNextStepOnly) &&
       (!lead.nextStepDueAt || new Date(lead.nextStepDueAt).getTime() >= now.getTime())
     ) {
       return false;
     }
+
     if (probabilityMin !== null && probability < probabilityMin) return false;
     if (probabilityMax !== null && probability > probabilityMax) return false;
     if (dealValueMin !== null && dealValue < dealValueMin) return false;
     if (dealValueMax !== null && dealValue > dealValueMax) return false;
-    if (!isDateInRange(lead.createdAt, filters.createdAtFrom, filters.createdAtTo)) return false;
+
+    if (!isDateInRange(lead.createdAt, filters.createdAtFrom, filters.createdAtTo)) {
+      return false;
+    }
+
     if (
       !isDateInRange(
         lead.expectedCloseDate,
@@ -196,17 +209,24 @@ export function getCrmStats(filteredLeads: ExtendedLeadItem[]): CrmStats {
   const pipeline = filteredLeads.filter((lead) =>
     ['NEW', 'CONTACTED', 'PROPOSAL', 'NEGOTIATION'].includes(lead.status),
   ).length;
+
   const conversionRate = total ? Math.round((won / total) * 100) : 0;
+
   const monthStart = new Date();
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
+
   const newThisMonth = filteredLeads.filter(
     (lead) => new Date(lead.createdAt).getTime() >= monthStart.getTime(),
   ).length;
+
   const hotLeads = filteredLeads.filter(
     (lead) => getLeadTemperature(getLeadScore(lead, [], [])) === 'Quente',
   ).length;
-  const stalledLeads = filteredLeads.filter((lead) => daysSince(getLastActivity(lead)) > 5).length;
+
+  const stalledLeads = filteredLeads.filter(
+    (lead) => daysSince(getLastActivity(lead)) > 5,
+  ).length;
 
   return {
     total,
@@ -236,13 +256,16 @@ export function getPipelineGroups(
             parseMoney(b.dealValue) - parseMoney(a.dealValue) ||
             new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
         );
+
       return acc;
     },
     {} as Record<LeadStatus, ExtendedLeadItem[]>,
   );
 }
 
-export function getPipelineTotals(pipelineGroups: Record<LeadStatus, ExtendedLeadItem[]>) {
+export function getPipelineTotals(
+  pipelineGroups: Record<LeadStatus, ExtendedLeadItem[]>,
+): PipelineTotal[] {
   return STATUS_ORDER.map((status) => {
     const items = pipelineGroups[status];
     const totalValue = items.reduce((sum, lead) => sum + parseMoney(lead.dealValue), 0);
@@ -250,8 +273,11 @@ export function getPipelineTotals(pipelineGroups: Record<LeadStatus, ExtendedLea
       (sum, lead) => sum + parseMoney(lead.dealValue) * (normalizeProbability(lead) / 100),
       0,
     );
+
     const avgProbability = items.length
-      ? Math.round(items.reduce((sum, lead) => sum + normalizeProbability(lead), 0) / items.length)
+      ? Math.round(
+          items.reduce((sum, lead) => sum + normalizeProbability(lead), 0) / items.length,
+        )
       : 0;
 
     return {
@@ -271,6 +297,7 @@ export function getDominantStatus(pipelineTotals: PipelineTotal[]): LeadStatus {
 
 export function getTopOwner(filteredLeads: ExtendedLeadItem[]): [string, number] | null {
   const counts = new Map<string, number>();
+
   filteredLeads.forEach((lead) => {
     const owner = normalizeUiText(lead.ownerUser?.name || '');
     if (!owner) return;
@@ -291,6 +318,7 @@ export function getTotalForecast(pipelineTotals: PipelineTotal[]) {
 
 export function getAverageProbability(filteredLeads: ExtendedLeadItem[]) {
   if (!filteredLeads.length) return 0;
+
   return Math.round(
     filteredLeads.reduce((sum, lead) => sum + normalizeProbability(lead), 0) /
       filteredLeads.length,
@@ -300,16 +328,27 @@ export function getAverageProbability(filteredLeads: ExtendedLeadItem[]) {
 export function getStageConversionReport(filteredLeads: ExtendedLeadItem[]): CrmReportRow[] {
   const counts = new Map<LeadStatus, number>();
   STATUS_ORDER.forEach((status) => counts.set(status, 0));
-  filteredLeads.forEach((lead) => counts.set(lead.status, (counts.get(lead.status) || 0) + 1));
+
+  filteredLeads.forEach((lead) => {
+    counts.set(lead.status, (counts.get(lead.status) || 0) + 1);
+  });
 
   return STATUS_ORDER.map((status, index) => {
     const count = counts.get(status) || 0;
     const previousStatus = STATUS_ORDER[Math.max(index - 1, 0)];
     const previousCount = counts.get(previousStatus) || 0;
-    const rate = index === 0 ? (count > 0 ? 100 : 0) : previousCount ? Math.round((count / previousCount) * 100) : 0;
+
+    const rate =
+      index === 0
+        ? count > 0
+          ? 100
+          : 0
+        : previousCount
+          ? Math.round((count / previousCount) * 100)
+          : 0;
 
     return {
-      label: STATUS_ORDER[index],
+      label: status,
       count,
       rate,
     };
@@ -322,9 +361,11 @@ export function getSourceConversionReport(filteredLeads: ExtendedLeadItem[]): Cr
   filteredLeads.forEach((lead) => {
     const source = normalizeUiText(lead.source || 'Sem origem');
     const current = groups.get(source) || { count: 0, won: 0, value: 0 };
+
     current.count += 1;
     current.won += lead.status === 'WON' ? 1 : 0;
     current.value += parseMoney(lead.dealValue);
+
     groups.set(source, current);
   });
 
@@ -351,8 +392,10 @@ function getValueByGroup(
   getPipelineLeads(filteredLeads).forEach((lead) => {
     const label = normalizeUiText(getLabel(lead) || 'Não definido');
     const current = groups.get(label) || { count: 0, value: 0 };
+
     current.count += 1;
     current.value += parseMoney(lead.dealValue);
+
     groups.set(label, current);
   });
 
@@ -377,11 +420,19 @@ export function getPipelineValueByDepartmentReport(filteredLeads: ExtendedLeadIt
   return getValueByGroup(filteredLeads, (lead) => lead.department?.name || 'Sem departamento');
 }
 
-export function getWonLostByPeriodReport(filteredLeads: ExtendedLeadItem[]): CrmPeriodOutcomeRow[] {
+export function getWonLostByPeriodReport(
+  filteredLeads: ExtendedLeadItem[],
+): CrmPeriodOutcomeRow[] {
   const groups = new Map<string, CrmPeriodOutcomeRow>();
 
   filteredLeads.forEach((lead) => {
-    const date = lead.status === 'WON' ? lead.wonAt : lead.status === 'LOST' ? lead.lostAt : null;
+    const date =
+      lead.status === 'WON'
+        ? lead.wonAt
+        : lead.status === 'LOST'
+          ? lead.lostAt
+          : null;
+
     if (!date) return;
 
     const parsed = new Date(date);
@@ -389,8 +440,10 @@ export function getWonLostByPeriodReport(filteredLeads: ExtendedLeadItem[]): Crm
 
     const period = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}`;
     const current = groups.get(period) || { period, won: 0, lost: 0 };
+
     if (lead.status === 'WON') current.won += 1;
     if (lead.status === 'LOST') current.lost += 1;
+
     groups.set(period, current);
   });
 
@@ -415,7 +468,10 @@ export function getLossReasonsBreakdownReport(filteredLeads: ExtendedLeadItem[])
 export function getStageAgingReport(filteredLeads: ExtendedLeadItem[]): CrmReportRow[] {
   return STATUS_ORDER.map((status) => {
     const leads = filteredLeads.filter((lead) => lead.status === status);
-    const totalDays = leads.reduce((sum, lead) => sum + daysSince(lead.statusChangedAt || lead.updatedAt), 0);
+    const totalDays = leads.reduce(
+      (sum, lead) => sum + daysSince(lead.statusChangedAt || lead.updatedAt),
+      0,
+    );
 
     return {
       label: status,
@@ -446,6 +502,7 @@ export function getOpenTasksByOwnerReport(filteredLeads: ExtendedLeadItem[]): Cr
   filteredLeads.forEach((lead) => {
     const openTasks = lead.tasks?.length || 0;
     if (openTasks === 0) return;
+
     const label = normalizeUiText(lead.ownerUser?.name || 'Sem responsável');
     groups.set(label, (groups.get(label) || 0) + openTasks);
   });

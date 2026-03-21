@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { updateCrmLeadOutcome } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { ExtendedLeadItem } from './types';
@@ -66,8 +65,11 @@ export function useLeadOutcomeUpdate({
   }, []);
 
   const submitOutcome = useCallback(async () => {
-    if (!outcomeLead || !outcomeStatus || savingOutcome) return;
-    if (outcomeStatus === 'LOST' && !lostReason.trim()) return;
+    if (!outcomeLead || !outcomeStatus) return;
+
+    const normalizedLostReason = lostReason.trim();
+
+    if (outcomeStatus === 'LOST' && !normalizedLostReason) return;
 
     try {
       setSavingOutcome(true);
@@ -75,11 +77,15 @@ export function useLeadOutcomeUpdate({
 
       const updatedLead = await updateCrmLeadOutcome(authHeaders, outcomeLead.id, {
         status: outcomeStatus,
-        lostReason: outcomeStatus === 'LOST' ? lostReason : undefined,
+        lostReason: outcomeStatus === 'LOST' ? normalizedLostReason : undefined,
       });
 
       await loadLeads();
-      await onLeadUpdated(updatedLead);
+
+      if (updatedLead) {
+        await onLeadUpdated(updatedLead);
+      }
+
       closeOutcomeFlow();
     } catch (error: unknown) {
       setError(
@@ -101,7 +107,6 @@ export function useLeadOutcomeUpdate({
     onLeadUpdated,
     outcomeLead,
     outcomeStatus,
-    savingOutcome,
     setError,
   ]);
 

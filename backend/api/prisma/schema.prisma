@@ -59,11 +59,643 @@ enum AutomationExecutionStatus {
   SKIPPED
 }
 
+enum SalesTargetPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  MONTH
+  QUARTER
+  YEAR
+}
+
+enum CrmForecastCategory {
+  PIPELINE
+  BEST_CASE
+  COMMIT
+  CLOSED
+}
+
+enum CrmMailboxProvider {
+  GOOGLE
+  MICROSOFT
+  IMAP
+  SMTP
+  OTHER
+}
+
+enum CrmMailboxSyncStatus {
+  DISCONNECTED
+  CONNECTED
+  SYNCING
+  ERROR
+}
+
+enum CrmIntegrationProvider {
+  GOOGLE
+  GMAIL
+  MICROSOFT
+  YAHOO
+  WHATSAPP
+  FACEBOOK
+  INSTAGRAM
+  OTHER
+}
+
+enum CrmIntegrationCategory {
+  EMAIL
+  MESSAGING
+  SOCIAL
+}
+
+enum CrmIntegrationConnectionMode {
+  OAUTH
+  API_KEY
+  MANUAL
+  WEBHOOK
+  IMAP_SMTP
+}
+
+enum CrmIntegrationStatus {
+  DISCONNECTED
+  PENDING
+  CONNECTED
+  ERROR
+  EXPIRED
+  REQUIRES_REAUTH
+}
+
+enum CrmOmnichannelDirection {
+  INBOUND
+  OUTBOUND
+  SYSTEM
+}
+
+enum CrmOmnichannelMessageStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  RECEIVED
+}
+
+enum CrmEmailDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum CrmEmailSyncSource {
+  MANUAL
+  PROVIDER
+  SEQUENCE
+  AUTOMATION
+}
+
+enum CrmSequenceStepType {
+  EMAIL
+  TASK
+  CALL
+  MEETING
+  NOTE
+}
+
+enum CrmSequenceEnrollmentStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  STOPPED
+}
+
+enum CrmQuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  APPROVED
+  SIGNED
+  REJECTED
+  EXPIRED
+}
+
+enum CrmDocumentType {
+  QUOTE
+  PROPOSAL
+  CONTRACT
+  ATTACHMENT
+}
+
+enum CrmSignatureStatus {
+  NOT_SENT
+  SENT
+  VIEWED
+  SIGNED
+  DECLINED
+  EXPIRED
+}
+
+enum CrmRoutingStrategy {
+  ROUND_ROBIN
+  LOAD_BALANCED
+  BEST_FIT
+  MANUAL
+}
+
+enum CrmRoutingExecutionStatus {
+  APPLIED
+  SKIPPED
+}
+
+enum FinanceAccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum FinanceBankAccountType {
+  BANK
+  CASH
+  WALLET
+  CREDIT_CARD
+}
+
+enum FinanceCategoryKind {
+  INCOME
+  EXPENSE
+  TRANSFER
+  TAX
+  PAYROLL
+  OPERATING
+}
+
+enum FinanceDocumentStatus {
+  DRAFT
+  OPEN
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELED
+  APPROVAL_PENDING
+  DISPUTED
+}
+
+enum FinanceTransactionDirection {
+  INFLOW
+  OUTFLOW
+  TRANSFER
+}
+
+enum FinanceTransactionSource {
+  MANUAL
+  PAYABLE
+  RECEIVABLE
+  STATEMENT_IMPORT
+  RECONCILIATION
+  PIX
+  INTERCOMPANY
+}
+
+enum FinanceReminderChannel {
+  EMAIL
+  WHATSAPP
+  SMS
+  MANUAL
+}
+
+enum FinanceReminderStatus {
+  PENDING
+  SENT
+  FAILED
+  ACKNOWLEDGED
+}
+
+enum FinanceStatementImportStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum FinanceStatementLineMatchStatus {
+  UNMATCHED
+  SUGGESTED
+  MATCHED
+  IGNORED
+}
+
+enum FinanceApprovalPolicyScope {
+  COMPANY
+  BRANCH
+  DEPARTMENT
+  COST_CENTER
+}
+
+enum FinanceApprovalRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELED
+}
+
+enum FinanceClosePeriodStatus {
+  OPEN
+  IN_REVIEW
+  CLOSED
+}
+
+enum FinanceBudgetPeriod {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum FinanceBudgetLineType {
+  REVENUE
+  EXPENSE
+  CASHFLOW
+}
+
+enum FinanceVendorPortalStatus {
+  DISABLED
+  INVITED
+  ACTIVE
+  SUSPENDED
+}
+
+enum FinanceDocumentCaptureStatus {
+  UPLOADED
+  PROCESSING
+  EXTRACTED
+  REVIEWED
+  REJECTED
+}
+
+enum FinanceProcurementStatus {
+  DRAFT
+  SUBMITTED
+  APPROVAL_PENDING
+  APPROVED
+  REJECTED
+  ORDERED
+  RECEIVED
+  CLOSED
+}
+
+enum FinancePurchaseOrderStatus {
+  DRAFT
+  APPROVAL_PENDING
+  APPROVED
+  ISSUED
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CLOSED
+  CANCELLED
+}
+
+enum FinanceGoodsReceiptStatus {
+  PENDING
+  PARTIAL
+  COMPLETE
+}
+
+enum FinanceThreeWayMatchStatus {
+  PENDING
+  MATCHED
+  VARIANCE
+  REJECTED
+}
+
+enum FinanceExpenseReportStatus {
+  DRAFT
+  SUBMITTED
+  APPROVAL_PENDING
+  APPROVED
+  REIMBURSED
+  REJECTED
+}
+
+enum FinanceExpenseSource {
+  MANUAL
+  CARD
+  OCR
+  IMPORT
+}
+
+enum FinanceCorporateCardStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum FinanceErpProvider {
+  NETSUITE
+  SAGE_INTACCT
+  QUICKBOOKS
+  XERO
+  DYNAMICS
+  OTHER
+}
+
+enum FinanceSyncStatus {
+  DISCONNECTED
+  CONNECTED
+  SYNCING
+  ERROR
+}
+
+enum FinanceTreasuryTransferStatus {
+  PLANNED
+  IN_TRANSIT
+  SETTLED
+  CANCELLED
+  FAILED
+}
+
+enum FinanceTreasuryAllocationType {
+  OPERATING
+  RESERVE
+  INVESTMENT
+  ESCROW
+}
+
+enum FinanceAnomalySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum FinanceTravelPolicyStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum FinanceTravelRequestStatus {
+  DRAFT
+  SUBMITTED
+  APPROVAL_PENDING
+  APPROVED
+  BOOKED
+  COMPLETED
+  REJECTED
+}
+
+enum FinanceTravelBookingType {
+  FLIGHT
+  HOTEL
+  CAR
+  RAIL
+  OTHER
+}
+
+enum FinanceTravelAdvanceStatus {
+  REQUESTED
+  APPROVED
+  PAID
+  SETTLED
+  REJECTED
+}
+
+enum FinanceSubscriptionInterval {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+enum FinanceBillingStatus {
+  DRAFT
+  ACTIVE
+  PAST_DUE
+  PAUSED
+  CANCELED
+}
+
+enum FinanceInvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  OVERDUE
+  REFUNDED
+}
+
+enum FinanceTaxRegime {
+  SIMPLE
+  STANDARD
+  VAT
+  GST
+  OTHER
+}
+
+enum FinanceRevenueScheduleStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELED
+}
+
+enum FinanceRecoveryStatus {
+  PENDING
+  IN_PROGRESS
+  RECOVERED
+  LOST
+}
+
+enum FinanceCloseEvidenceStatus {
+  PENDING
+  ATTACHED
+  VERIFIED
+}
+
+enum FinanceGlobalEntityStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum FinanceCountryPolicyStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum FinancePlanDriverType {
+  HEADCOUNT
+  REVENUE
+  VOLUME
+  FX
+  CUSTOM
+}
+
+enum FinancePlanScenarioStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum FinanceCopilotPlaybookStatus {
+  DRAFT
+  ACTIVE
+  RUNNING
+  COMPLETED
+}
+
+enum FinanceRevenueConnectorProvider {
+  STRIPE
+  PADDLE
+  CHARGEBEE
+  ZUORA
+  OTHER
+}
+
+enum FinanceRevenueConnectorStatus {
+  DISCONNECTED
+  CONNECTED
+  SYNCING
+  ERROR
+}
+
+enum FinanceFxRateSource {
+  MANUAL
+  ECB
+  OPEN_EXCHANGE
+  BANK
+  OTHER
+}
+
+enum FinanceInternationalReimbursementStatus {
+  DRAFT
+  APPROVAL_PENDING
+  APPROVED
+  PAID
+  REJECTED
+}
+
+enum FinanceLocalPayoutStatus {
+  PLANNED
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum FinanceIntercompanyStatus {
+  DRAFT
+  POSTED
+  SETTLED
+  RECONCILED
+}
+
+enum FinanceConsolidationStatus {
+  DRAFT
+  RUNNING
+  COMPLETED
+  LOCKED
+}
+
+enum FinanceVendorKycStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum FinanceVendorContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRING
+  EXPIRED
+  TERMINATED
+}
+
+enum FinanceBenchmarkStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum FinanceWarehouseStatus {
+  DISCONNECTED
+  CONNECTED
+  SYNCING
+  ERROR
+}
+
+enum FinanceMetricSnapshotType {
+  CASH
+  REVENUE
+  SPEND
+  MARGIN
+  CUSTOM
+}
+
+enum FinanceRevenueCohortType {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum EnterpriseIdentityProvider {
+  OKTA
+  AZURE_AD
+  GOOGLE
+  ONESIGNAL
+  CUSTOM
+}
+
+enum EnterpriseSsoStatus {
+  DRAFT
+  ACTIVE
+  DISABLED
+}
+
+enum EnterpriseScimStatus {
+  DRAFT
+  ACTIVE
+  ERROR
+}
+
+enum EnterpriseRetentionStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum EnterpriseAuditExportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EnterpriseSodSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum FinanceApprovalEvidenceStatus {
+  PENDING
+  ATTACHED
+  VERIFIED
+}
+
 model Company {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  requestId String?
+  id               String   @id @default(cuid())
+  name             String
+  sector           String?
+  teamSize         String?
+  operationModel   String?
+  hasInventory     String?
+  salesModel       String?
+  financeMaturity  String?
+  multiUnit        String?
+  mainGoal         String?
+  createdAt        DateTime @default(now())
+  requestId        String?
 
   users                User[]
   branches             Branch[]
@@ -75,6 +707,151 @@ model Company {
   crmLeadActivities    CrmLeadActivity[]
   crmLeadTasks         CrmLeadTask[]
   crmSavedViews        CrmSavedView[]
+  salesTargets         SalesTarget[]
+  crmPipelines         CrmPipeline[]
+  crmPipelineStages    CrmPipelineStage[]
+  crmAccounts          CrmAccount[]
+  crmContacts          CrmContact[]
+  crmMailboxes         CrmMailbox[]
+  crmChannelIntegrations CrmChannelIntegration[]
+  crmOmnichannelMessages CrmOmnichannelMessage[]
+  crmEmailTemplates    CrmEmailTemplate[]
+  crmSequences         CrmSequence[]
+  crmSequenceSteps     CrmSequenceStep[]
+  crmSequenceEnrollments CrmSequenceEnrollment[]
+  crmEmailMessages     CrmEmailMessage[]
+  crmQuotes            CrmQuote[]
+  crmQuoteItems        CrmQuoteItem[]
+  crmDocuments         CrmDocument[]
+  crmRoutingRules      CrmRoutingRule[]
+  crmRoutingExecutions CrmRoutingExecution[]
+  crmConversationInsights CrmConversationInsight[]
+  crmForecastSnapshots CrmForecastSnapshot[]
+  crmForecastAdjustments CrmForecastAdjustment[]
+  financeAccounts        FinanceAccount[]
+  financeBankAccounts    FinanceBankAccount[]
+  financeCostCenters     FinanceCostCenter[]
+  financeCategories      FinanceCategory[]
+  financePayables        FinancePayable[]
+  financeReceivables     FinanceReceivable[]
+  financeReminders       FinanceReminder[]
+  financeTransactions    FinanceTransaction[]
+  financeStatementImports FinanceStatementImport[]
+  financeStatementLines  FinanceStatementLine[]
+  financeReconciliationMatches FinanceReconciliationMatch[]
+  financePixConfirmations FinancePixConfirmation[]
+  financeApprovalPolicies FinanceApprovalPolicy[]
+  financeApprovalRequests FinanceApprovalRequest[]
+  financeClosePeriods    FinanceClosePeriod[]
+  financeCloseChecklistItems FinanceCloseChecklistItem[]
+  financeBudgetPlans     FinanceBudgetPlan[]
+  financeBudgetLines     FinanceBudgetLine[]
+  financeForecastSnapshots FinanceForecastSnapshot[]
+  financeVendors         FinanceVendor[]
+  financeVendorDocuments FinanceVendorDocument[]
+  financeProcurementRequests FinanceProcurementRequest[]
+  financePurchaseOrders  FinancePurchaseOrder[]
+  financePurchaseOrderLines FinancePurchaseOrderLine[]
+  financeGoodsReceipts   FinanceGoodsReceipt[]
+  financeThreeWayMatches FinanceThreeWayMatch[]
+  financeExpenseReports  FinanceExpenseReport[]
+  financeExpenseItems    FinanceExpenseItem[]
+  financeCorporateCards  FinanceCorporateCard[]
+  financeCardTransactions FinanceCardTransaction[]
+  financeErpConnections  FinanceErpConnection[]
+  financeErpSyncJobs     FinanceErpSyncJob[]
+  financeTreasuryTransfers FinanceTreasuryTransfer[]
+  financeTreasuryAllocations FinanceTreasuryAllocation[]
+  financeCashPositionSnapshots FinanceCashPositionSnapshot[]
+  financeAnomalyInsights FinanceAnomalyInsight[]
+  financeCashForecastRuns FinanceCashForecastRun[]
+  financeTravelPolicies  FinanceTravelPolicy[]
+  financeTravelRequests  FinanceTravelRequest[]
+  financeTravelBookings  FinanceTravelBooking[]
+  financeTravelAdvances  FinanceTravelAdvance[]
+  financeBillingPlans    FinanceBillingPlan[]
+  financeInvoices        FinanceInvoice[]
+  financeTaxProfiles     FinanceTaxProfile[]
+  financeRevenueSchedules FinanceRevenueSchedule[]
+  financeRecoveryCases   FinanceRecoveryCase[]
+  financeCloseEvidences  FinanceCloseEvidence[]
+  financeGlobalEntities  FinanceGlobalEntity[]
+  financeCountryPolicies FinanceCountryPolicy[]
+  financePlanDrivers     FinancePlanDriver[]
+  financePlanScenarios   FinancePlanScenario[]
+  financeCopilotInsights FinanceCopilotInsight[]
+  financeCopilotPlaybooks FinanceCopilotPlaybook[]
+  financeUsageMeters     FinanceUsageMeter[]
+  financeUsageEvents     FinanceUsageEvent[]
+  financeRevenueSubledgerEntries FinanceRevenueSubledgerEntry[]
+  financeRevenueConnectors FinanceRevenueConnector[]
+  financeFxRates         FinanceFxRate[]
+  financeInternationalReimbursements FinanceInternationalReimbursement[]
+  financeLocalPayouts    FinanceLocalPayout[]
+  financeIntercompanyTransfers FinanceIntercompanyTransfer[]
+  financeConsolidationSnapshots FinanceConsolidationSnapshot[]
+  financeTaxJurisdictions FinanceTaxJurisdiction[]
+  financeTaxTrails       FinanceTaxTrail[]
+  financeVendorKycReviews FinanceVendorKycReview[]
+  financeVendorContracts FinanceVendorContract[]
+  financeVendorNegotiationBenchmarks FinanceVendorNegotiationBenchmark[]
+  financeWarehouseConnections FinanceDataWarehouseConnection[]
+  financeMetricSnapshots FinanceMetricSnapshot[]
+  financeRevenueCohorts  FinanceRevenueCohort[]
+  financeUnitBenchmarks  FinanceUnitBenchmark[]
+  financeBillingPlanVersions FinanceBillingPlanVersion[]
+  financeCustomerCreditBalances FinanceCustomerCreditBalance[]
+  financeRateCards       FinanceRateCard[]
+  financeInvoiceRetryAttempts FinanceInvoiceRetryAttempt[]
+  financeWorkforcePlans  FinanceWorkforcePlan[]
+  financeScenarioMerges  FinanceScenarioMerge[]
+  financeVarianceExplanations FinanceVarianceExplanation[]
+  financePlanningCollaborations FinancePlanningCollaboration[]
+  financeProcurementSignals FinanceProcurementSignal[]
+  financeCopilotRuns    FinanceCopilotRun[]
+  financeCopilotCases   FinanceCopilotCase[]
+  financeDunningPolicies FinanceDunningPolicy[]
+  financeInvoiceLifecycleEvents FinanceInvoiceLifecycleEvent[]
+  financeCustomerBillingPortals FinanceCustomerBillingPortal[]
+  financeProcurementInvestigations FinanceProcurementInvestigation[]
+  financeOcrLineItems   FinanceOcrLineItem[]
+  financeVendorScorecards FinanceVendorScorecard[]
+  financePlanningCycles FinancePlanningCycle[]
+  financeHeadcountPlanLines FinanceHeadcountPlanLine[]
+  financeScenarioComparisons FinanceScenarioComparison[]
+  financeFxExposures    FinanceFxExposure[]
+  financeIntercompanySettlements FinanceIntercompanySettlement[]
+  financeTaxRegistrations FinanceTaxRegistration[]
+  financeComplianceRuns FinanceComplianceRun[]
+  financeControlExceptions FinanceControlException[]
+  financeCopilotRules FinanceCopilotRule[]
+  financeCopilotActions FinanceCopilotAction[]
+  financeApprovalGuardrails FinanceApprovalGuardrail[]
+  financeCollectionAutomations FinanceCollectionAutomation[]
+  financeCashRebalanceInstructions FinanceCashRebalanceInstruction[]
+  financeCustomerUsageSnapshots FinanceCustomerUsageSnapshot[]
+  financeInvoicePaymentSessions FinanceInvoicePaymentSession[]
+  financeBillingCreditApplications FinanceBillingCreditApplication[]
+  financeRetrySegmentPolicies FinanceRetrySegmentPolicy[]
+  financeFxAutomationRuns FinanceFxAutomationRun[]
+  financeLocalPayoutBatches FinanceLocalPayoutBatch[]
+  financeIntercompanySettlementLines FinanceIntercompanySettlementLine[]
+  financeTaxRules FinanceTaxRule[]
+  financeConsolidationEntityBalances FinanceConsolidationEntityBalance[]
+  financeSegregationEnforcements FinanceSegregationEnforcement[]
+  financeEvidencePacks FinanceEvidencePack[]
+  financeRetentionExecutions FinanceRetentionExecution[]
+  financeAuditPackages FinanceAuditPackage[]
+  financeOcrMatchResults FinanceOcrMatchResult[]
+  financeFraudDetectionRuns FinanceFraudDetectionRun[]
+  financeVendorDynamicScores FinanceVendorDynamicScore[]
+  financeNegotiationOpportunities FinanceNegotiationOpportunity[]
+  enterpriseSsoConfigs   EnterpriseSsoConfig[]
+  enterpriseScimProvisions EnterpriseScimProvision[]
+  enterpriseDataRetentionPolicies EnterpriseDataRetentionPolicy[]
+  enterpriseAuditExports EnterpriseAuditExport[]
+  enterpriseSegregationPolicies EnterpriseSegregationPolicy[]
+  financeApprovalEvidences FinanceApprovalEvidence[]
   automationRules      AutomationRule[]
   automationActions    AutomationAction[]
   automationExecutions AutomationExecution[]
@@ -92,9 +869,28 @@ model Branch {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  users       User[]
-  departments Department[]
-  crmLeads    CrmLead[]
+  users        User[]
+  departments  Department[]
+  crmLeads     CrmLead[]
+  salesTargets SalesTarget[]
+  crmAccounts  CrmAccount[]
+  crmContacts  CrmContact[]
+  crmQuotes    CrmQuote[]
+  crmForecastSnapshots CrmForecastSnapshot[]
+  crmRoutingRules CrmRoutingRule[]
+  financeAccounts FinanceAccount[]
+  financeBankAccounts FinanceBankAccount[]
+  financeCostCenters FinanceCostCenter[]
+  financeCategories FinanceCategory[]
+  financePayables FinancePayable[]
+  financeReceivables FinanceReceivable[]
+  financeTransactions FinanceTransaction[]
+  financeApprovalPolicies FinanceApprovalPolicy[]
+  financeApprovalRequests FinanceApprovalRequest[]
+  financeClosePeriods FinanceClosePeriod[]
+  financeBudgetPlans FinanceBudgetPlan[]
+  financeBudgetLines FinanceBudgetLine[]
+  financeForecastSnapshots FinanceForecastSnapshot[]
 
   @@unique([companyId, name])
   @@index([companyId])
@@ -113,8 +909,26 @@ model Department {
   branchId String
   branch   Branch @relation(fields: [branchId], references: [id])
 
-  users    User[]
-  crmLeads CrmLead[]
+  users        User[]
+  crmLeads     CrmLead[]
+  salesTargets SalesTarget[]
+  crmAccounts  CrmAccount[]
+  crmContacts  CrmContact[]
+  crmQuotes    CrmQuote[]
+  crmForecastSnapshots CrmForecastSnapshot[]
+  crmRoutingRules CrmRoutingRule[]
+  financeAccounts FinanceAccount[]
+  financeCostCenters FinanceCostCenter[]
+  financeCategories FinanceCategory[]
+  financePayables FinancePayable[]
+  financeReceivables FinanceReceivable[]
+  financeTransactions FinanceTransaction[]
+  financeApprovalPolicies FinanceApprovalPolicy[]
+  financeApprovalRequests FinanceApprovalRequest[]
+  financeClosePeriods FinanceClosePeriod[]
+  financeBudgetPlans FinanceBudgetPlan[]
+  financeBudgetLines FinanceBudgetLine[]
+  financeForecastSnapshots FinanceForecastSnapshot[]
 
   @@unique([branchId, name])
   @@index([companyId])
@@ -148,10 +962,28 @@ model User {
   sessions             Session[]
   auditLogs            AuditLog[]
   userPermissions      UserPermission[]
-  ownedCrmLeads        CrmLead[]         @relation("CrmLeadOwner")
+  ownedCrmLeads        CrmLead[]     @relation("CrmLeadOwner")
+  ownedCrmAccounts     CrmAccount[]  @relation("CrmAccountOwner")
+  ownedCrmContacts     CrmContact[]  @relation("CrmContactOwner")
   crmLeadActivities    CrmLeadActivity[]
-  assignedCrmLeadTasks CrmLeadTask[]     @relation("CrmLeadTaskAssignedUser")
+  assignedCrmLeadTasks CrmLeadTask[] @relation("CrmLeadTaskAssignedUser")
   crmSavedViews        CrmSavedView[]
+  salesTargets         SalesTarget[]
+  crmMailboxes         CrmMailbox[]
+  crmChannelIntegrations CrmChannelIntegration[]
+  crmEmailTemplates    CrmEmailTemplate[]
+  crmSequences         CrmSequence[]
+  crmQuotes            CrmQuote[]
+  crmDocuments         CrmDocument[]
+  crmRoutingExecutions CrmRoutingExecution[] @relation("CrmRoutingExecutionAssignedUser")
+  crmConversationInsights CrmConversationInsight[] @relation("CrmConversationInsightAuthor")
+  crmForecastSnapshots CrmForecastSnapshot[] @relation("CrmForecastSnapshotOwner")
+  crmForecastAdjustments CrmForecastAdjustment[] @relation("CrmForecastAdjustmentAuthor")
+  financeApprovalRequestsRequested FinanceApprovalRequest[] @relation("FinanceApprovalRequester")
+  financeApprovalRequestsApproved FinanceApprovalRequest[] @relation("FinanceApprovalApprover")
+  financeCloseChecklistItemsCompleted FinanceCloseChecklistItem[] @relation("FinanceCloseChecklistCompletedBy")
+  financeBudgetPlansOwned FinanceBudgetPlan[] @relation("FinanceBudgetPlanOwner")
+  financeReconciliationMatches FinanceReconciliationMatch[] @relation("FinanceReconciliationMatchedBy")
 
   @@unique([companyId, email])
   @@index([companyId])
@@ -266,6 +1098,54 @@ model UserPermission {
   @@index([companyId, userId, effect])
 }
 
+model CrmPipeline {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  stages CrmPipelineStage[]
+  leads  CrmLead[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([companyId, isDefault])
+  @@index([companyId, isActive])
+}
+
+model CrmPipelineStage {
+  id            String        @id @default(cuid())
+  name          String
+  order         Int
+  color         String?
+  isActive      Boolean       @default(true)
+  isSystemStage Boolean       @default(false)
+  statusBase    CrmLeadStatus
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  pipelineId String
+  pipeline   CrmPipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+
+  leads CrmLead[]
+
+  @@unique([pipelineId, name])
+  @@unique([pipelineId, order])
+  @@index([companyId])
+  @@index([pipelineId])
+  @@index([pipelineId, order])
+  @@index([companyId, statusBase])
+}
+
 model CrmLead {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -286,19 +1166,20 @@ model CrmLead {
   notes       String?
   status      CrmLeadStatus @default(NEW)
 
-  dealValue         Decimal?  @db.Decimal(14, 2)
-  currency          String    @default("BRL")
-  probability       Int       @default(10)
+  dealValue         Decimal? @db.Decimal(14, 2)
+  currency          String   @default("BRL")
+  probability       Int      @default(10)
   source            String?
   sourceDetail      String?
   priority          String?
   competitor        String?
   wonReason         String?
+  forecastCategory  CrmForecastCategory @default(PIPELINE)
   nextStep          String?
   nextStepDueAt     DateTime?
   nextMeetingAt     DateTime?
   expectedCloseDate DateTime?
-  statusChangedAt   DateTime  @default(now())
+  statusChangedAt   DateTime @default(now())
   lastActivityAt    DateTime?
   lastContactAt     DateTime?
   wonAt             DateTime?
@@ -309,7 +1190,7 @@ model CrmLead {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   ownerUserId String?
-  ownerUser   User?   @relation("CrmLeadOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerUser   User? @relation("CrmLeadOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
 
   branchId String?
   branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
@@ -317,15 +1198,42 @@ model CrmLead {
   departmentId String?
   department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
 
+  accountId String?
+  account   CrmAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  contactId String?
+  contact   CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  pipelineId String?
+  pipeline   CrmPipeline? @relation(fields: [pipelineId], references: [id], onDelete: SetNull)
+
+  stageId String?
+  stage   CrmPipelineStage? @relation(fields: [stageId], references: [id], onDelete: SetNull)
+
   activities CrmLeadActivity[]
   tasks      CrmLeadTask[]
+  emailMessages CrmEmailMessage[]
+  omnichannelMessages CrmOmnichannelMessage[]
+  sequenceEnrollments CrmSequenceEnrollment[]
+  quotes     CrmQuote[]
+  documents  CrmDocument[]
+  conversationInsights CrmConversationInsight[]
+  forecastAdjustments CrmForecastAdjustment[]
+  routingExecutions CrmRoutingExecution[]
 
   @@index([companyId])
   @@index([ownerUserId])
   @@index([branchId])
   @@index([departmentId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([pipelineId])
+  @@index([stageId])
   @@index([status])
+  @@index([forecastCategory])
   @@index([companyId, status])
+  @@index([companyId, pipelineId])
+  @@index([companyId, stageId])
   @@index([companyId, createdAt])
   @@index([companyId, statusChangedAt])
   @@index([companyId, lastActivityAt])
@@ -348,7 +1256,7 @@ model CrmLeadActivity {
   lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([companyId])
   @@index([leadId])
@@ -374,7 +1282,7 @@ model CrmLeadTask {
   lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   assignedUserId String?
-  assignedUser   User?   @relation("CrmLeadTaskAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  assignedUser   User? @relation("CrmLeadTaskAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
 
   @@index([companyId])
   @@index([leadId])
@@ -400,6 +1308,3567 @@ model CrmSavedView {
   @@index([companyId])
   @@index([userId])
   @@index([companyId, userId, createdAt])
+}
+
+model SalesTarget {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  periodType  SalesTargetPeriod
+  periodStart DateTime
+  periodEnd   DateTime
+
+  targetValue Decimal? @db.Decimal(14, 2)
+  targetDeals Int?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([userId])
+  @@index([companyId, periodType])
+  @@index([companyId, periodStart, periodEnd])
+}
+
+model CrmAccount {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  name       String
+  legalName  String?
+  website    String?
+  industry   String?
+  companySize String?
+  city       String?
+  state      String?
+  notes      String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  ownerUserId String?
+  ownerUser   User? @relation("CrmAccountOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  contacts      CrmContact[]
+  leads         CrmLead[]
+  emailMessages CrmEmailMessage[]
+  omnichannelMessages CrmOmnichannelMessage[]
+  quotes        CrmQuote[]
+  documents     CrmDocument[]
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([ownerUserId])
+}
+
+model CrmContact {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  firstName  String
+  lastName   String?
+  fullName   String
+  email      String?
+  phone      String?
+  whatsapp   String?
+  jobTitle   String?
+  notes      String?
+  isPrimary  Boolean  @default(false)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  accountId String
+  account   CrmAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  ownerUserId String?
+  ownerUser   User? @relation("CrmContactOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  leads         CrmLead[]
+  emailMessages CrmEmailMessage[]
+  omnichannelMessages CrmOmnichannelMessage[]
+  quotes        CrmQuote[]
+  documents     CrmDocument[]
+  sequenceEnrollments CrmSequenceEnrollment[]
+
+  @@index([companyId])
+  @@index([accountId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([ownerUserId])
+  @@index([companyId, email])
+}
+
+model CrmMailbox {
+  id          String             @id @default(cuid())
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  provider    CrmMailboxProvider
+  label       String
+  emailAddress String
+  isActive    Boolean            @default(true)
+  syncStatus  CrmMailboxSyncStatus @default(DISCONNECTED)
+  lastSyncAt  DateTime?
+  errorMessage String?
+  configJson  Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  messages CrmEmailMessage[]
+
+  @@index([companyId])
+  @@index([userId])
+  @@unique([companyId, emailAddress])
+}
+
+model CrmChannelIntegration {
+  id          String                       @id @default(cuid())
+  createdAt   DateTime                     @default(now())
+  updatedAt   DateTime                     @updatedAt
+  provider    CrmIntegrationProvider
+  category    CrmIntegrationCategory
+  connectionMode CrmIntegrationConnectionMode @default(OAUTH)
+  status      CrmIntegrationStatus         @default(PENDING)
+  label       String
+  channelIdentifier String?
+  externalAccountId String?
+  externalPageId String?
+  externalBusinessId String?
+  scopes      String[]
+  accessToken String?
+  refreshToken String?
+  tokenExpiresAt DateTime?
+  authUrl     String?
+  callbackUrl String?
+  webhookUrl  String?
+  webhookVerifyToken String?
+  webhookSecret String?
+  lastSyncAt  DateTime?
+  lastInboundAt DateTime?
+  errorMessage String?
+  configJson  Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  messages CrmOmnichannelMessage[]
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([provider])
+  @@index([status])
+}
+
+model CrmOmnichannelMessage {
+  id          String                      @id @default(cuid())
+  createdAt   DateTime                    @default(now())
+  updatedAt   DateTime                    @updatedAt
+  direction   CrmOmnichannelDirection
+  channelType String
+  status      CrmOmnichannelMessageStatus @default(RECEIVED)
+  providerMessageId String?
+  threadId    String?
+  senderName  String?
+  senderHandle String?
+  recipientHandle String?
+  body        String
+  attachmentsJson Json?
+  sentAt      DateTime?
+  receivedAt  DateTime?
+  readAt      DateTime?
+  failedAt    DateTime?
+  metadataJson Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  integrationId String?
+  integration   CrmChannelIntegration? @relation(fields: [integrationId], references: [id], onDelete: SetNull)
+
+  leadId String?
+  lead   CrmLead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   CrmAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  contactId String?
+  contact   CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([integrationId])
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([providerMessageId])
+}
+
+model CrmEmailTemplate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  subject   String
+  body      String
+  category  String?
+  isActive  Boolean  @default(true)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([userId])
+  @@unique([companyId, name])
+}
+
+model CrmSequence {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  steps       CrmSequenceStep[]
+  enrollments CrmSequenceEnrollment[]
+
+  @@index([companyId])
+  @@index([userId])
+  @@unique([companyId, name])
+}
+
+model CrmSequenceStep {
+  id         String              @id @default(cuid())
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  order      Int
+  type       CrmSequenceStepType
+  subject    String?
+  body       String?
+  taskTitle  String?
+  dueInDays  Int                 @default(0)
+  configJson Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  sequenceId String
+  sequence   CrmSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([sequenceId])
+  @@unique([sequenceId, order])
+}
+
+model CrmSequenceEnrollment {
+  id          String                      @id @default(cuid())
+  createdAt   DateTime                    @default(now())
+  updatedAt   DateTime                    @updatedAt
+  status      CrmSequenceEnrollmentStatus @default(ACTIVE)
+  currentStepOrder Int                    @default(0)
+  startedAt   DateTime                    @default(now())
+  nextRunAt   DateTime?
+  completedAt DateTime?
+  stoppedReason String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  sequenceId String
+  sequence   CrmSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+
+  leadId String
+  lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  contactId String?
+  contact   CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  emailMessages CrmEmailMessage[]
+
+  @@index([companyId])
+  @@index([sequenceId])
+  @@index([leadId])
+  @@index([contactId])
+}
+
+model CrmEmailMessage {
+  id          String            @id @default(cuid())
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  direction   CrmEmailDirection
+  syncSource  CrmEmailSyncSource @default(MANUAL)
+  providerMessageId String?
+  threadId    String?
+  subject     String
+  body        String
+  fromEmail   String?
+  toEmail     String?
+  status      String?
+  sentAt      DateTime?
+  receivedAt  DateTime?
+  openedAt    DateTime?
+  repliedAt   DateTime?
+  metadataJson Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  mailboxId String?
+  mailbox   CrmMailbox? @relation(fields: [mailboxId], references: [id], onDelete: SetNull)
+
+  leadId String?
+  lead   CrmLead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   CrmAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  contactId String?
+  contact   CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  sequenceEnrollmentId String?
+  sequenceEnrollment   CrmSequenceEnrollment? @relation(fields: [sequenceEnrollmentId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([mailboxId])
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([sequenceEnrollmentId])
+}
+
+model CrmQuote {
+  id          String         @id @default(cuid())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  number      String
+  title       String
+  status      CrmQuoteStatus @default(DRAFT)
+  currency    String         @default("BRL")
+  subtotal    Decimal?       @db.Decimal(14, 2)
+  discount    Decimal?       @db.Decimal(14, 2)
+  total       Decimal?       @db.Decimal(14, 2)
+  validUntil  DateTime?
+  notes       String?
+  viewedAt    DateTime?
+  approvedAt  DateTime?
+  signedAt    DateTime?
+  rejectedAt  DateTime?
+  eSignatureProvider String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  leadId String?
+  lead   CrmLead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   CrmAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  contactId String?
+  contact   CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  ownerUserId String?
+  ownerUser   User? @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  items     CrmQuoteItem[]
+  documents CrmDocument[]
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([ownerUserId])
+  @@unique([companyId, number])
+}
+
+model CrmQuoteItem {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  description String
+  quantity   Decimal  @default(1) @db.Decimal(12, 2)
+  unitPrice  Decimal  @default(0) @db.Decimal(14, 2)
+  total      Decimal  @default(0) @db.Decimal(14, 2)
+  sortOrder  Int      @default(0)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  quoteId String
+  quote   CrmQuote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([quoteId])
+}
+
+model CrmDocument {
+  id         String            @id @default(cuid())
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  type       CrmDocumentType
+  title      String
+  signatureStatus CrmSignatureStatus @default(NOT_SENT)
+  fileUrl    String?
+  contentHtml String?
+  sentAt     DateTime?
+  openedAt   DateTime?
+  signedAt   DateTime?
+  externalDocumentId String?
+  provider   String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  quoteId String?
+  quote   CrmQuote? @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+
+  leadId String?
+  lead   CrmLead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   CrmAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  contactId String?
+  contact   CrmContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([quoteId])
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+}
+
+model CrmRoutingRule {
+  id           String             @id @default(cuid())
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  name         String
+  isActive     Boolean            @default(true)
+  priority     Int                @default(0)
+  strategy     CrmRoutingStrategy
+  source       String?
+  conditionsJson Json?
+  ownerPoolJson Json?
+  lastAssignedUserId String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  executions CrmRoutingExecution[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([companyId, isActive, priority])
+}
+
+model CrmRoutingExecution {
+  id         String                    @id @default(cuid())
+  createdAt  DateTime                  @default(now())
+  status     CrmRoutingExecutionStatus @default(APPLIED)
+  reason     String
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  routingRuleId String?
+  routingRule   CrmRoutingRule? @relation(fields: [routingRuleId], references: [id], onDelete: SetNull)
+
+  leadId String
+  lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  assignedUserId String?
+  assignedUser   User? @relation("CrmRoutingExecutionAssignedUser", fields: [assignedUserId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([routingRuleId])
+  @@index([leadId])
+  @@index([assignedUserId])
+}
+
+model CrmConversationInsight {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  sourceType   String
+  transcriptText String?
+  summaryText  String?
+  objectionsJson Json?
+  nextStepsJson Json?
+  sentimentScore Int?
+  coachingNotes String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  leadId String
+  lead   CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation("CrmConversationInsightAuthor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([userId])
+}
+
+model CrmForecastSnapshot {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  label         String
+  periodStart   DateTime
+  periodEnd     DateTime
+  pipelineValue Decimal  @default(0) @db.Decimal(14, 2)
+  bestCaseValue Decimal  @default(0) @db.Decimal(14, 2)
+  commitValue   Decimal  @default(0) @db.Decimal(14, 2)
+  closedValue   Decimal  @default(0) @db.Decimal(14, 2)
+  gapToTarget   Decimal? @db.Decimal(14, 2)
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  ownerUserId String?
+  ownerUser   User? @relation("CrmForecastSnapshotOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  adjustments CrmForecastAdjustment[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([ownerUserId])
+}
+
+model CrmForecastAdjustment {
+  id          String              @id @default(cuid())
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  category    CrmForecastCategory
+  adjustedValue Decimal           @db.Decimal(14, 2)
+  reason      String
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  snapshotId String?
+  snapshot   CrmForecastSnapshot? @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+
+  leadId String?
+  lead   CrmLead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  userId String?
+  user   User? @relation("CrmForecastAdjustmentAuthor", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([snapshotId])
+  @@index([leadId])
+  @@index([userId])
+}
+
+model FinanceAccount {
+  id        String            @id @default(cuid())
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  code      String
+  name      String
+  type      FinanceAccountType
+  isActive  Boolean           @default(true)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  payables     FinancePayable[]
+  receivables  FinanceReceivable[]
+  transactions FinanceTransaction[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@unique([companyId, code])
+}
+
+model FinanceBankAccount {
+  id                String                 @id @default(cuid())
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  name              String
+  bankName          String?
+  accountType       FinanceBankAccountType
+  currency          String                 @default("BRL")
+  currentBalance    Decimal                @default(0) @db.Decimal(14, 2)
+  accountNumberMasked String?
+  pixKey            String?
+  isActive          Boolean                @default(true)
+  lastSyncAt        DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  transactions     FinanceTransaction[]
+  statementImports FinanceStatementImport[]
+  payables         FinancePayable[]
+  receivables      FinanceReceivable[]
+  treasurySourceTransfers FinanceTreasuryTransfer[] @relation("FinanceTreasurySourceBankAccount")
+  treasuryDestinationTransfers FinanceTreasuryTransfer[] @relation("FinanceTreasuryDestinationBankAccount")
+  treasuryAllocations FinanceTreasuryAllocation[]
+
+  @@index([companyId])
+  @@index([branchId])
+}
+
+model FinanceCostCenter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  code      String
+  name      String
+  isActive  Boolean  @default(true)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  categories       FinanceCategory[]
+  payables         FinancePayable[]
+  receivables      FinanceReceivable[]
+  transactions     FinanceTransaction[]
+  approvalPolicies FinanceApprovalPolicy[]
+  approvalRequests FinanceApprovalRequest[]
+  budgetLines      FinanceBudgetLine[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@unique([companyId, code])
+}
+
+model FinanceCategory {
+  id        String              @id @default(cuid())
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  name      String
+  kind      FinanceCategoryKind
+  isActive  Boolean             @default(true)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  payables     FinancePayable[]
+  receivables  FinanceReceivable[]
+  transactions FinanceTransaction[]
+  budgetLines  FinanceBudgetLine[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+}
+
+model FinancePayable {
+  id             String                @id @default(cuid())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  vendorName     String
+  documentNumber String?
+  description    String?
+  issueDate      DateTime?
+  dueAt          DateTime
+  competenceDate DateTime?
+  paidAt         DateTime?
+  amount         Decimal               @db.Decimal(14, 2)
+  outstandingAmount Decimal            @db.Decimal(14, 2)
+  currency       String                @default("BRL")
+  status         FinanceDocumentStatus @default(OPEN)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  bankAccountId String?
+  bankAccount   FinanceBankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   FinanceAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  vendorId String?
+  vendor   FinanceVendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+
+  procurementRequestId String?
+  procurementRequest   FinanceProcurementRequest? @relation(fields: [procurementRequestId], references: [id], onDelete: SetNull)
+
+  purchaseOrderId String?
+  purchaseOrder   FinancePurchaseOrder? @relation(fields: [purchaseOrderId], references: [id], onDelete: SetNull)
+
+  approvalRequestId String?
+  approvalRequest   FinanceApprovalRequest? @relation("FinancePayableApprovalRequest", fields: [approvalRequestId], references: [id], onDelete: SetNull)
+
+  reminders    FinanceReminder[]
+  transactions FinanceTransaction[]
+  vendorDocuments FinanceVendorDocument[]
+  threeWayMatches FinanceThreeWayMatch[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+  @@index([categoryId])
+  @@index([bankAccountId])
+  @@index([accountId])
+  @@index([vendorId])
+  @@index([procurementRequestId])
+  @@index([purchaseOrderId])
+  @@index([dueAt])
+  @@index([status])
+}
+
+model FinanceReceivable {
+  id             String                @id @default(cuid())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  customerName   String
+  invoiceNumber  String?
+  description    String?
+  issueDate      DateTime?
+  dueAt          DateTime
+  competenceDate DateTime?
+  paidAt         DateTime?
+  amount         Decimal               @db.Decimal(14, 2)
+  outstandingAmount Decimal            @db.Decimal(14, 2)
+  currency       String                @default("BRL")
+  status         FinanceDocumentStatus @default(OPEN)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  bankAccountId String?
+  bankAccount   FinanceBankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   FinanceAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  reminders       FinanceReminder[]
+  transactions    FinanceTransaction[]
+  pixConfirmations FinancePixConfirmation[]
+  invoices        FinanceInvoice[]
+  recoveryCases   FinanceRecoveryCase[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+  @@index([categoryId])
+  @@index([bankAccountId])
+  @@index([accountId])
+  @@index([dueAt])
+  @@index([status])
+}
+
+model FinanceReminder {
+  id          String                @id @default(cuid())
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  channel     FinanceReminderChannel
+  status      FinanceReminderStatus @default(PENDING)
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  message     String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  payableId String?
+  payable   FinancePayable? @relation(fields: [payableId], references: [id], onDelete: SetNull)
+
+  receivableId String?
+  receivable   FinanceReceivable? @relation(fields: [receivableId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([payableId])
+  @@index([receivableId])
+}
+
+model FinanceTransaction {
+  id          String                    @id @default(cuid())
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  occurredAt  DateTime                  @default(now())
+  postedAt    DateTime?
+  description String
+  amount      Decimal                   @db.Decimal(14, 2)
+  currency    String                    @default("BRL")
+  direction   FinanceTransactionDirection
+  source      FinanceTransactionSource  @default(MANUAL)
+  status      String?
+  metadataJson Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  bankAccountId String?
+  bankAccount   FinanceBankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  accountId String?
+  account   FinanceAccount? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+
+  payableId String?
+  payable   FinancePayable? @relation(fields: [payableId], references: [id], onDelete: SetNull)
+
+  receivableId String?
+  receivable   FinanceReceivable? @relation(fields: [receivableId], references: [id], onDelete: SetNull)
+
+  statementLine   FinanceStatementLine?
+
+  approvalRequestId String?
+  approvalRequest   FinanceApprovalRequest? @relation("FinanceTransactionApprovalRequest", fields: [approvalRequestId], references: [id], onDelete: SetNull)
+
+  reconciliationMatches FinanceReconciliationMatch[]
+  pixConfirmations      FinancePixConfirmation[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+  @@index([categoryId])
+  @@index([bankAccountId])
+  @@index([accountId])
+  @@index([payableId])
+  @@index([receivableId])
+  @@index([occurredAt])
+}
+
+model FinanceStatementImport {
+  id         String                      @id @default(cuid())
+  createdAt  DateTime                    @default(now())
+  updatedAt  DateTime                    @updatedAt
+  source     String
+  provider   String?
+  fileName   String?
+  periodStart DateTime?
+  periodEnd  DateTime?
+  importedAt DateTime?
+  status     FinanceStatementImportStatus @default(PENDING)
+  rawJson    Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  bankAccountId String?
+  bankAccount   FinanceBankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  lines FinanceStatementLine[]
+
+  @@index([companyId])
+  @@index([bankAccountId])
+  @@index([status])
+}
+
+model FinanceStatementLine {
+  id             String                         @id @default(cuid())
+  createdAt      DateTime                       @default(now())
+  updatedAt      DateTime                       @updatedAt
+  externalId     String?
+  bookingDate    DateTime?
+  description    String
+  counterpartyName String?
+  amount         Decimal                        @db.Decimal(14, 2)
+  currency       String                         @default("BRL")
+  direction      FinanceTransactionDirection
+  matchStatus    FinanceStatementLineMatchStatus @default(UNMATCHED)
+  rawJson        Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  importId String
+  import   FinanceStatementImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  transactionId String? @unique
+  transaction   FinanceTransaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  reconciliationMatches FinanceReconciliationMatch[]
+
+  @@index([companyId])
+  @@index([importId])
+  @@index([transactionId])
+  @@index([matchStatus])
+}
+
+model FinanceReconciliationMatch {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  confidenceScore Int?
+  notes        String?
+  matchedAt    DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  statementLineId String
+  statementLine   FinanceStatementLine @relation(fields: [statementLineId], references: [id], onDelete: Cascade)
+
+  transactionId String
+  transaction   FinanceTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User? @relation("FinanceReconciliationMatchedBy", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([statementLineId])
+  @@index([transactionId])
+  @@index([userId])
+}
+
+model FinancePixConfirmation {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  provider     String?
+  externalTxId String?
+  payerName    String?
+  payerDocument String?
+  amount       Decimal  @db.Decimal(14, 2)
+  confirmedAt  DateTime @default(now())
+  status       String
+  rawJson      Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  receivableId String?
+  receivable   FinanceReceivable? @relation(fields: [receivableId], references: [id], onDelete: SetNull)
+
+  transactionId String?
+  transaction   FinanceTransaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([receivableId])
+  @@index([transactionId])
+}
+
+model FinanceApprovalPolicy {
+  id           String                     @id @default(cuid())
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+  name         String
+  scope        FinanceApprovalPolicyScope @default(COMPANY)
+  roleRequired String
+  minAmount    Decimal?                   @db.Decimal(14, 2)
+  maxAmount    Decimal?                   @db.Decimal(14, 2)
+  isActive     Boolean                    @default(true)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  approvalRequests FinanceApprovalRequest[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+}
+
+model FinanceApprovalRequest {
+  id            String                       @id @default(cuid())
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @updatedAt
+  entityType    String
+  entityId      String?
+  amount        Decimal?                     @db.Decimal(14, 2)
+  currency      String                       @default("BRL")
+  reason        String?
+  decisionNotes String?
+  requestedAt   DateTime                     @default(now())
+  decidedAt     DateTime?
+  status        FinanceApprovalRequestStatus @default(PENDING)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  policyId String?
+  policy   FinanceApprovalPolicy? @relation(fields: [policyId], references: [id], onDelete: SetNull)
+
+  requesterUserId String?
+  requesterUser   User? @relation("FinanceApprovalRequester", fields: [requesterUserId], references: [id], onDelete: SetNull)
+
+  approverUserId String?
+  approverUser   User? @relation("FinanceApprovalApprover", fields: [approverUserId], references: [id], onDelete: SetNull)
+
+  payable   FinancePayable[] @relation("FinancePayableApprovalRequest")
+  transaction FinanceTransaction[] @relation("FinanceTransactionApprovalRequest")
+  evidences FinanceApprovalEvidence[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+  @@index([policyId])
+  @@index([requesterUserId])
+  @@index([approverUserId])
+  @@index([status])
+}
+
+model FinanceClosePeriod {
+  id          String                   @id @default(cuid())
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  label       String
+  periodStart DateTime
+  periodEnd   DateTime
+  status      FinanceClosePeriodStatus @default(OPEN)
+  closedAt    DateTime?
+  notes       String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  checklistItems  FinanceCloseChecklistItem[]
+  forecastSnapshots FinanceForecastSnapshot[]
+  evidences       FinanceCloseEvidence[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([status])
+}
+
+model FinanceCloseChecklistItem {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  description String?
+  isRequired  Boolean  @default(true)
+  completedAt DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  closePeriodId String
+  closePeriod   FinanceClosePeriod @relation(fields: [closePeriodId], references: [id], onDelete: Cascade)
+
+  completedByUserId String?
+  completedByUser   User? @relation("FinanceCloseChecklistCompletedBy", fields: [completedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([closePeriodId])
+  @@index([completedByUserId])
+}
+
+model FinanceBudgetPlan {
+  id          String              @id @default(cuid())
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  name        String
+  periodType  FinanceBudgetPeriod
+  periodStart DateTime
+  periodEnd   DateTime
+  status      String              @default("ACTIVE")
+  notes       String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  ownerUserId String?
+  ownerUser   User? @relation("FinanceBudgetPlanOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  lines            FinanceBudgetLine[]
+  forecastSnapshots FinanceForecastSnapshot[]
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([ownerUserId])
+}
+
+model FinanceBudgetLine {
+  id            String                @id @default(cuid())
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  lineType      FinanceBudgetLineType
+  label         String
+  plannedAmount Decimal               @default(0) @db.Decimal(14, 2)
+  forecastAmount Decimal              @default(0) @db.Decimal(14, 2)
+  actualAmount  Decimal               @default(0) @db.Decimal(14, 2)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  budgetPlanId String
+  budgetPlan   FinanceBudgetPlan @relation(fields: [budgetPlanId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  costCenterId String?
+  costCenter   FinanceCostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   FinanceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([budgetPlanId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([costCenterId])
+  @@index([categoryId])
+}
+
+model FinanceForecastSnapshot {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  label         String
+  asOf          DateTime @default(now())
+  periodStart   DateTime
+  periodEnd     DateTime
+  projectedInflows Decimal @default(0) @db.Decimal(14, 2)
+  projectedOutflows Decimal @default(0) @db.Decimal(14, 2)
+  projectedClosingCash Decimal @default(0) @db.Decimal(14, 2)
+  gapToBudget   Decimal? @db.Decimal(14, 2)
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  closePeriodId String?
+  closePeriod   FinanceClosePeriod? @relation(fields: [closePeriodId], references: [id], onDelete: SetNull)
+
+  budgetPlanId String?
+  budgetPlan   FinanceBudgetPlan? @relation(fields: [budgetPlanId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([branchId])
+  @@index([departmentId])
+  @@index([closePeriodId])
+  @@index([budgetPlanId])
+}
+
+model FinanceVendor {
+  id                String                    @id @default(cuid())
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  name              String
+  legalName         String?
+  taxId             String?
+  email             String?
+  phone             String?
+  portalStatus      FinanceVendorPortalStatus @default(DISABLED)
+  portalAccessEmail String?
+  paymentTerms      String?
+  riskScore         Int?                      @default(0)
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  documents           FinanceVendorDocument[]
+  procurementRequests FinanceProcurementRequest[]
+  purchaseOrders      FinancePurchaseOrder[]
+  payables            FinancePayable[]
+  kycReviews          FinanceVendorKycReview[]
+  contracts           FinanceVendorContract[]
+  negotiationBenchmarks FinanceVendorNegotiationBenchmark[]
+
+  @@index([companyId])
+  @@index([portalStatus])
+  @@index([taxId])
+}
+
+model FinanceVendorDocument {
+  id             String                       @id @default(cuid())
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+  title          String
+  documentType   String
+  fileName       String?
+  fileUrl        String?
+  captureStatus  FinanceDocumentCaptureStatus @default(UPLOADED)
+  extractedJson  Json?
+  reviewNotes    String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+  vendor   FinanceVendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+
+  payableId String?
+  payable   FinancePayable? @relation(fields: [payableId], references: [id], onDelete: SetNull)
+
+  purchaseOrderId String?
+  purchaseOrder   FinancePurchaseOrder? @relation(fields: [purchaseOrderId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([vendorId])
+  @@index([payableId])
+  @@index([purchaseOrderId])
+  @@index([captureStatus])
+}
+
+model FinanceProcurementRequest {
+  id              String                    @id @default(cuid())
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  title           String
+  description     String?
+  amount          Decimal                   @db.Decimal(14, 2)
+  currency        String                    @default("BRL")
+  status          FinanceProcurementStatus  @default(DRAFT)
+  requestedByName String?
+  businessJustification String?
+  requestedAt     DateTime                  @default(now())
+  neededBy        DateTime?
+  categoryLabel   String?
+  vendorName      String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+  vendor   FinanceVendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+
+  purchaseOrders FinancePurchaseOrder[]
+  payables       FinancePayable[]
+
+  @@index([companyId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([requestedAt])
+}
+
+model FinancePurchaseOrder {
+  id             String                     @id @default(cuid())
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  poNumber       String
+  title          String
+  status         FinancePurchaseOrderStatus @default(DRAFT)
+  issueDate      DateTime?
+  expectedAt     DateTime?
+  currency       String                     @default("BRL")
+  subtotalAmount Decimal                    @default(0) @db.Decimal(14, 2)
+  taxAmount      Decimal                    @default(0) @db.Decimal(14, 2)
+  totalAmount    Decimal                    @default(0) @db.Decimal(14, 2)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+  vendor   FinanceVendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+
+  procurementRequestId String?
+  procurementRequest   FinanceProcurementRequest? @relation(fields: [procurementRequestId], references: [id], onDelete: SetNull)
+
+  lines            FinancePurchaseOrderLine[]
+  goodsReceipts    FinanceGoodsReceipt[]
+  threeWayMatches  FinanceThreeWayMatch[]
+  vendorDocuments  FinanceVendorDocument[]
+  payables         FinancePayable[]
+
+  @@unique([companyId, poNumber])
+  @@index([companyId])
+  @@index([vendorId])
+  @@index([procurementRequestId])
+  @@index([status])
+}
+
+model FinancePurchaseOrderLine {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  description   String
+  quantity      Decimal  @default(1) @db.Decimal(14, 2)
+  unitPrice     Decimal  @default(0) @db.Decimal(14, 2)
+  receivedQty   Decimal  @default(0) @db.Decimal(14, 2)
+  lineAmount    Decimal  @default(0) @db.Decimal(14, 2)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  purchaseOrderId String
+  purchaseOrder   FinancePurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([purchaseOrderId])
+}
+
+model FinanceGoodsReceipt {
+  id             String                   @id @default(cuid())
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  receiptNumber  String
+  status         FinanceGoodsReceiptStatus @default(PENDING)
+  receivedAt     DateTime?
+  receivedQty    Decimal                  @default(0) @db.Decimal(14, 2)
+  varianceNotes  String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  purchaseOrderId String
+  purchaseOrder   FinancePurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+
+  threeWayMatches FinanceThreeWayMatch[]
+
+  @@unique([companyId, receiptNumber])
+  @@index([companyId])
+  @@index([purchaseOrderId])
+  @@index([status])
+}
+
+model FinanceThreeWayMatch {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  status         FinanceThreeWayMatchStatus @default(PENDING)
+  varianceAmount Decimal?                  @db.Decimal(14, 2)
+  notes          String?
+  matchedAt      DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  purchaseOrderId String
+  purchaseOrder   FinancePurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+
+  goodsReceiptId String?
+  goodsReceipt   FinanceGoodsReceipt? @relation(fields: [goodsReceiptId], references: [id], onDelete: SetNull)
+
+  payableId String?
+  payable   FinancePayable? @relation(fields: [payableId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([purchaseOrderId])
+  @@index([goodsReceiptId])
+  @@index([payableId])
+  @@index([status])
+}
+
+model FinanceExpenseReport {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  title          String
+  employeeName   String
+  status         FinanceExpenseReportStatus @default(DRAFT)
+  currency       String                    @default("BRL")
+  totalAmount    Decimal                   @default(0) @db.Decimal(14, 2)
+  submittedAt    DateTime?
+  approvedAt     DateTime?
+  reimbursedAt   DateTime?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  items FinanceExpenseItem[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceExpenseItem {
+  id             String               @id @default(cuid())
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  description    String
+  expenseDate    DateTime?
+  amount         Decimal              @default(0) @db.Decimal(14, 2)
+  currency       String               @default("BRL")
+  source         FinanceExpenseSource @default(MANUAL)
+  merchant       String?
+  receiptUrl     String?
+  ocrJson        Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  expenseReportId String
+  expenseReport   FinanceExpenseReport @relation(fields: [expenseReportId], references: [id], onDelete: Cascade)
+
+  corporateCardId String?
+  corporateCard   FinanceCorporateCard? @relation(fields: [corporateCardId], references: [id], onDelete: SetNull)
+
+  cardTransactionId String?
+  cardTransaction   FinanceCardTransaction? @relation(fields: [cardTransactionId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([expenseReportId])
+  @@index([corporateCardId])
+  @@index([cardTransactionId])
+  @@index([source])
+}
+
+model FinanceCorporateCard {
+  id                String                     @id @default(cuid())
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+  cardName          String
+  provider          String?
+  cardHolderName    String?
+  last4             String?
+  limitAmount       Decimal                    @default(0) @db.Decimal(14, 2)
+  spentAmount       Decimal                    @default(0) @db.Decimal(14, 2)
+  currency          String                     @default("BRL")
+  status            FinanceCorporateCardStatus @default(ACTIVE)
+  policySummary     String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  expenseItems     FinanceExpenseItem[]
+  cardTransactions FinanceCardTransaction[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceCardTransaction {
+  id             String               @id @default(cuid())
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  occurredAt     DateTime             @default(now())
+  merchant       String
+  amount         Decimal              @default(0) @db.Decimal(14, 2)
+  currency       String               @default("BRL")
+  source         FinanceExpenseSource @default(CARD)
+  status         String?
+  memo           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  corporateCardId String
+  corporateCard   FinanceCorporateCard @relation(fields: [corporateCardId], references: [id], onDelete: Cascade)
+
+  expenseItems FinanceExpenseItem[]
+
+  @@index([companyId])
+  @@index([corporateCardId])
+  @@index([occurredAt])
+}
+
+model FinanceErpConnection {
+  id              String            @id @default(cuid())
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  provider        FinanceErpProvider
+  label           String
+  status          FinanceSyncStatus @default(DISCONNECTED)
+  externalOrgId   String?
+  syncDirection   String?
+  lastSyncAt      DateTime?
+  credentialsJson Json?
+  settingsJson    Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  jobs FinanceErpSyncJob[]
+
+  @@index([companyId])
+  @@index([provider])
+  @@index([status])
+}
+
+model FinanceErpSyncJob {
+  id            String            @id @default(cuid())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  jobType       String
+  status        FinanceSyncStatus @default(SYNCING)
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  recordsSynced Int               @default(0)
+  errorMessage  String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  connectionId String
+  connection   FinanceErpConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([connectionId])
+  @@index([status])
+}
+
+model FinanceTreasuryTransfer {
+  id                String                        @id @default(cuid())
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+  reference         String
+  status            FinanceTreasuryTransferStatus @default(PLANNED)
+  amount            Decimal                       @default(0) @db.Decimal(14, 2)
+  currency          String                        @default("BRL")
+  initiatedAt       DateTime?
+  settledAt         DateTime?
+  expectedSettlementAt DateTime?
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  sourceBankAccountId String?
+  sourceBankAccount   FinanceBankAccount? @relation("FinanceTreasurySourceBankAccount", fields: [sourceBankAccountId], references: [id], onDelete: SetNull)
+
+  destinationBankAccountId String?
+  destinationBankAccount   FinanceBankAccount? @relation("FinanceTreasuryDestinationBankAccount", fields: [destinationBankAccountId], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, reference])
+  @@index([companyId])
+  @@index([sourceBankAccountId])
+  @@index([destinationBankAccountId])
+  @@index([status])
+}
+
+model FinanceTreasuryAllocation {
+  id            String                        @id @default(cuid())
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+  label         String
+  allocationType FinanceTreasuryAllocationType
+  amount        Decimal                       @default(0) @db.Decimal(14, 2)
+  currency      String                        @default("BRL")
+  yieldPct      Decimal?                      @db.Decimal(8, 2)
+  riskNotes     String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  bankAccountId String?
+  bankAccount   FinanceBankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([bankAccountId])
+  @@index([allocationType])
+}
+
+model FinanceCashPositionSnapshot {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  asOf             DateTime @default(now())
+  availableCash    Decimal  @default(0) @db.Decimal(14, 2)
+  restrictedCash   Decimal  @default(0) @db.Decimal(14, 2)
+  projected7d      Decimal  @default(0) @db.Decimal(14, 2)
+  projected30d     Decimal  @default(0) @db.Decimal(14, 2)
+  concentrationRiskPct Decimal? @db.Decimal(8, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([asOf])
+}
+
+model FinanceAnomalyInsight {
+  id             String                 @id @default(cuid())
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  title          String
+  description    String
+  severity       FinanceAnomalySeverity
+  anomalyType    String
+  affectedAmount Decimal?               @db.Decimal(14, 2)
+  resolvedAt     DateTime?
+  explanation    String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([severity])
+  @@index([resolvedAt])
+}
+
+model FinanceCashForecastRun {
+  id                    String   @id @default(cuid())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  asOf                  DateTime @default(now())
+  horizonDays           Int      @default(30)
+  projectedInflows      Decimal  @default(0) @db.Decimal(14, 2)
+  projectedOutflows     Decimal  @default(0) @db.Decimal(14, 2)
+  projectedClosingCash  Decimal  @default(0) @db.Decimal(14, 2)
+  confidencePct         Decimal? @db.Decimal(8, 2)
+  assumptionsJson       Json?
+  notes                 String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([asOf])
+}
+
+model FinanceTravelPolicy {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  name           String
+  status         FinanceTravelPolicyStatus @default(ACTIVE)
+  countryCode    String?
+  maxFlightAmount Decimal?                 @db.Decimal(14, 2)
+  maxHotelNightly Decimal?                 @db.Decimal(14, 2)
+  perDiemAmount  Decimal?                  @db.Decimal(14, 2)
+  approvalNotes  String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  requests FinanceTravelRequest[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceTravelRequest {
+  id             String                     @id @default(cuid())
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  travelerName   String
+  destination    String
+  purpose        String
+  departureAt    DateTime?
+  returnAt       DateTime?
+  estimatedCost  Decimal                    @default(0) @db.Decimal(14, 2)
+  currency       String                     @default("BRL")
+  status         FinanceTravelRequestStatus @default(DRAFT)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  policyId String?
+  policy   FinanceTravelPolicy? @relation(fields: [policyId], references: [id], onDelete: SetNull)
+
+  bookings FinanceTravelBooking[]
+  advances FinanceTravelAdvance[]
+
+  @@index([companyId])
+  @@index([policyId])
+  @@index([status])
+}
+
+model FinanceTravelBooking {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  bookingType    FinanceTravelBookingType
+  provider       String?
+  reference      String?
+  bookedAt       DateTime?
+  amount         Decimal                   @default(0) @db.Decimal(14, 2)
+  currency       String                    @default("BRL")
+  autoReconciled Boolean                   @default(false)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  travelRequestId String
+  travelRequest   FinanceTravelRequest @relation(fields: [travelRequestId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([travelRequestId])
+}
+
+model FinanceTravelAdvance {
+  id             String                     @id @default(cuid())
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  amount         Decimal                    @default(0) @db.Decimal(14, 2)
+  currency       String                     @default("BRL")
+  status         FinanceTravelAdvanceStatus @default(REQUESTED)
+  requestedAt    DateTime                   @default(now())
+  settledAt      DateTime?
+  settlementNotes String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  travelRequestId String
+  travelRequest   FinanceTravelRequest @relation(fields: [travelRequestId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([travelRequestId])
+  @@index([status])
+}
+
+model FinanceBillingPlan {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  customerName   String
+  planName       String
+  interval       FinanceSubscriptionInterval
+  status         FinanceBillingStatus      @default(DRAFT)
+  amount         Decimal                   @default(0) @db.Decimal(14, 2)
+  currency       String                    @default("BRL")
+  nextBillingAt  DateTime?
+  churnRiskPct   Decimal?                  @db.Decimal(8, 2)
+  recoveryMode   String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  invoices         FinanceInvoice[]
+  revenueSchedules FinanceRevenueSchedule[]
+  recoveryCases    FinanceRecoveryCase[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceInvoice {
+  id               String               @id @default(cuid())
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  invoiceNumber    String
+  status           FinanceInvoiceStatus @default(DRAFT)
+  issueDate        DateTime?
+  dueAt            DateTime?
+  paidAt           DateTime?
+  amount           Decimal              @default(0) @db.Decimal(14, 2)
+  taxAmount        Decimal              @default(0) @db.Decimal(14, 2)
+  netAmount        Decimal              @default(0) @db.Decimal(14, 2)
+  currency         String               @default("BRL")
+  smartNotes       String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  billingPlanId String?
+  billingPlan   FinanceBillingPlan? @relation(fields: [billingPlanId], references: [id], onDelete: SetNull)
+
+  receivableId String?
+  receivable   FinanceReceivable? @relation(fields: [receivableId], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, invoiceNumber])
+  @@index([companyId])
+  @@index([billingPlanId])
+  @@index([receivableId])
+  @@index([status])
+}
+
+model FinanceTaxProfile {
+  id               String            @id @default(cuid())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  label            String
+  countryCode      String
+  regime           FinanceTaxRegime
+  taxNumber        String?
+  defaultRatePct   Decimal?          @db.Decimal(8, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([countryCode])
+}
+
+model FinanceRevenueSchedule {
+  id               String                       @id @default(cuid())
+  createdAt        DateTime                     @default(now())
+  updatedAt        DateTime                     @updatedAt
+  label            String
+  status           FinanceRevenueScheduleStatus @default(DRAFT)
+  recognitionStart DateTime?
+  recognitionEnd   DateTime?
+  recognizedAmount Decimal                      @default(0) @db.Decimal(14, 2)
+  deferredAmount   Decimal                      @default(0) @db.Decimal(14, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  billingPlanId String?
+  billingPlan   FinanceBillingPlan? @relation(fields: [billingPlanId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([billingPlanId])
+  @@index([status])
+}
+
+model FinanceRecoveryCase {
+  id            String               @id @default(cuid())
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  status        FinanceRecoveryStatus @default(PENDING)
+  reason        String?
+  attemptCount  Int                  @default(0)
+  recoveredAt   DateTime?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  billingPlanId String?
+  billingPlan   FinanceBillingPlan? @relation(fields: [billingPlanId], references: [id], onDelete: SetNull)
+
+  receivableId String?
+  receivable   FinanceReceivable? @relation(fields: [receivableId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([billingPlanId])
+  @@index([receivableId])
+  @@index([status])
+}
+
+model FinanceCloseEvidence {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  title          String
+  evidenceType   String
+  fileUrl        String?
+  status         FinanceCloseEvidenceStatus @default(PENDING)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  closePeriodId String
+  closePeriod   FinanceClosePeriod @relation(fields: [closePeriodId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([closePeriodId])
+  @@index([status])
+}
+
+model FinanceGlobalEntity {
+  id               String                    @id @default(cuid())
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  name             String
+  legalName        String?
+  countryCode      String
+  baseCurrency     String
+  status           FinanceGlobalEntityStatus @default(DRAFT)
+  taxNumber        String?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  countryPolicies FinanceCountryPolicy[]
+
+  @@index([companyId])
+  @@index([countryCode])
+  @@index([status])
+}
+
+model FinanceCountryPolicy {
+  id                String                     @id @default(cuid())
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+  countryCode       String
+  status            FinanceCountryPolicyStatus @default(DRAFT)
+  expensePolicyJson Json?
+  reimbursementCurrency String?
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  globalEntityId String?
+  globalEntity   FinanceGlobalEntity? @relation(fields: [globalEntityId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([globalEntityId])
+  @@index([status])
+}
+
+model FinancePlanDriver {
+  id             String                @id @default(cuid())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  label          String
+  driverType     FinancePlanDriverType
+  unit           String?
+  currentValue   Decimal               @default(0) @db.Decimal(14, 2)
+  targetValue    Decimal?              @db.Decimal(14, 2)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([driverType])
+}
+
+model FinancePlanScenario {
+  id               String                    @id @default(cuid())
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  label            String
+  status           FinancePlanScenarioStatus @default(DRAFT)
+  horizonMonths    Int                       @default(12)
+  headcountPlan    Int?
+  revenuePlan      Decimal?                  @db.Decimal(14, 2)
+  spendPlan        Decimal?                  @db.Decimal(14, 2)
+  assumptionsJson  Json?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceCopilotInsight {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  title          String
+  summary        String
+  recommendation String?
+  actionLabel    String?
+  actionPayload  Json?
+  riskLevel      String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model FinanceCopilotPlaybook {
+  id             String                     @id @default(cuid())
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  title          String
+  objective      String
+  status         FinanceCopilotPlaybookStatus @default(DRAFT)
+  triggerType    String?
+  stepsJson      Json?
+  lastRunAt      DateTime?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceUsageMeter {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  name            String
+  externalKey     String?
+  billingUnit     String?
+  currentUsage    Decimal  @default(0) @db.Decimal(18, 4)
+  includedUnits   Decimal? @db.Decimal(18, 4)
+  overageRate     Decimal? @db.Decimal(14, 4)
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  usageEvents FinanceUsageEvent[]
+
+  @@index([companyId])
+  @@index([externalKey])
+}
+
+model FinanceUsageEvent {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  customerName String
+  quantity     Decimal  @default(0) @db.Decimal(18, 4)
+  occurredAt   DateTime @default(now())
+  source       String?
+  metadataJson Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  usageMeterId String
+  usageMeter   FinanceUsageMeter @relation(fields: [usageMeterId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([usageMeterId])
+  @@index([occurredAt])
+}
+
+model FinanceRevenueSubledgerEntry {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  entryDate     DateTime @default(now())
+  entryType     String
+  referenceType String?
+  referenceId   String?
+  amount        Decimal  @default(0) @db.Decimal(14, 2)
+  currency      String   @default("BRL")
+  notes         String?
+  metadataJson  Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([entryDate])
+  @@index([referenceType, referenceId])
+}
+
+model FinanceRevenueConnector {
+  id              String                        @id @default(cuid())
+  createdAt       DateTime                      @default(now())
+  updatedAt       DateTime                      @updatedAt
+  provider        FinanceRevenueConnectorProvider
+  label           String
+  status          FinanceRevenueConnectorStatus @default(DISCONNECTED)
+  externalOrgId   String?
+  syncDirection   String?
+  lastSyncAt      DateTime?
+  credentialsJson Json?
+  settingsJson    Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceFxRate {
+  id           String              @id @default(cuid())
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  baseCurrency String
+  quoteCurrency String
+  rate         Decimal             @db.Decimal(18, 8)
+  asOf         DateTime            @default(now())
+  source       FinanceFxRateSource @default(MANUAL)
+  notes        String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([baseCurrency, quoteCurrency, asOf])
+}
+
+model FinanceInternationalReimbursement {
+  id                  String                                @id @default(cuid())
+  createdAt           DateTime                              @default(now())
+  updatedAt           DateTime                              @updatedAt
+  employeeName        String
+  homeCountryCode     String?
+  payoutCountryCode   String
+  sourceCurrency      String
+  payoutCurrency      String
+  requestedAmount     Decimal                               @db.Decimal(14, 2)
+  payoutAmount        Decimal?                              @db.Decimal(14, 2)
+  fxRateUsed          Decimal?                              @db.Decimal(18, 8)
+  status              FinanceInternationalReimbursementStatus @default(DRAFT)
+  expenseReportId     String?
+  notes               String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+  @@index([expenseReportId])
+}
+
+model FinanceLocalPayout {
+  id                String                   @id @default(cuid())
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  beneficiaryName   String
+  countryCode       String
+  currency          String
+  amount            Decimal                  @db.Decimal(14, 2)
+  status            FinanceLocalPayoutStatus @default(PLANNED)
+  payoutMethod      String?
+  payoutReference   String?
+  scheduledAt       DateTime?
+  paidAt            DateTime?
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceIntercompanyTransfer {
+  id                  String                   @id @default(cuid())
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  reference           String
+  sourceEntityId      String?
+  destinationEntityId String?
+  amount              Decimal                  @db.Decimal(14, 2)
+  currency            String                   @default("BRL")
+  status              FinanceIntercompanyStatus @default(DRAFT)
+  initiatedAt         DateTime?
+  settledAt           DateTime?
+  notes               String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceConsolidationSnapshot {
+  id               String                     @id @default(cuid())
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
+  label            String
+  asOf             DateTime                   @default(now())
+  status           FinanceConsolidationStatus @default(DRAFT)
+  entityCount      Int                        @default(0)
+  totalRevenue     Decimal                    @default(0) @db.Decimal(14, 2)
+  totalSpend       Decimal                    @default(0) @db.Decimal(14, 2)
+  netCash          Decimal                    @default(0) @db.Decimal(14, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([asOf])
+  @@index([status])
+}
+
+model FinanceTaxJurisdiction {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  countryCode    String
+  stateCode      String?
+  city           String?
+  regime         String?
+  defaultRatePct Decimal? @db.Decimal(8, 2)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([countryCode, stateCode])
+}
+
+model FinanceTaxTrail {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  referenceType    String
+  referenceId      String?
+  jurisdictionCode String
+  taxAmount        Decimal  @default(0) @db.Decimal(14, 2)
+  currency         String   @default("BRL")
+  detailsJson      Json?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([referenceType, referenceId])
+}
+
+model FinanceVendorKycReview {
+  id             String                @id @default(cuid())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  status         FinanceVendorKycStatus @default(PENDING)
+  reviewerName   String?
+  score          Int?
+  checklistJson  Json?
+  notes          String?
+  reviewedAt     DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String
+  vendor   FinanceVendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model FinanceVendorContract {
+  id              String                     @id @default(cuid())
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+  title           String
+  contractNumber  String?
+  status          FinanceVendorContractStatus @default(DRAFT)
+  effectiveAt     DateTime?
+  renewalAt       DateTime?
+  endAt           DateTime?
+  totalValue      Decimal?                   @db.Decimal(14, 2)
+  currency        String                     @default("BRL")
+  fileUrl         String?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String
+  vendor   FinanceVendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model FinanceVendorNegotiationBenchmark {
+  id               String                 @id @default(cuid())
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  benchmarkType    String
+  status           FinanceBenchmarkStatus @default(DRAFT)
+  currentSpend     Decimal?               @db.Decimal(14, 2)
+  benchmarkSpend   Decimal?               @db.Decimal(14, 2)
+  savingsPotential Decimal?               @db.Decimal(14, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+  vendor   FinanceVendor? @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+model FinanceDataWarehouseConnection {
+  id              String                 @id @default(cuid())
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  provider        String
+  label           String
+  status          FinanceWarehouseStatus @default(DISCONNECTED)
+  dataset         String?
+  schemaName      String?
+  lastSyncAt      DateTime?
+  credentialsJson Json?
+  settingsJson    Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceMetricSnapshot {
+  id             String                    @id @default(cuid())
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  metricType     FinanceMetricSnapshotType
+  label          String
+  metricDate     DateTime                  @default(now())
+  value          Decimal                   @default(0) @db.Decimal(14, 2)
+  compareValue   Decimal?                  @db.Decimal(14, 2)
+  unitLabel      String?
+  breakdownJson  Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([metricType, metricDate])
+}
+
+model FinanceRevenueCohort {
+  id               String                  @id @default(cuid())
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  cohortType       FinanceRevenueCohortType
+  cohortLabel      String
+  startDate        DateTime
+  endDate          DateTime?
+  customersCount   Int                     @default(0)
+  retainedRevenue  Decimal                 @default(0) @db.Decimal(14, 2)
+  churnedRevenue   Decimal                 @default(0) @db.Decimal(14, 2)
+  metadataJson     Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([cohortType, startDate])
+}
+
+model FinanceUnitBenchmark {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  unitLabel       String
+  benchmarkDate   DateTime @default(now())
+  revenueValue    Decimal? @db.Decimal(14, 2)
+  spendValue      Decimal? @db.Decimal(14, 2)
+  marginPct       Decimal? @db.Decimal(8, 2)
+  cashValue       Decimal? @db.Decimal(14, 2)
+  benchmarkJson   Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([benchmarkDate])
+}
+
+model EnterpriseSsoConfig {
+  id               String                @id @default(cuid())
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  provider         EnterpriseIdentityProvider
+  label            String
+  status           EnterpriseSsoStatus   @default(DRAFT)
+  samlEntryPoint   String?
+  samlIssuer       String?
+  samlCert         String?
+  scimBaseUrl      String?
+  metadataJson     Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model EnterpriseScimProvision {
+  id               String               @id @default(cuid())
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  status           EnterpriseScimStatus @default(DRAFT)
+  principalType    String
+  principalRef     String?
+  externalId       String?
+  lastSyncAt       DateTime?
+  payloadJson      Json?
+  errorMessage     String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model EnterpriseDataRetentionPolicy {
+  id               String                   @id @default(cuid())
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  label            String
+  status           EnterpriseRetentionStatus @default(ACTIVE)
+  entityScope      String
+  retentionDays    Int
+  archiveEnabled   Boolean                  @default(true)
+  purgeEnabled     Boolean                  @default(false)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model EnterpriseAuditExport {
+  id              String                    @id @default(cuid())
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  status          EnterpriseAuditExportStatus @default(PENDING)
+  format          String
+  dateFrom        DateTime?
+  dateTo          DateTime?
+  fileUrl         String?
+  notes           String?
+  scopeJson       Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model EnterpriseSegregationPolicy {
+  id                String                @id @default(cuid())
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  label             String
+  severity          EnterpriseSodSeverity @default(MEDIUM)
+  incompatibleRoles Json
+  controlsJson      Json?
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([severity])
+}
+
+model FinanceApprovalEvidence {
+  id                String                        @id @default(cuid())
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+  title             String
+  evidenceType      String
+  status            FinanceApprovalEvidenceStatus @default(PENDING)
+  fileUrl           String?
+  notes             String?
+  verifiedAt        DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  approvalRequestId String
+  approvalRequest   FinanceApprovalRequest @relation(fields: [approvalRequestId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([approvalRequestId])
+  @@index([status])
+}
+
+model FinanceBillingPlanVersion {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  versionLabel    String
+  pricingModel    String
+  baseAmount      Decimal  @default(0) @db.Decimal(14, 2)
+  includedUnits   Decimal? @db.Decimal(18, 4)
+  overageRate     Decimal? @db.Decimal(14, 4)
+  effectiveAt     DateTime @default(now())
+  retiredAt       DateTime?
+  configurationJson Json?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  billingPlanId String
+  billingPlanRef String?
+
+  @@index([companyId])
+  @@index([billingPlanId])
+  @@index([effectiveAt])
+}
+
+model FinanceCustomerCreditBalance {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  customerName     String
+  currency         String   @default("BRL")
+  availableBalance Decimal  @default(0) @db.Decimal(14, 2)
+  reservedBalance  Decimal  @default(0) @db.Decimal(14, 2)
+  consumedBalance  Decimal  @default(0) @db.Decimal(14, 2)
+  lastActivityAt   DateTime?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([customerName])
+}
+
+model FinanceRateCard {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  label           String
+  metricKey       String
+  pricingModel    String
+  billingUnit     String?
+  unitPrice       Decimal  @default(0) @db.Decimal(14, 4)
+  minimumCommit   Decimal? @db.Decimal(14, 2)
+  tiersJson       Json?
+  isActive        Boolean  @default(true)
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  billingPlanId String?
+
+  @@index([companyId])
+  @@index([billingPlanId])
+  @@index([isActive])
+}
+
+model FinanceInvoiceRetryAttempt {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  attemptNumber Int      @default(1)
+  status        String
+  channel       String?
+  scheduledAt   DateTime?
+  attemptedAt   DateTime?
+  responseCode  String?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  invoiceId String
+
+  @@index([companyId])
+  @@index([invoiceId])
+  @@index([status])
+}
+
+model FinanceWorkforcePlan {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  label         String
+  headcountTarget Int    @default(0)
+  hiringPlan    Int      @default(0)
+  payrollRunRate Decimal @default(0) @db.Decimal(14, 2)
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  branchId String?
+  departmentId String?
+  scenarioId String?
+
+  @@index([companyId])
+  @@index([scenarioId])
+}
+
+model FinanceScenarioMerge {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  title          String
+  sourceScenarioId String
+  targetScenarioId String
+  mergeStatus    String
+  assumptionsJson Json?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([sourceScenarioId, targetScenarioId])
+}
+
+model FinanceVarianceExplanation {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  title            String
+  varianceType     String
+  metricLabel      String
+  varianceAmount   Decimal  @default(0) @db.Decimal(14, 2)
+  explanation      String
+  recommendedAction String?
+  ownerName        String?
+  status           String   @default("OPEN")
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  snapshotId String?
+  scenarioId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinancePlanningCollaboration {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  title       String
+  body        String
+  authorName  String?
+  status      String   @default("OPEN")
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  scenarioId String?
+  branchId String?
+  departmentId String?
+
+  @@index([companyId])
+  @@index([scenarioId])
+  @@index([status])
+}
+
+model FinanceProcurementSignal {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  signalType       String
+  severity         String
+  title            String
+  detail           String?
+  recommendedAction String?
+  status           String   @default("OPEN")
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  payableId String?
+  purchaseOrderId String?
+  vendorDocumentId String?
+
+  @@index([companyId])
+  @@index([status])
+  @@index([severity])
+}
+
+model FinanceCopilotRun {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  runType         String
+  status          String   @default("PENDING")
+  casesOpened     Int      @default(0)
+  actionsQueued   Int      @default(0)
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  summary         String?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([runType, status])
+}
+
+model FinanceCopilotCase {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  caseType        String
+  priority        String
+  status          String   @default("OPEN")
+  title           String
+  ownerName       String?
+  resolutionState String?
+  payloadJson     Json?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, priority])
+}
+
+model FinanceDunningPolicy {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  label         String
+  status        String   @default("DRAFT")
+  segment       String?
+  maxAttempts   Int      @default(3)
+  strategyJson  Json?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceInvoiceLifecycleEvent {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  eventType   String
+  eventStatus String
+  eventAt     DateTime @default(now())
+  payloadJson Json?
+  notes       String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  invoiceId String
+
+  @@index([companyId])
+  @@index([invoiceId, eventAt])
+}
+
+model FinanceCustomerBillingPortal {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  customerName   String
+  status         String   @default("INACTIVE")
+  portalUrl      String?
+  lastAccessAt   DateTime?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  billingPlanId   String?
+  creditBalanceId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceProcurementInvestigation {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  title             String
+  severity          String
+  status            String   @default("OPEN")
+  finding           String?
+  recommendedAction String?
+  ownerName         String?
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  signalId String?
+
+  @@index([companyId])
+  @@index([status, severity])
+}
+
+model FinanceOcrLineItem {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lineNumber     Int
+  description    String?
+  quantity       Decimal? @db.Decimal(14, 4)
+  unitPrice      Decimal? @db.Decimal(14, 4)
+  totalAmount    Decimal? @db.Decimal(14, 2)
+  confidencePct  Decimal? @db.Decimal(8, 2)
+  mappedCategory String?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorDocumentId String?
+
+  @@index([companyId])
+  @@index([vendorDocumentId])
+}
+
+model FinanceVendorScorecard {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  scoreDate       DateTime @default(now())
+  deliveryScore   Decimal? @db.Decimal(8, 2)
+  priceScore      Decimal? @db.Decimal(8, 2)
+  complianceScore Decimal? @db.Decimal(8, 2)
+  riskScore       Decimal? @db.Decimal(8, 2)
+  totalScore      Decimal? @db.Decimal(8, 2)
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+
+  @@index([companyId])
+  @@index([vendorId, scoreDate])
+}
+
+model FinancePlanningCycle {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  label         String
+  status        String   @default("DRAFT")
+  horizonMonths Int      @default(12)
+  ownerName     String?
+  lockedAt      DateTime?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  scenarioId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceHeadcountPlanLine {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  roleName         String
+  departmentName   String?
+  location         String?
+  plannedHeadcount Int      @default(0)
+  plannedCost      Decimal? @db.Decimal(14, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  workforcePlanId String?
+
+  @@index([companyId])
+  @@index([workforcePlanId])
+}
+
+model FinanceScenarioComparison {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  status          String   @default("DRAFT")
+  summary         String?
+  deltaRevenue    Decimal? @db.Decimal(14, 2)
+  deltaSpend      Decimal? @db.Decimal(14, 2)
+  deltaCash       Decimal? @db.Decimal(14, 2)
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  baseScenarioId    String
+  compareScenarioId String
+
+  @@index([companyId])
+  @@index([baseScenarioId, compareScenarioId])
+}
+
+model FinanceFxExposure {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  currencyCode   String
+  exposureAmount Decimal  @db.Decimal(14, 2)
+  hedgeStatus    String   @default("UNHEDGED")
+  asOf           DateTime @default(now())
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  entityId String?
+
+  @@index([companyId])
+  @@index([currencyCode, asOf])
+}
+
+model FinanceIntercompanySettlement {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  amount          Decimal  @db.Decimal(14, 2)
+  currency        String   @default("BRL")
+  status          String   @default("PENDING")
+  dueAt           DateTime?
+  settledAt       DateTime?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  transferId           String?
+  sourceEntityId       String?
+  destinationEntityId  String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceTaxRegistration {
+  id                 String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  jurisdictionCode   String
+  registrationNumber String
+  filingFrequency    String?
+  status             String   @default("ACTIVE")
+  notes              String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  entityId String?
+
+  @@index([companyId])
+  @@index([jurisdictionCode, status])
+}
+
+model FinanceComplianceRun {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  runType         String
+  status          String   @default("PENDING")
+  findingsCount   Int      @default(0)
+  exceptionsCount Int      @default(0)
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([runType, status])
+}
+
+model FinanceControlException {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  controlType     String
+  severity        String
+  title           String
+  status          String   @default("OPEN")
+  ownerName       String?
+  remediation     String?
+  dueAt           DateTime?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  complianceRunId String?
+
+  @@index([companyId])
+  @@index([status, severity])
+}
+
+model FinanceCopilotRule {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  name          String
+  triggerType   String
+  scope         String?
+  status        String   @default("ACTIVE")
+  priority      String?
+  conditionJson Json?
+  actionJson    Json?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, triggerType])
+}
+
+model FinanceCopilotAction {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  actionType    String
+  status        String   @default("QUEUED")
+  title         String
+  ownerName     String?
+  executeAfter  DateTime?
+  payloadJson   Json?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  caseId String?
+  runId  String?
+
+  @@index([companyId])
+  @@index([status, actionType])
+}
+
+model FinanceApprovalGuardrail {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  title           String
+  status          String   @default("ACTIVE")
+  ruleType        String
+  thresholdAmount Decimal? @db.Decimal(14, 2)
+  scopeJson       Json?
+  policyJson      Json?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, ruleType])
+}
+
+model FinanceCollectionAutomation {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  name          String
+  segment       String?
+  status        String   @default("ACTIVE")
+  triggerType   String
+  cadenceJson   Json?
+  policyJson    Json?
+  lastRunAt     DateTime?
+  notes         String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, triggerType])
+}
+
+model FinanceCashRebalanceInstruction {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  status          String   @default("PLANNED")
+  sourceAccountId String?
+  targetAccountId String?
+  currency        String   @default("BRL")
+  amount          Decimal  @db.Decimal(14, 2)
+  rationale       String?
+  executeBy       DateTime?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceCustomerUsageSnapshot {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  customerName    String
+  periodLabel     String
+  usageQuantity   Decimal  @db.Decimal(14, 4)
+  ratedAmount     Decimal  @db.Decimal(14, 2)
+  creditApplied   Decimal? @db.Decimal(14, 2)
+  breakdownJson   Json?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  meterId String?
+
+  @@index([companyId])
+  @@index([customerName, periodLabel])
+}
+
+model FinanceInvoicePaymentSession {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  customerName   String
+  status         String   @default("OPEN")
+  amount         Decimal  @db.Decimal(14, 2)
+  currency       String   @default("BRL")
+  paymentUrl     String?
+  expiresAt      DateTime?
+  completedAt    DateTime?
+  paymentMethod  String?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  invoiceId String?
+
+  @@index([companyId])
+  @@index([status, expiresAt])
+}
+
+model FinanceBillingCreditApplication {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  customerName    String
+  status          String   @default("APPLIED")
+  appliedAmount   Decimal  @db.Decimal(14, 2)
+  currency        String   @default("BRL")
+  reason          String?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  invoiceId       String?
+  creditBalanceId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceRetrySegmentPolicy {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  segment        String
+  status         String   @default("ACTIVE")
+  retryCount     Int      @default(3)
+  intervalDays   Int      @default(3)
+  channelJson    Json?
+  guardrailJson  Json?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([segment, status])
+}
+
+model FinanceFxAutomationRun {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  status            String   @default("PENDING")
+  baseCurrency      String
+  targetCurrency    String
+  executedAt        DateTime @default(now())
+  convertedAmount   Decimal? @db.Decimal(14, 2)
+  averageRate       Decimal? @db.Decimal(14, 6)
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, executedAt])
+}
+
+model FinanceLocalPayoutBatch {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  batchLabel      String
+  status          String   @default("PLANNED")
+  countryCode     String
+  currency        String   @default("BRL")
+  payoutCount     Int      @default(0)
+  totalAmount     Decimal  @db.Decimal(14, 2)
+  processedAt     DateTime?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, countryCode])
+}
+
+model FinanceIntercompanySettlementLine {
+  id                   String   @id @default(cuid())
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  status               String   @default("OPEN")
+  description          String?
+  amount               Decimal  @db.Decimal(14, 2)
+  currency             String   @default("BRL")
+  dueAt                DateTime?
+  sourceEntityLabel    String?
+  destinationEntityLabel String?
+  notes                String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  settlementId String?
+
+  @@index([companyId])
+  @@index([status, dueAt])
+}
+
+model FinanceTaxRule {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  jurisdictionCode String
+  ruleType         String
+  status           String   @default("ACTIVE")
+  ratePct          Decimal? @db.Decimal(8, 4)
+  payloadJson      Json?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([jurisdictionCode, status])
+}
+
+model FinanceConsolidationEntityBalance {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  entityLabel    String
+  snapshotLabel  String?
+  cashBalance    Decimal? @db.Decimal(14, 2)
+  receivables    Decimal? @db.Decimal(14, 2)
+  payables       Decimal? @db.Decimal(14, 2)
+  fxImpact       Decimal? @db.Decimal(14, 2)
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  consolidationSnapshotId String?
+
+  @@index([companyId])
+  @@index([entityLabel])
+}
+
+model FinanceSegregationEnforcement {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  title            String
+  status           String   @default("ACTIVE")
+  enforcementType  String
+  conflictDetected Boolean  @default(false)
+  payloadJson      Json?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  policyId String?
+
+  @@index([companyId])
+  @@index([status, enforcementType])
+}
+
+model FinanceEvidencePack {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  title            String
+  status           String   @default("PENDING")
+  evidenceCount    Int      @default(0)
+  packageUrl       String?
+  generatedAt      DateTime?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  approvalRequestId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceRetentionExecution {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  status          String   @default("PENDING")
+  policyLabel     String
+  recordsAffected Int      @default(0)
+  executedAt      DateTime?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  retentionPolicyId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceAuditPackage {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  label          String
+  status         String   @default("PENDING")
+  packageUrl     String?
+  generatedAt    DateTime?
+  scopeJson      Json?
+  notes          String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  auditExportId String?
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model FinanceOcrMatchResult {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  status            String   @default("OPEN")
+  matchType         String
+  confidencePct     Decimal? @db.Decimal(8, 2)
+  mismatchAmount    Decimal? @db.Decimal(14, 2)
+  drilldownJson     Json?
+  notes             String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  lineItemId String?
+
+  @@index([companyId])
+  @@index([status, matchType])
+}
+
+model FinanceFraudDetectionRun {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  status          String   @default("PENDING")
+  findingsCount   Int      @default(0)
+  severity        String?
+  executedAt      DateTime @default(now())
+  summary         String?
+  notes           String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status, executedAt])
+}
+
+model FinanceVendorDynamicScore {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  scoreDate        DateTime @default(now())
+  priceScore       Decimal? @db.Decimal(8, 2)
+  fulfillmentScore Decimal? @db.Decimal(8, 2)
+  complianceScore  Decimal? @db.Decimal(8, 2)
+  totalScore       Decimal? @db.Decimal(8, 2)
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+
+  @@index([companyId])
+  @@index([vendorId, scoreDate])
+}
+
+model FinanceNegotiationOpportunity {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  title            String
+  status           String   @default("OPEN")
+  savingsPotential Decimal? @db.Decimal(14, 2)
+  benchmarkGapPct  Decimal? @db.Decimal(8, 2)
+  rationale        String?
+  notes            String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+  benchmarkId String?
+
+  @@index([companyId])
+  @@index([status])
 }
 
 model AutomationRule {

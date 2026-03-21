@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Delete,
@@ -22,6 +22,7 @@ import { CreateCrmLeadTaskDto } from "./dto/create-crm-lead-task.dto";
 import { CreateCrmSavedViewDto } from "./dto/create-crm-saved-view.dto";
 import { ListCrmLeadsQueryDto } from "./dto/list-crm-leads.query.dto";
 import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
+import { MoveLeadStageDto } from "./dto/move-lead-stage.dto";
 
 type CrmCurrentUser = {
   id: string;
@@ -221,6 +222,22 @@ export class CrmLeadsController {
     return this.crmLeads.update(id, actor, body);
   }
 
+    @Patch(":leadId/move-stage")
+  @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES)
+  async moveStage(
+    @Param("leadId") leadId: string,
+    @Body() body: MoveLeadStageDto,
+    @CurrentUser() user: CrmCurrentUser,
+  ) {
+    const actor = this.toActor(user);
+    return this.crmLeads.moveLeadStage(
+      leadId,
+      actor,
+      body.pipelineId,
+      body.stageId,
+    );
+  }
+
   @Delete(":id")
   @Roles(Role.ADMIN_MASTER, Role.ADMIN, Role.CEO, Role.CMO, Role.SALES)
   async remove(
@@ -231,3 +248,5 @@ export class CrmLeadsController {
     return this.crmLeads.remove(id, actor);
   }
 }
+
+

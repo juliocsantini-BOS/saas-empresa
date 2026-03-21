@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { createCrmLeadActivity } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { ActivityComposerType, ExtendedLeadItem } from './types';
@@ -46,7 +45,7 @@ export function useLeadActivityComposer({
 
   const submitActivity = useCallback(
     async (lead: ExtendedLeadItem | null) => {
-      if (!lead || savingActivity || activityText.trim().length < 2) return;
+      if (!lead || activityText.trim().length < 2) return;
 
       try {
         setSavingActivity(true);
@@ -61,7 +60,9 @@ export function useLeadActivityComposer({
 
         setActivityText('');
         setActivityType('NOTE');
+
         await loadLeads();
+
         await refreshLeadDetails({
           ...lead,
           lastActivityAt: now,
@@ -73,7 +74,7 @@ export function useLeadActivityComposer({
         setSavingActivity(false);
       }
     },
-    [activityText, activityType, authHeaders, loadLeads, refreshLeadDetails, savingActivity, setError],
+    [activityText, activityType, authHeaders, loadLeads, refreshLeadDetails, setError],
   );
 
   return {

@@ -118,7 +118,7 @@ export default function Page() {
 
   function statusBadge(statusCode: number) {
     if (statusCode >= 200 && statusCode < 300) {
-      return 'rounded-full border border-[#3BFF8C]/20 bg-[#3BFF8C]/10 px-3 py-1 text-xs text-[#9CFFC2]';
+      return 'rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-xs text-[#D8B4FE]';
     }
 
     if (statusCode >= 400 && statusCode < 500) {
@@ -154,7 +154,7 @@ export default function Page() {
               setLoading(true);
               loadAudit();
             }}
-            className="rounded-2xl bg-[#3BFF8C] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
+            className="rounded-2xl bg-[#8B5CF6] px-5 py-3 text-sm font-semibold text-black transition hover:opacity-90"
           >
             Atualizar
           </button>
@@ -170,7 +170,7 @@ export default function Page() {
 
         <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
           <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">2xx</div>
-          <div className="mt-4 text-3xl font-semibold text-[#3BFF8C]">{stats.success}</div>
+          <div className="mt-4 text-3xl font-semibold text-[#8B5CF6]">{stats.success}</div>
           <div className="mt-2 text-sm text-zinc-400">Requisições bem-sucedidas</div>
         </div>
 
@@ -187,7 +187,7 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(59,255,140,0.05)]">
+      <div className="rounded-[32px] border border-white/10 bg-[#111113] p-5 shadow-[0_0_60px_rgba(139,92,246,0.05)]">
         <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="text-lg font-semibold text-white">Logs de auditoria</div>
@@ -201,7 +201,7 @@ export default function Page() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por rota, método, userId, requestId..."
-              className="w-full rounded-2xl border border-white/10 bg-[#0F1012] px-4 py-3 text-sm text-white outline-none transition focus:border-[#3BFF8C]/40"
+              className="w-full rounded-2xl border border-white/10 bg-[#0F1012] px-4 py-3 text-sm text-white outline-none transition focus:border-[#8B5CF6]/40"
             />
           </div>
         </div>
@@ -282,7 +282,7 @@ export default function Page() {
 
       {selectedLog ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(59,255,140,0.08)]">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-[32px] border border-white/10 bg-[#111113] p-6 shadow-[0_0_80px_rgba(139,92,246,0.08)]">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-white">Detalhe do log</h3>

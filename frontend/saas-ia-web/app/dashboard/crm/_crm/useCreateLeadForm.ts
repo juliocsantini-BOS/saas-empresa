@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { createCrmLead } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { CreateLeadForm } from './types';
@@ -17,16 +16,25 @@ const emptyForm: CreateLeadForm = {
   industry: '',
   companySize: '',
   notes: '',
+  accountId: '',
+  contactId: '',
+  forecastCategory: 'PIPELINE',
   dealValue: '',
+  currency: 'BRL',
   probability: '',
   source: '',
   sourceDetail: '',
   priority: 'MEDIUM',
   competitor: '',
   wonReason: '',
+  lostReason: '',
   nextStep: '',
+  nextStepDueAt: '',
   nextMeetingAt: '',
   expectedCloseDate: '',
+  ownerUserId: '',
+  branchId: '',
+  departmentId: '',
 };
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -72,6 +80,7 @@ export function useCreateLeadForm({
 
     try {
       setSavingLead(true);
+      setError(null);
 
       await createCrmLead(authHeaders, createForm);
 

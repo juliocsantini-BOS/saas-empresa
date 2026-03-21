@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-
 import { updateCrmLeadStatus } from './crm.service';
 import type { AuthHeaders } from './crm.service';
 import type { ExtendedLeadItem, LeadStatus } from './types';
@@ -44,23 +43,35 @@ export function useLeadStatusUpdate({
 
   const changeLeadStatus = useCallback(
     async (lead: ExtendedLeadItem, status: LeadStatus) => {
-      if (savingStatus || lead.status === status) return;
+      if (lead.status === status) return;
 
       try {
         setSavingStatus(true);
         setError(null);
 
-        const updatedLead = await updateCrmLeadStatus(authHeaders, lead.id, status);
+        const updatedLead = await updateCrmLeadStatus(
+          authHeaders,
+          lead.id,
+          status,
+        );
 
         await loadLeads();
-        await onLeadUpdated(updatedLead);
+
+        if (updatedLead) {
+          await onLeadUpdated(updatedLead);
+        }
       } catch (error: unknown) {
-        setError(getErrorMessage(error, 'Não foi possível atualizar o status do lead.'));
+        setError(
+          getErrorMessage(
+            error,
+            'Não foi possível atualizar o status do lead.',
+          ),
+        );
       } finally {
         setSavingStatus(false);
       }
     },
-    [authHeaders, loadLeads, onLeadUpdated, savingStatus, setError],
+    [authHeaders, loadLeads, onLeadUpdated, setError],
   );
 
   return {
