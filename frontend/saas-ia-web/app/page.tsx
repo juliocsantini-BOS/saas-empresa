@@ -12,7 +12,7 @@ export default function Home() {
 
           <nav className="flex items-center gap-3">
             <Link
-              href="/dashboard"
+              href="/login"
               className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-200"
             >
               Login
@@ -38,7 +38,7 @@ export default function Home() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/dashboard"
+              href="/login"
               className="rounded-full bg-[linear-gradient(135deg,#f5f3ff,#b197fc)] px-6 py-3.5 text-sm font-semibold text-[#12081d]"
             >
               Open platform
