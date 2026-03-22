@@ -1,330 +1,395 @@
 import Link from 'next/link';
 
-function Pill({ children }: { children: React.ReactNode }) {
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] uppercase tracking-[0.24em] text-zinc-300">
+    <a
+      href={href}
+      className="rounded-full px-4 py-2 text-sm text-zinc-300 transition hover:bg-white/6 hover:text-white"
+    >
+      {children}
+    </a>
+  );
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-[11px] uppercase tracking-[0.26em] text-zinc-300 backdrop-blur-md">
+      <span className="h-2 w-2 rounded-full bg-violet-300 shadow-[0_0_18px_rgba(196,181,253,0.9)]" />
       {children}
     </div>
   );
 }
 
-function Metric({
-  label,
-  value,
-  note,
+function SignalCard({
+  title,
+  subtitle,
+  accent,
 }: {
-  label: string;
-  value: string;
-  note: string;
+  title: string;
+  subtitle: string;
+  accent: string;
 }) {
   return (
-    <div className="rounded-[24px] border border-white/10 bg-black/20 p-4">
-      <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">{label}</div>
-      <div className="mt-3 text-2xl font-semibold tracking-tight text-white">{value}</div>
-      <div className="mt-2 text-sm leading-6 text-zinc-400">{note}</div>
+    <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))] p-4 shadow-[0_14px_40px_rgba(0,0,0,0.22)] backdrop-blur-xl">
+      <div className="flex items-center justify-between">
+        <div className="text-xs uppercase tracking-[0.22em] text-zinc-500">{subtitle}</div>
+        <div
+          className="h-2.5 w-2.5 rounded-full shadow-[0_0_18px_rgba(255,255,255,0.35)]"
+          style={{ backgroundColor: accent }}
+        />
+      </div>
+      <div className="mt-4 text-lg font-semibold text-white">{title}</div>
     </div>
   );
 }
 
 function Capability({
+  eyebrow,
   title,
   text,
 }: {
+  eyebrow: string;
   title: string;
   text: string;
 }) {
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.018))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-      <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Capability</div>
-      <div className="mt-4 text-xl font-semibold text-white">{title}</div>
-      <div className="mt-2 text-sm leading-7 text-zinc-400">{text}</div>
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.016))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+      <div className="text-[11px] uppercase tracking-[0.24em] text-zinc-500">{eyebrow}</div>
+      <div className="mt-4 text-2xl font-semibold tracking-tight text-white">{title}</div>
+      <div className="mt-3 text-sm leading-7 text-zinc-400">{text}</div>
     </div>
   );
 }
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#07080D] text-white">
-      <div className="mx-auto max-w-[1480px] px-5 py-5 md:px-8 xl:px-10">
-        <header className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))] px-5 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <main className="min-h-screen overflow-hidden bg-[#07080d] text-white">
+      <div className="relative mx-auto max-w-[1600px] px-4 py-4 md:px-8 md:py-8">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-[-10%] top-16 h-[420px] w-[420px] rounded-full bg-violet-600/20 blur-[120px]" />
+          <div className="absolute right-[-12%] top-10 h-[420px] w-[420px] rounded-full bg-fuchsia-500/20 blur-[140px]" />
+          <div className="absolute bottom-[-8%] left-1/2 h-[320px] w-[680px] -translate-x-1/2 rounded-full bg-violet-500/12 blur-[120px]" />
+        </div>
+
+        <section className="relative overflow-hidden rounded-[38px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,17,27,0.96),rgba(7,8,13,0.98))] px-5 pb-10 pt-5 shadow-[0_40px_120px_rgba(0,0,0,0.34)] md:px-8 md:pb-14 md:pt-7 xl:px-10">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:88px_88px] opacity-[0.07]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.34),transparent)]" />
+          <div className="absolute left-[24%] top-[12%] h-[360px] w-[360px] rounded-full bg-violet-500/14 blur-[110px]" />
+          <div className="absolute right-[8%] top-[24%] h-[320px] w-[320px] rounded-full bg-pink-500/12 blur-[120px]" />
+          <div className="absolute bottom-[18%] left-1/2 h-[220px] w-[520px] -translate-x-1/2 rounded-full bg-white/8 blur-[130px]" />
+
+          <header className="relative z-10 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-[16px] bg-[linear-gradient(135deg,rgba(139,92,246,0.96),rgba(76,29,149,0.76))] shadow-[0_0_40px_rgba(139,92,246,0.28)]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[15px] border border-white/10 bg-[linear-gradient(135deg,rgba(157,111,255,0.9),rgba(77,31,145,0.75))] shadow-[0_0_40px_rgba(139,92,246,0.28)]">
                 <div className="h-3.5 w-3.5 rounded-full bg-white" />
               </div>
               <div>
-                <div className="text-[17px] font-semibold tracking-tight text-white">ELYON OS</div>
-                <div className="text-sm text-zinc-500">Enterprise operating system</div>
+                <div className="text-lg font-semibold tracking-tight text-white">ELYON OS</div>
+                <div className="text-sm text-zinc-500">Operating system for modern companies</div>
               </div>
             </div>
 
-            <nav className="flex flex-wrap items-center gap-1.5 text-sm text-zinc-300">
-              <a href="#platform" className="rounded-2xl px-3 py-2 hover:bg-white/5">
-                Plataforma
-              </a>
-              <a href="#modules" className="rounded-2xl px-3 py-2 hover:bg-white/5">
-                Módulos
-              </a>
-              <a href="#infrastructure" className="rounded-2xl px-3 py-2 hover:bg-white/5">
-                Infraestrutura
-              </a>
-              <a href="#contact" className="rounded-2xl px-3 py-2 hover:bg-white/5">
-                Contato
-              </a>
-            </nav>
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+              <nav className="flex flex-wrap items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-md">
+                <NavLink href="#platform">Platform</NavLink>
+                <NavLink href="#command">Command</NavLink>
+                <NavLink href="#modules">Modules</NavLink>
+                <NavLink href="#contact">Contact</NavLink>
+              </nav>
+
+              <div className="flex items-center gap-3">
+                <a
+                  href="#contact"
+                  className="rounded-full border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-medium text-white hover:bg-white/[0.08]"
+                >
+                  Login
+                </a>
+                <a
+                  href="#contact"
+                  className="rounded-full bg-[linear-gradient(135deg,#ede9fe,#a78bfa)] px-5 py-3 text-sm font-semibold text-[#130a26] shadow-[0_0_50px_rgba(167,139,250,0.35)] hover:translate-y-[-1px]"
+                >
+                  Request Access
+                </a>
+              </div>
+            </div>
+          </header>
+
+          <div className="relative z-10 mt-10 grid gap-8 xl:grid-cols-[1.05fr,0.95fr] xl:items-start">
+            <div className="max-w-[760px]">
+              <Badge>Enterprise AI Operating Layer</Badge>
+
+              <div className="mt-8">
+                <h1 className="max-w-[900px] text-[52px] font-semibold leading-[0.92] tracking-[-0.075em] text-white md:text-[78px] xl:text-[104px]">
+                  Run finance,
+                  <br />
+                  revenue and
+                  <br />
+                  operations from
+                  <br />
+                  one command layer.
+                </h1>
+                <p className="mt-6 max-w-[600px] text-[15px] leading-8 text-zinc-300 md:text-lg">
+                  Elyon OS unifies financial command, CRM execution, governance and embedded
+                  AI into a single operating environment designed for modern companies with
+                  real operational complexity.
+                </p>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href="#contact"
+                  className="rounded-full bg-[linear-gradient(135deg,#f5f3ff,#b197fc)] px-6 py-3.5 text-sm font-semibold text-[#11081f] shadow-[0_0_60px_rgba(177,151,252,0.28)]"
+                >
+                  Start with Elyon
+                </a>
+                <a
+                  href="#modules"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-medium text-white backdrop-blur-md hover:bg-white/[0.08]"
+                >
+                  Explore modules
+                </a>
+              </div>
+
+              <div className="mt-10 grid max-w-[620px] gap-3 md:grid-cols-3">
+                <SignalCard title="Finance OS" subtitle="Treasury" accent="#a78bfa" />
+                <SignalCard title="CRM OS" subtitle="Guided selling" accent="#f0abfc" />
+                <SignalCard title="AI Command" subtitle="Execution" accent="#ddd6fe" />
+              </div>
+            </div>
+
+            <div className="relative min-h-[640px]">
+              <div className="absolute right-[4%] top-[6%] z-20 w-[250px] rotate-[9deg] rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018))] p-5 shadow-[0_28px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-zinc-400">Performance</div>
+                  <div className="rounded-full bg-emerald-400/15 px-2.5 py-1 text-[11px] text-emerald-200">
+                    +12.8%
+                  </div>
+                </div>
+                <div className="mt-5 space-y-3">
+                  {[
+                    ['2021', '34%'],
+                    ['2022', '48%'],
+                    ['2023', '41%'],
+                    ['2024', '67%'],
+                    ['2025', '81%'],
+                  ].map(([year, value], index) => (
+                    <div key={year} className="flex items-center gap-3">
+                      <div className="w-10 text-xs text-zinc-500">{year}</div>
+                      <div className="h-10 flex-1 overflow-hidden rounded-full bg-white/5">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: value,
+                            background:
+                              index === 4
+                                ? 'linear-gradient(90deg,#e9d5ff,#8b5cf6)'
+                                : 'linear-gradient(90deg,rgba(167,139,250,0.9),rgba(59,130,246,0.85))',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="absolute left-[2%] top-[33%] z-20 w-[240px] -rotate-[12deg] rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,18,26,0.96),rgba(10,11,17,0.96))] p-5 shadow-[0_22px_58px_rgba(0,0,0,0.32)]">
+                <div className="text-sm text-zinc-400">Watchlist</div>
+                <div className="mt-4 space-y-3">
+                  {[
+                    ['Adobe', '$43,862.25', '+4.8%'],
+                    ['Netflix', '$2,095.89', '-0.8%'],
+                    ['ChatGPT', '$35,618.70', '+2.4%'],
+                  ].map(([name, amount, delta]) => (
+                    <div key={name} className="rounded-[18px] border border-white/8 bg-white/[0.03] p-3.5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-medium text-white">{name}</div>
+                        <div className="text-[11px] text-zinc-500">{delta}</div>
+                      </div>
+                      <div className="mt-2 text-sm text-zinc-300">{amount}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="absolute inset-x-0 bottom-0 z-10 rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(17,18,27,0.94),rgba(7,8,13,0.98))] p-4 shadow-[0_30px_80px_rgba(0,0,0,0.34)] md:p-5">
+                <div className="overflow-hidden rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(9,10,16,0.96),rgba(12,14,24,0.98))]">
+                  <div className="flex flex-col gap-4 border-b border-white/8 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,rgba(139,92,246,0.3),rgba(255,255,255,0.06))]">
+                        <div className="h-2.5 w-2.5 rounded-full bg-violet-200" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-white">ELYON Command Center</div>
+                        <div className="text-xs text-zinc-500">Finance, CRM, automation and governance</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-xs text-zinc-400">
+                      <span className="rounded-full bg-white/7 px-2 py-1">Multi-entity</span>
+                      <span className="rounded-full bg-white/7 px-2 py-1">AI copilots</span>
+                      <span className="rounded-full bg-white/7 px-2 py-1">Signal-driven</span>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 p-5 xl:grid-cols-[0.22fr,0.5fr,0.28fr]">
+                    <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Navigation</div>
+                      <div className="mt-4 space-y-2">
+                        {['Dashboard', 'Finance OS', 'CRM OS', 'Treasury', 'Compliance'].map((item, index) => (
+                          <div
+                            key={item}
+                            className={`rounded-[16px] px-3 py-2.5 text-sm ${
+                              index === 0
+                                ? 'border border-violet-400/30 bg-violet-500/10 text-white'
+                                : 'text-zinc-400'
+                            }`}
+                          >
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.2),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Cashflow</div>
+                          <div className="mt-2 text-3xl font-semibold tracking-tight text-white">$25,156.34</div>
+                        </div>
+                        <div className="rounded-full bg-emerald-400/14 px-3 py-1.5 text-xs text-emerald-200">
+                          +1.97%
+                        </div>
+                      </div>
+
+                      <div className="mt-6 flex h-[230px] items-end gap-3">
+                        {[42, 58, 51, 76, 62, 81, 68].map((height, index) => (
+                          <div key={height} className="flex flex-1 flex-col items-center gap-3">
+                            <div
+                              className="w-full rounded-t-[18px] bg-[linear-gradient(180deg,rgba(196,181,253,0.96),rgba(76,29,149,0.3))] shadow-[0_0_35px_rgba(139,92,246,0.15)]"
+                              style={{ height: `${height}%`, opacity: index === 3 ? 1 : 0.82 }}
+                            />
+                            <div className="text-[11px] text-zinc-500">
+                              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'][index]}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4">
+                        <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Execution</div>
+                        <div className="mt-4 space-y-3">
+                          {[
+                            'Revenue retry triggered',
+                            'Treasury rebalance suggested',
+                            'Vendor risk moved to review',
+                          ].map((item) => (
+                            <div key={item} className="rounded-[16px] border border-white/8 bg-black/20 px-3 py-3 text-sm text-zinc-300">
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4">
+                        <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Activity</div>
+                        <div className="mt-4 space-y-3">
+                          {[
+                            ['New transactions', '14 pending actions'],
+                            ['Compliance hub', '3 evidence packs due'],
+                          ].map(([title, text]) => (
+                            <div key={title} className="rounded-[16px] border border-white/8 bg-black/20 px-3 py-3">
+                              <div className="text-sm font-medium text-white">{title}</div>
+                              <div className="mt-1 text-xs text-zinc-500">{text}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </header>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[1.25fr,0.75fr]">
-          <div className="overflow-hidden rounded-[42px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.24),transparent_22%),radial-gradient(circle_at_78%_18%,rgba(124,58,237,0.16),transparent_16%),linear-gradient(180deg,rgba(12,14,22,0.98),rgba(7,9,15,0.98))] p-7 shadow-[0_30px_90px_rgba(0,0,0,0.28)] md:p-8 xl:p-10">
-            <div className="flex flex-wrap items-center gap-2">
-              <Pill>AI COMMAND LAYER</Pill>
-              <Pill>MULTI-ENTITY READY</Pill>
-              <Pill>AWS PATH</Pill>
-            </div>
-
-            <div className="mt-8 max-w-5xl">
-              <h1 className="text-[42px] font-semibold leading-[0.9] tracking-[-0.07em] text-white md:text-[64px] xl:text-[82px]">
-                Uma camada operacional para finanças, CRM, automação e governança empresarial.
-              </h1>
-              <p className="mt-6 max-w-3xl text-[15px] leading-8 text-zinc-300 md:text-lg">
-                A ELYON OS foi desenhada para consolidar command center, módulos críticos
-                e copilotos executáveis em uma estrutura única, orientada a operação real.
-              </p>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#contact"
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
-              >
-                Solicitar acesso
-              </a>
-              <a
-                href="#modules"
-                className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-              >
-                Ver estrutura
-              </a>
-            </div>
-
-            <div className="mt-10 grid gap-4 lg:grid-cols-[0.9fr,1.1fr]">
-              <div className="rounded-[30px] border border-white/10 bg-black/20 p-5">
-                <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Positioning</div>
-                <div className="mt-4 text-2xl font-semibold tracking-tight text-white">
-                  Enterprise AI operating system
-                </div>
-                <div className="mt-3 text-sm leading-7 text-zinc-400">
-                  Software orientado a decisão, execução e governança para grupos, operações
-                  multi-unidade e times que precisam de uma camada premium de comando.
-                </div>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-3">
-                <Metric
-                  label="Finance"
-                  value="Control Tower"
-                  note="Treasury, revenue ops, procurement, compliance e CFO autopilot."
-                />
-                <Metric
-                  label="CRM"
-                  value="Signal Driven"
-                  note="Pipeline, guided selling, workspaces comerciais e intelligence layer."
-                />
-                <Metric
-                  label="Core"
-                  value="Structured"
-                  note="Empresas, filiais, departamentos, RBAC, auditoria e escala operacional."
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-6">
-            <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-              <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Operating thesis</div>
-              <div className="mt-4 text-3xl font-semibold tracking-tight text-white">
-                Menos ferramentas soltas. Mais uma camada de operação integrada.
-              </div>
-              <div className="mt-4 text-sm leading-7 text-zinc-400">
-                Em vez de fragmentar CRM, finanças, automação e controladoria, a ELYON OS
-                reúne os principais domínios em um sistema orientado a command center.
-              </div>
-            </div>
-
-            <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(18,18,28,0.96),rgba(9,10,16,0.98))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-              <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Readiness</div>
-              <div className="mt-4 space-y-4">
-                <div className="rounded-[24px] border border-white/10 bg-black/20 p-4">
-                  <div className="text-base font-semibold text-white">Domain-first architecture</div>
-                  <div className="mt-2 text-sm leading-6 text-zinc-400">
-                    Pronta para domínio próprio, presença institucional e ecossistema de integrações.
-                  </div>
-                </div>
-                <div className="rounded-[24px] border border-white/10 bg-black/20 p-4">
-                  <div className="text-base font-semibold text-white">Cloud expansion path</div>
-                  <div className="mt-2 text-sm leading-6 text-zinc-400">
-                    Fundamentos para app, API, workers, data layer e rollout em infraestrutura própria.
-                  </div>
-                </div>
-                <div className="rounded-[24px] border border-white/10 bg-black/20 p-4">
-                  <div className="text-base font-semibold text-white">Provider onboarding</div>
-                  <div className="mt-2 text-sm leading-6 text-zinc-400">
-                    Base institucional para abrir contas business e ativar Google, Open Finance e parceiros enterprise.
-                  </div>
-                </div>
+          <div className="relative z-10 mt-10 border-t border-white/8 pt-6">
+            <div className="flex flex-wrap items-center justify-between gap-5 text-sm uppercase tracking-[0.24em] text-zinc-600">
+              <span>Command centers for finance-led companies</span>
+              <div className="flex flex-wrap items-center gap-7 text-zinc-500">
+                <span>Finance OS</span>
+                <span>CRM OS</span>
+                <span>Revenue Ops</span>
+                <span>Compliance</span>
+                <span>AI Command</span>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="platform" className="mt-6 grid gap-6 xl:grid-cols-[0.82fr,1.18fr]">
-          <div className="rounded-[36px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-            <Pill>PLATFORM</Pill>
-            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Construída para operar como software enterprise, não como dashboard decorativo.
-            </h2>
-            <div className="mt-5 space-y-4 text-sm leading-7 text-zinc-400">
-              <p>
-                A plataforma foi desenhada para unificar camada executiva, módulos operacionais,
-                governança, estrutura multi-unidade e copilotos contextuais.
-              </p>
-              <p>
-                A proposta não é criar mais uma ferramenta isolada, mas uma base para consolidar
-                finanças, CRM, workflows e operação em uma única experiência.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
+        <section id="platform" className="mt-8 grid gap-5 xl:grid-cols-[0.95fr,1.05fr]">
+          <Capability
+            eyebrow="Platform"
+            title="A flagship operating environment designed for real company complexity."
+            text="Elyon OS was designed to feel less like fragmented software and more like a premium operating layer where finance, CRM, governance and automation share the same command language."
+          />
+          <div className="grid gap-5 md:grid-cols-2" id="command">
             <Capability
-              title="Core operacional"
-              text="Empresas, filiais, departamentos, permissões, auditoria e estrutura enterprise como fundação do produto."
+              eyebrow="Command"
+              title="Signal-first control"
+              text="Command surfaces built around execution, decision velocity and visibility across finance, commercial and core operations."
             />
             <Capability
-              title="Camada de IA"
-              text="Copilotos e command interfaces desenhados para execução, contexto operacional e leitura premium."
-            />
-            <Capability
-              title="Execution workspaces"
-              text="Domínios orientados a operador para comercial, controladoria, procurement, compliance e treasury."
-            />
-            <Capability
-              title="Integration-ready"
-              text="Arquitetura pensada para Open Finance, billing, ERP, email, calendários e expansão para cloud própria."
+              eyebrow="Architecture"
+              title="Cloud-scale foundation"
+              text="Structured for domain isolation, multi-entity governance, integrations and a future AWS rollout without losing product cohesion."
             />
           </div>
         </section>
 
-        <section id="modules" className="mt-6 rounded-[38px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.014))] p-6 shadow-[0_22px_60px_rgba(0,0,0,0.18)]">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div>
-              <Pill>MODULE STACK</Pill>
-              <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                Um stack desenhado para operar empresa, não apenas exibir informação.
+        <section id="modules" className="mt-8 grid gap-5 xl:grid-cols-3">
+          <Capability
+            eyebrow="Finance OS"
+            title="Treasury, revenue, procurement and compliance in one premium layer."
+            text="Control tower for multi-unit cash, billing, governance, approvals and CFO automation."
+          />
+          <Capability
+            eyebrow="CRM OS"
+            title="Commercial workspaces designed for guided execution, not for visual clutter."
+            text="Signal-driven pipeline, intelligence surfaces and operator-first sales command."
+          />
+          <Capability
+            eyebrow="AI Command"
+            title="Embedded copilots for decisions, investigations and operational movement."
+            text="Contextual AI integrated into the core operating system instead of bolted on as decoration."
+          />
+        </section>
+
+        <section id="contact" className="mt-8 rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.22)] md:p-8">
+          <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-[780px]">
+              <Badge>Institutional Presence</Badge>
+              <h2 className="mt-6 text-3xl font-semibold tracking-[-0.05em] text-white md:text-5xl">
+                A premium front door for provider onboarding, strategic partnerships and market positioning.
               </h2>
-            </div>
-            <div className="max-w-2xl text-sm leading-7 text-zinc-400">
-              Módulos independentes, mas conectados por uma mesma linguagem de produto:
-              command center, governança, workflows, IA e estrutura multi-entidade.
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 xl:grid-cols-4">
-            <div className="rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.18),transparent_24%),linear-gradient(180deg,rgba(14,15,24,0.96),rgba(9,10,16,0.98))] p-6">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Finance OS</div>
-              <div className="mt-4 text-2xl font-semibold text-white">Controladoria premium</div>
-              <div className="mt-3 text-sm leading-7 text-zinc-400">
-                Treasury, revenue operations, procurement, compliance, BI e CFO autopilot em uma única camada.
-              </div>
+              <p className="mt-5 max-w-[620px] text-sm leading-7 text-zinc-400 md:text-base">
+                Elyon OS is now ready to operate as an institutional brand presence while the
+                full platform infrastructure expands behind it.
+              </p>
             </div>
 
-            <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.016))] p-6">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">CRM OS</div>
-              <div className="mt-4 text-2xl font-semibold text-white">Sales intelligence</div>
-              <div className="mt-3 text-sm leading-7 text-zinc-400">
-                Pipeline executivo, guided selling, workspaces comerciais e playbooks operacionais.
-              </div>
-            </div>
-
-            <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.016))] p-6">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Automation OS</div>
-              <div className="mt-4 text-2xl font-semibold text-white">Orchestration layer</div>
-              <div className="mt-3 text-sm leading-7 text-zinc-400">
-                Regras, execuções, gatilhos e automações transversais entre domínios críticos.
-              </div>
-            </div>
-
-            <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.016))] p-6">
-              <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">AI Command</div>
-              <div className="mt-4 text-2xl font-semibold text-white">Embedded copilots</div>
-              <div className="mt-3 text-sm leading-7 text-zinc-400">
-                Interfaces conversacionais e decision support para vendas, finanças e operação enterprise.
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="infrastructure" className="mt-6 grid gap-6 xl:grid-cols-[1.05fr,0.95fr]">
-          <div className="rounded-[36px] border border-white/10 bg-[linear-gradient(180deg,rgba(13,15,22,0.98),rgba(8,10,16,0.98))] p-6 shadow-[0_22px_60px_rgba(0,0,0,0.18)]">
-            <Pill>INFRASTRUCTURE</Pill>
-            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Base institucional e técnica para escalar a marca e preparar o rollout em cloud.
-            </h2>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <Metric
-                label="Domain"
-                value="elyonos.com.br"
-                note="Ponto oficial de presença institucional e distribuição pública do produto."
-              />
-              <Metric
-                label="Cloud Path"
-                value="AWS Ready"
-                note="Separação prevista entre domínio, app, API, workers, data e integrações."
-              />
-              <Metric
-                label="Provider Onboarding"
-                value="Business Setup"
-                note="Base pronta para abertura de contas business e ativação de parceiros estratégicos."
-              />
-              <Metric
-                label="Expansion"
-                value="Integration First"
-                note="Open Finance, ERP, billing, email, identidade e serviços enterprise no roadmap."
-              />
-            </div>
-          </div>
-
-          <div
-            id="contact"
-            className="rounded-[36px] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.18),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.016))] p-6 shadow-[0_22px_60px_rgba(0,0,0,0.18)]"
-          >
-            <Pill>CONTACT</Pill>
-            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Uma presença institucional forte para abrir portas com providers e parceiros enterprise.
-            </h2>
-            <p className="mt-5 text-sm leading-7 text-zinc-400">
-              O domínio oficial da ELYON OS já pode sustentar onboarding com Google,
-              provedores de Open Finance, billing, ERP, identidade e parceiros de infraestrutura.
-            </p>
-
-            <div className="mt-8 space-y-3">
-              <div className="rounded-[24px] border border-white/10 bg-black/20 px-4 py-4 text-sm text-zinc-300">
-                contato@elyonos.com.br
-              </div>
-              <div className="rounded-[24px] border border-white/10 bg-black/20 px-4 py-4 text-sm text-zinc-300">
-                www.elyonos.com.br
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="mailto:contato@elyonos.com.br"
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
+                className="rounded-full bg-[linear-gradient(135deg,#f5f3ff,#b197fc)] px-6 py-3.5 text-sm font-semibold text-[#12081d]"
               >
-                Falar com a equipe
+                contato@elyonos.com.br
               </Link>
+              <a
+                href="https://www.elyonos.com.br"
+                className="rounded-full border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-medium text-white"
+              >
+                www.elyonos.com.br
+              </a>
             </div>
           </div>
         </section>
