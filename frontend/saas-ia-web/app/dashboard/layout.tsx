@@ -77,8 +77,8 @@ function getUserInitials(user: CurrentUser | null) {
 
 const assistantPrompts = [
   'Resuma a operação do dia.',
-  'Destaque gargalos na execução.',
-  'Gerar plano executivo da semana.',
+  'Aponte gargalos críticos.',
+  'Monte um plano executivo.',
 ];
 
 export default function DashboardLayout({
@@ -140,28 +140,28 @@ export default function DashboardLayout({
   return (
     <main className="h-screen overflow-hidden bg-[#09090f] text-white">
       <div className="flex h-full overflow-hidden">
-        <aside className="hidden h-full w-[248px] shrink-0 border-r border-white/8 bg-[#0d0c16] lg:flex lg:flex-col">
-          <div className="px-4 py-5">
-            <div className="flex items-center gap-3 rounded-[24px] border border-white/8 bg-white/[0.03] px-3 py-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-sm font-semibold text-white">
+        <aside className="hidden h-full w-[232px] shrink-0 border-r border-white/8 bg-[#0d0c16] lg:flex lg:flex-col lg:overflow-hidden">
+          <div className="px-3 pb-2 pt-3">
+            <div className="flex items-center gap-3 rounded-[22px] border border-white/8 bg-white/[0.03] px-3 py-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[16px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-sm font-semibold text-white">
                 EO
               </div>
-              <div>
-                <div className="text-sm font-semibold text-white">ELYON OS</div>
-                <div className="text-xs text-zinc-500">AI Business OS</div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-white">ELYON OS</div>
+                <div className="truncate text-xs text-zinc-500">AI Business OS</div>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-4">
-            <div className="space-y-5">
+          <div className="flex min-h-0 flex-1 flex-col justify-between px-3 pb-3">
+            <div className="space-y-3">
               {menuGroups.map((group) => (
                 <div key={group.title}>
-                  <div className="mb-2 px-2 text-[10px] uppercase tracking-[0.28em] text-zinc-500">
+                  <div className="mb-1.5 px-2 text-[9px] uppercase tracking-[0.28em] text-zinc-500">
                     {group.title}
                   </div>
 
-                  <nav className="space-y-1.5">
+                  <nav className="space-y-1">
                     {group.items.map((item) => {
                       const active =
                         pathname === item.href ||
@@ -173,8 +173,8 @@ export default function DashboardLayout({
                           href={item.href}
                           className={
                             active
-                              ? 'flex items-center gap-3 rounded-[18px] border border-violet-300/14 bg-[linear-gradient(180deg,rgba(141,92,246,0.18),rgba(141,92,246,0.08))] px-3 py-3 text-sm font-medium text-white'
-                              : 'flex items-center gap-3 rounded-[18px] border border-transparent px-3 py-3 text-sm text-zinc-400 transition hover:border-white/8 hover:bg-white/[0.03] hover:text-white'
+                              ? 'flex items-center gap-3 rounded-[16px] border border-violet-300/14 bg-[linear-gradient(180deg,rgba(141,92,246,0.18),rgba(141,92,246,0.08))] px-3 py-2.5 text-[13px] font-medium text-white'
+                              : 'flex items-center gap-3 rounded-[16px] border border-transparent px-3 py-2.5 text-[13px] text-zinc-400 transition hover:border-white/8 hover:bg-white/[0.03] hover:text-white'
                           }
                         >
                           <span
@@ -192,23 +192,23 @@ export default function DashboardLayout({
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="border-t border-white/8 p-4">
-            <div className="rounded-[24px] border border-white/8 bg-white/[0.03] p-3.5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-sm font-semibold text-white">
+            <div className="rounded-[20px] border border-white/8 bg-white/[0.03] p-3">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[15px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-sm font-semibold text-white">
                   {userInitials}
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-white">{user.name || 'Usuário'}</div>
-                  <div className="truncate text-xs text-zinc-500">{user.email || user.role}</div>
+                  <div className="truncate text-[13px] font-medium text-white">
+                    {user.name || 'Usuário'}
+                  </div>
+                  <div className="truncate text-[11px] text-zinc-500">{user.email || user.role}</div>
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-between rounded-[18px] border border-white/8 bg-black/20 px-3 py-2 text-xs text-zinc-400">
+              <div className="mt-2.5 flex items-center justify-between rounded-[16px] border border-white/8 bg-black/20 px-3 py-2 text-[11px] text-zinc-400">
                 <span>{user.role}</span>
-                <span className="rounded-full border border-white/8 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-zinc-300">
+                <span className="rounded-full border border-white/8 bg-white/5 px-2 py-0.5 text-[9px] uppercase tracking-[0.18em] text-zinc-300">
                   online
                 </span>
               </div>
@@ -252,7 +252,7 @@ export default function DashboardLayout({
 
           <div
             className={`hidden h-full shrink-0 border-l border-white/8 bg-[#120f1e] transition-[width] duration-300 xl:block ${
-              aiExpanded ? 'w-[318px]' : 'w-[84px]'
+              aiExpanded ? 'w-[312px]' : 'w-[86px]'
             }`}
           >
             <div className="flex h-full flex-col">
@@ -275,7 +275,7 @@ export default function DashboardLayout({
                 {aiExpanded ? (
                   <div className="flex h-full flex-col">
                     <div className="rounded-[24px] border border-white/8 bg-white/[0.04] p-4">
-                      <div className="text-sm text-zinc-400">Good afternoon,</div>
+                      <div className="text-sm text-zinc-400">Boa tarde,</div>
                       <div className="mt-1 text-3xl font-semibold leading-tight text-white">
                         {user.name?.split(' ')[0] || 'Usuário'}
                       </div>
