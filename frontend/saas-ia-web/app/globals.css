@@ -51,6 +51,9 @@ body {
   font-family:
     "Satoshi", "General Sans", "Plus Jakarta Sans", "Inter", "Segoe UI", Arial, sans-serif;
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a,
@@ -69,4 +72,14 @@ textarea {
 ::selection {
   background: rgba(139, 92, 246, 0.28);
   color: #f8f5ff;
+}
+
+.hero-orb {
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.12) 18%, transparent 42%),
+    radial-gradient(circle at center, rgba(168, 85, 247, 0.3), rgba(76, 29, 149, 0.1) 50%, transparent 72%);
+  box-shadow:
+    0 0 80px rgba(149, 76, 233, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  filter: blur(0.2px);
 }
