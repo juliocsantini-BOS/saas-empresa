@@ -69,10 +69,48 @@ const FINANCE_PERMISSION_KEYS = [
   "finance.budgets.write",
 ] as const;
 
+const CORE_ADMIN_PERMISSION_KEYS = [
+  "users.read",
+  "users.create",
+  "users.update",
+  "users.enable",
+  "users.disable",
+  "users.reset_password",
+  "branches.read",
+  "branches.create",
+  "branches.update",
+  "branches.delete",
+  "departments.read",
+  "departments.create",
+  "departments.update",
+  "departments.delete",
+  "company.read",
+  "company.create",
+  "audit.read",
+  "audit.export",
+  "rbac.permissions.read",
+  "rbac.roles.read",
+  "rbac.roles.update",
+  "rbac.user_permissions.read",
+  "rbac.user_permissions.allow",
+  "rbac.user_permissions.deny",
+  "rbac.user_permissions.revoke",
+] as const;
+
+const CEO_CORE_PERMISSION_KEYS = [
+  "users.read",
+  "branches.read",
+  "departments.read",
+  "company.read",
+  "audit.read",
+] as const;
+
+const SUPPORT_CORE_PERMISSION_KEYS = ["audit.read"] as const;
+
 const CRM_ROLE_DEFAULTS: Record<Role, readonly string[]> = {
-  ADMIN_MASTER: [...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
-  ADMIN: [...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
-  CEO: [...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
+  ADMIN_MASTER: [...CORE_ADMIN_PERMISSION_KEYS, ...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
+  ADMIN: [...CORE_ADMIN_PERMISSION_KEYS, ...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
+  CEO: [...CEO_CORE_PERMISSION_KEYS, ...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
   CFO: [
     "crm.sales_targets.read",
     "crm.pipelines.read",
@@ -107,6 +145,7 @@ const CRM_ROLE_DEFAULTS: Record<Role, readonly string[]> = {
     ...FINANCE_PERMISSION_KEYS,
   ],
   SUPPORT: [
+    ...SUPPORT_CORE_PERMISSION_KEYS,
     "crm.read.company",
     "crm.values.read",
     "crm.loss_reasons.read",
@@ -149,7 +188,13 @@ export class PermissionsSyncService implements OnModuleInit {
       const crmPermissions = await this.prisma.permission.findMany({
         where: {
           key: {
-            in: [...CRM_PERMISSION_KEYS, ...FINANCE_PERMISSION_KEYS],
+            in: [
+              ...CORE_ADMIN_PERMISSION_KEYS,
+              ...CEO_CORE_PERMISSION_KEYS,
+              ...SUPPORT_CORE_PERMISSION_KEYS,
+              ...CRM_PERMISSION_KEYS,
+              ...FINANCE_PERMISSION_KEYS,
+            ],
           },
         },
         select: {
