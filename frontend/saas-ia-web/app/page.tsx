@@ -137,9 +137,17 @@ export default function Home() {
                           <p className="text-[11px] uppercase tracking-[0.28em] text-zinc-500">
                             Health score
                           </p>
-                          <p className="mt-3 text-4xl font-semibold tracking-[-0.08em] text-white">
-                            94.6
-                          </p>
+                          <div className="mt-3 flex items-end justify-between">
+                            <p className="text-4xl font-semibold tracking-[-0.08em] text-white">
+                              94.6
+                            </p>
+                            <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-emerald-200">
+                              Estavel
+                            </span>
+                          </div>
+                          <div className="mt-4 h-2 rounded-full bg-white/5">
+                            <div className="h-full w-[94%] rounded-full bg-[linear-gradient(90deg,#d7c1ff,#8b5cf6)] shadow-[0_0_18px_rgba(139,92,246,0.45)]" />
+                          </div>
                         </div>
                       </div>
 
@@ -166,27 +174,97 @@ export default function Home() {
 
                         <div className="rounded-[28px] border border-violet-200/10 bg-white/[0.03] p-5">
                           <div className="flex items-center justify-between">
-                            <p className="text-3xl font-semibold tracking-[-0.06em] text-white">
-                              Dashboard
-                            </p>
+                            <div>
+                              <p className="text-3xl font-semibold tracking-[-0.06em] text-white">
+                                Camada de comando
+                              </p>
+                              <p className="mt-1 text-sm text-zinc-500">
+                                Fluxo financeiro, estrutura e execucao em um unico cockpit.
+                              </p>
+                            </div>
                             <div className="rounded-full border border-white/8 px-3 py-1 text-xs text-zinc-300">
                               Weekly
                             </div>
                           </div>
 
-                          <div className="mt-6 flex h-[300px] items-end gap-3">
-                            {[26, 38, 34, 48, 42, 58, 88].map((height, index) => (
-                              <div key={height} className="flex flex-1 flex-col items-center gap-3">
-                                <div
-                                  className={`w-full rounded-full ${
-                                    index === 6
-                                      ? 'bg-[linear-gradient(180deg,#fffaff,#d4bbff_44%,#8a5cff)] shadow-[0_0_24px_rgba(138,92,255,0.42)]'
-                                      : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(130,87,255,0.18))]'
-                                  }`}
-                                  style={{ height: `${height}%` }}
-                                />
+                          <div className="mt-6 grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_280px]">
+                            <div className="rounded-[24px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">
+                                    Fluxo de caixa sincronizado
+                                  </p>
+                                  <p className="mt-2 text-2xl font-semibold tracking-[-0.06em] text-white">
+                                    R$ 120,3M
+                                  </p>
+                                </div>
+                                <div className="rounded-full border border-violet-300/20 bg-violet-400/10 px-3 py-1 text-[11px] text-violet-100">
+                                  +12,7%
+                                </div>
                               </div>
-                            ))}
+
+                              <div className="mt-5 flex h-[220px] items-end gap-3">
+                                {[32, 48, 42, 58, 50, 68, 64, 88].map((height, index) => (
+                                  <div key={height} className="flex flex-1 flex-col items-center gap-2">
+                                    <div
+                                      className={`w-full rounded-[18px] ${
+                                        index >= 6
+                                          ? 'bg-[linear-gradient(180deg,#f8f4ff,#d8c0ff_36%,#8b5cf6)] shadow-[0_0_24px_rgba(139,92,246,0.38)]'
+                                          : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.7),rgba(129,88,255,0.16))]'
+                                      }`}
+                                      style={{ height: `${height}%` }}
+                                    />
+                                    <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+                                      {['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'][index]}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <div className="rounded-[24px] border border-white/6 bg-white/[0.03] p-4">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-sm font-medium text-white">Command feed</p>
+                                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                                    ao vivo
+                                  </span>
+                                </div>
+                                <div className="mt-4 space-y-3">
+                                  {[
+                                    ['Aprovacao financeira concluida', 'há 2 min'],
+                                    ['Filial Sao Paulo sincronizada', 'há 6 min'],
+                                    ['Autopilot de caixa executado', 'há 11 min'],
+                                  ].map(([title, time]) => (
+                                    <div
+                                      key={title}
+                                      className="rounded-2xl border border-white/6 bg-black/10 px-4 py-3"
+                                    >
+                                      <p className="text-sm text-zinc-100">{title}</p>
+                                      <p className="mt-1 text-xs text-zinc-500">{time}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="rounded-[24px] border border-white/6 bg-white/[0.03] p-4">
+                                <p className="text-sm font-medium text-white">Estrutura operacional</p>
+                                <div className="mt-4 space-y-3">
+                                  {[
+                                    ['Matriz', 'Sincronizada'],
+                                    ['Financeiro', 'Ativo'],
+                                    ['Governanca', 'Conforme'],
+                                  ].map(([label, status]) => (
+                                    <div key={label} className="flex items-center justify-between">
+                                      <span className="text-sm text-zinc-400">{label}</span>
+                                      <span className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1 text-[11px] text-white">
+                                        {status}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -201,15 +279,39 @@ export default function Home() {
 
                         <div className="minimal-float rounded-[24px] border border-white/8 bg-white/[0.03] p-5">
                           <p className="text-sm font-medium text-white">Autonomias ativas</p>
-                          <p className="mt-3 text-3xl font-semibold tracking-[-0.08em] text-white">28</p>
+                          <div className="mt-3 flex items-end justify-between">
+                            <p className="text-3xl font-semibold tracking-[-0.08em] text-white">28</p>
+                            <span className="text-xs text-zinc-500">+4 esta semana</span>
+                          </div>
+                          <div className="mt-4 flex gap-2">
+                            {[72, 54, 88, 63].map((width) => (
+                              <div key={width} className="h-1.5 flex-1 rounded-full bg-white/5">
+                                <div
+                                  className="h-full rounded-full bg-[linear-gradient(90deg,#cbb3ff,#8b5cf6)]"
+                                  style={{ width: `${width}%` }}
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
 
                         <div className="minimal-float-slow rounded-[24px] border border-white/8 bg-white/[0.03] p-5">
                           <p className="text-sm font-medium text-white">Posicoes estrategicas</p>
-                          <p className="mt-3 text-sm leading-7 text-zinc-400">
-                            Financeiro, governanca, operacoes e IA executiva em um unico
-                            cockpit operacional.
-                          </p>
+                          <div className="mt-4 space-y-3">
+                            {[
+                              ['Financeiro', 'Prioridade alta'],
+                              ['Operacoes', '4 automacoes'],
+                              ['Governanca', '100% conforme'],
+                            ].map(([label, meta]) => (
+                              <div
+                                key={label}
+                                className="flex items-center justify-between rounded-2xl border border-white/6 bg-black/10 px-4 py-3"
+                              >
+                                <span className="text-sm text-zinc-200">{label}</span>
+                                <span className="text-xs text-zinc-500">{meta}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
