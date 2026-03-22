@@ -2,7 +2,14 @@ import Link from 'next/link';
 
 const navItems = ['Plataforma', 'Solucoes', 'IA', 'Seguranca', 'Contato'];
 
-const trustItems = ['Financeiro', 'Operacoes', 'Governanca', 'Autopilot', 'Compliance', 'Multiunidade'];
+const trustItems = [
+  'Financeiro',
+  'Operacoes',
+  'Governanca',
+  'Autopilot',
+  'Compliance',
+  'Multiunidade',
+];
 
 const sideStats = [
   { label: 'Health score', value: '94.6' },
@@ -72,21 +79,22 @@ export default function Home() {
               <div className="mx-auto max-w-[980px] text-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-zinc-300">
                   <span className="h-2 w-2 rounded-full bg-violet-300 shadow-[0_0_16px_rgba(196,181,253,0.95)]" />
-                  Camada central de comando empresarial
+                  Sistema operacional empresarial com IA
                 </div>
 
-                <h1 className="mx-auto mt-8 max-w-[1080px] text-[3.2rem] font-semibold leading-[0.9] tracking-[-0.09em] text-white md:text-[5rem] xl:text-[6.5rem]">
-                  Gestao, governanca
+                <h1 className="mx-auto mt-8 max-w-[1180px] text-[3.2rem] font-semibold leading-[0.88] tracking-[-0.09em] text-white md:text-[5rem] xl:text-[6.5rem]">
+                  O AI Business OS
                   <br />
-                  e execucao com IA
+                  para gestao, governanca
                   <br />
-                  em modo flagship.
+                  e execucao em tempo real.
                 </h1>
 
-                <p className="mx-auto mt-7 max-w-[760px] text-base leading-8 text-zinc-400 md:text-lg">
+                <p className="mx-auto mt-7 max-w-[820px] text-base leading-8 text-zinc-400 md:text-lg">
                   O Elyon OS conecta financeiro, operacoes, estrutura organizacional,
-                  automacoes e inteligencia executiva em uma unica camada premium de
-                  comando.
+                  automacoes, compliance e inteligencia executiva em uma unica camada
+                  de comando para empresas que precisam decidir, operar e crescer com
+                  precisao.
                 </p>
 
                 <div className="mt-9 flex flex-wrap justify-center gap-4">
@@ -102,6 +110,12 @@ export default function Home() {
                   >
                     Falar com especialista
                   </Link>
+                </div>
+
+                <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-zinc-500">
+                  <span>Financeiro e liquidez em uma unica visao</span>
+                  <span>Governanca multiunidade</span>
+                  <span>Execucao assistida por IA</span>
                 </div>
               </div>
 
@@ -134,7 +148,7 @@ export default function Home() {
                               Elyon Command Center
                             </p>
                             <p className="mt-2 text-sm font-medium text-white">
-                              Operacao empresarial sincronizada
+                              Gestao empresarial sincronizada em uma unica camada
                             </p>
                           </div>
                           <div className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100">
@@ -182,9 +196,9 @@ export default function Home() {
 
                           <div className="space-y-4">
                             {[
-                              ['Governanca multiunidade', '8 unidades sob monitoramento'],
-                              ['Autopilot de execucao', '28 autonomias ativas'],
-                              ['Compliance operacional', '100% conforme nas politicas chave'],
+                              ['Governanca multiunidade', '8 unidades operando na mesma camada de comando'],
+                              ['Autopilot de execucao', '28 automacoes executando fluxos criticos sem friccao'],
+                              ['Compliance operacional', '100% conforme nas politicas e checkpoints principais'],
                             ].map(([title, meta]) => (
                               <div
                                 key={title}
@@ -199,9 +213,9 @@ export default function Home() {
 
                         <div className="mt-5 grid gap-4 md:grid-cols-3">
                           {[
-                            ['Financeiro', 'Caixa, cobranca, pagamentos e aprovacoes numa unica camada.'],
-                            ['Operacoes', 'Estrutura, fluxo e governanca empresarial conectados.'],
-                            ['IA executiva', 'Alertas, recomendacoes e acao assistida por contexto.'],
+                            ['Financeiro', 'Caixa, cobranca, aprovacoes, fluxo e liquidez conectados.'],
+                            ['Operacoes', 'Estrutura, unidades, departamentos e execucao em sincronia.'],
+                            ['IA executiva', 'Alertas, recomendacoes e acao assistida por contexto operacional.'],
                           ].map(([title, body]) => (
                             <div
                               key={title}
@@ -236,7 +250,7 @@ export default function Home() {
             <section className="border-t border-white/8 px-5 py-6 md:px-8 lg:px-10">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <p className="text-[11px] uppercase tracking-[0.32em] text-zinc-500">
-                  Construido para operacao, comando e crescimento empresarial
+                  Construido para empresas que operam com ambicao, controle e escala
                 </p>
                 <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium text-zinc-500">
                   {trustItems.map((item) => (
