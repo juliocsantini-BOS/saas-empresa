@@ -5,7 +5,7 @@ import type {
   FinanceTaskStatus,
 } from './types';
 
-export const API_URL = 'http://localhost:3000';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.elyonos.com.br';
 
 export const SEVERITY_STYLES: Record<FinanceAlertSeverity, string> = {
   critical: 'border-red-500/30 bg-red-500/10 text-red-200',

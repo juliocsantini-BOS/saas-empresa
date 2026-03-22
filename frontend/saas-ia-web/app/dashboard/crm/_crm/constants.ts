@@ -1,6 +1,6 @@
 import type { ActivityComposerType, LeadPriority, LeadStatus, TemperatureFilter } from './types';
 
-export const API_URL = 'http://localhost:3000';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.elyonos.com.br';
 
 export const STATUS_ORDER: LeadStatus[] = [
   'NEW',
