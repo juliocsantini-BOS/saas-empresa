@@ -1,13 +1,20 @@
 import Link from 'next/link';
 
-const navItems = ['Home', 'Platform', 'Solutions', 'Security', 'Contact'];
+const navItems = ['Inicio', 'Plataforma', 'Solucoes', 'Seguranca', 'Contato'];
 
-const trustItems = ['Finance', 'CRM', 'Treasury', 'Governance', 'Automation', 'AI Ops'];
+const trustItems = [
+  'Financeiro',
+  'Operacoes',
+  'Governanca',
+  'Automacoes',
+  'Multiunidade',
+  'IA empresarial',
+];
 
 const floatingMetrics = [
-  { label: 'Operating score', value: '94', tone: 'violet' },
-  { label: 'Recovery lift', value: '+38%', tone: 'emerald' },
-  { label: 'Live entities', value: '05', tone: 'sky' },
+  { label: 'Score operacional', value: '94' },
+  { label: 'Ganho em execucao', value: '+38%' },
+  { label: 'Entidades ativas', value: '05' },
 ];
 
 export default function Home() {
@@ -32,7 +39,7 @@ export default function Home() {
                 <div>
                   <p className="text-lg font-semibold tracking-[0.14em] text-white">ELYON OS</p>
                   <p className="text-xs uppercase tracking-[0.34em] text-zinc-500">
-                    Enterprise AI operating system
+                    AI Business OS
                   </p>
                 </div>
               </div>
@@ -57,13 +64,13 @@ export default function Home() {
                   href="/login"
                   className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-zinc-100"
                 >
-                  Login
+                  Entrar
                 </Link>
                 <Link
                   href="mailto:contato@elyonos.com.br"
                   className="rounded-full bg-[linear-gradient(135deg,#fbf7ff,#d2bcff_44%,#8a5cff)] px-5 py-3 text-sm font-semibold text-[#120817] shadow-[0_14px_60px_rgba(163,121,255,0.26)]"
                 >
-                  Contact
+                  Contato
                 </Link>
               </div>
             </header>
@@ -79,21 +86,21 @@ export default function Home() {
                   <div className="mx-auto flex max-w-[860px] flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-zinc-300">
                       <span className="h-2 w-2 rounded-full bg-violet-300 shadow-[0_0_18px_rgba(196,181,253,0.95)]" />
-                      Flagship command surface
+                      Camada central de comando
                     </div>
 
                     <h1 className="mt-8 max-w-[1100px] text-[3.1rem] font-semibold leading-[0.9] tracking-[-0.085em] text-white md:text-[5rem] xl:text-[6.15rem]">
-                      The enterprise operating system
+                      O sistema operacional
                       <br />
-                      for finance, CRM and
+                      empresarial para gestao,
                       <br />
-                      AI-led execution.
+                      governanca e execucao com IA.
                     </h1>
 
                     <p className="mt-7 max-w-[720px] text-base leading-8 text-zinc-400 md:text-lg">
-                      Elyon OS brings together command, governance and operator execution in
-                      a single premium environment built for modern companies running at
-                      scale.
+                      O Elyon OS unifica financeiro, operacoes, estrutura organizacional,
+                      automacoes e inteligencia executiva em um unico ambiente premium para
+                      empresas que precisam operar com controle real.
                     </p>
 
                     <div className="mt-9 flex flex-wrap justify-center gap-4">
@@ -101,7 +108,7 @@ export default function Home() {
                         href="/login"
                         className="rounded-full bg-[linear-gradient(135deg,#fbf7ff,#d2bcff_44%,#8a5cff)] px-7 py-4 text-sm font-semibold text-[#120817] shadow-[0_16px_70px_rgba(163,121,255,0.3)]"
                       >
-                        Enter platform
+                        Entrar na plataforma
                       </Link>
                       <Link
                         href="mailto:contato@elyonos.com.br"
@@ -117,8 +124,14 @@ export default function Home() {
                       <div className="order-2 xl:order-1 xl:pb-8">
                         <div className="space-y-4">
                           {[
-                            ['Command continuity', 'Multi-entity control across finance and execution.'],
-                            ['Autopilot ready', 'Guardrails, approvals and evidence already embedded.'],
+                            [
+                              'Continuidade operacional',
+                              'Controle multiunidade e multiempresa sobre financeiro e execucao.',
+                            ],
+                            [
+                              'Autopilot pronto',
+                              'Guardrails, aprovacoes e evidencias ja embutidos na operacao.',
+                            ],
                           ].map(([title, text]) => (
                             <div
                               key={title}
@@ -140,25 +153,25 @@ export default function Home() {
                                   Elyon Command
                                 </p>
                                 <p className="mt-2 text-sm font-medium text-white">
-                                  Unified operating posture
+                                  Postura operacional unificada
                                 </p>
                               </div>
                               <div className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100">
-                                live
+                                ao vivo
                               </div>
                             </div>
 
                             <div className="mt-5 grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
                               <div className="rounded-[24px] border border-white/8 bg-black/20 p-5">
                                 <p className="text-xs uppercase tracking-[0.28em] text-zinc-500">
-                                  Operating score
+                                  Score operacional
                                 </p>
                                 <div className="mt-4 flex items-end justify-between gap-4">
                                   <p className="text-6xl font-semibold tracking-[-0.09em] text-white">
                                     94
                                   </p>
                                   <span className="rounded-full border border-violet-300/20 bg-violet-300/10 px-3 py-1 text-xs font-medium text-violet-100">
-                                    +12 this week
+                                    +12 na semana
                                   </span>
                                 </div>
 
@@ -183,9 +196,9 @@ export default function Home() {
 
                               <div className="space-y-4">
                                 {[
-                                  ['Revenue recovery', '8 exceptions in queue'],
-                                  ['Treasury rebalance', '2 actions prepared'],
-                                  ['Approval routing', '14 items pending'],
+                                  ['Recovery financeiro', '8 excecoes em fila'],
+                                  ['Rebalanceamento de caixa', '2 acoes preparadas'],
+                                  ['Fluxo de aprovacao', '14 itens pendentes'],
                                 ].map(([label, meta], index) => (
                                   <div
                                     key={label}
@@ -204,9 +217,18 @@ export default function Home() {
 
                             <div className="mt-5 grid gap-4 md:grid-cols-3">
                               {[
-                                ['Finance command', 'Cash, procurement and approvals in one lane.'],
-                                ['CRM execution', 'Pipeline risk and action surfaces in real time.'],
-                                ['Governance', 'RBAC, audit and approval evidence by default.'],
+                                [
+                                  'Gestao financeira',
+                                  'Caixa, procurement, cobranca e aprovacoes em uma unica camada.',
+                                ],
+                                [
+                                  'Operacao empresarial',
+                                  'Execucao, estrutura, fluxos e produtividade sob o mesmo comando.',
+                                ],
+                                [
+                                  'Governanca nativa',
+                                  'RBAC, auditoria e evidencias de aprovacao embutidos por padrao.',
+                                ],
                               ].map(([title, text]) => (
                                 <div
                                   key={title}
@@ -247,7 +269,7 @@ export default function Home() {
             <section className="border-t border-white/8 px-5 py-6 md:px-8 lg:px-10">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <p className="text-xs uppercase tracking-[0.34em] text-zinc-500">
-                  Built for finance, command and AI-led operations
+                  Construido para gestao, comando e operacoes com IA
                 </p>
                 <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium text-zinc-500">
                   {trustItems.map((item) => (
