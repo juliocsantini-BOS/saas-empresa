@@ -266,36 +266,6 @@ export default function DashboardLayout({
 
                 <div className="ai-drawer-scroll flex-1 overflow-y-auto p-3">
                   <div className="flex h-full flex-col gap-4">
-                    <div className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[linear-gradient(180deg,rgba(160,102,255,1),rgba(113,58,220,1))] text-xs font-semibold text-white">
-                          IA
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium text-white">Copiloto Elyon</div>
-                          <div className="mt-0.5 text-xs text-zinc-400">
-                            Assistente operacional em qualquer tela
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-5 rounded-[22px] border border-white/8 bg-[#161421] px-4 py-3">
-                        <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Contexto</div>
-                        <div className="mt-3 space-y-2.5 text-sm text-zinc-300">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-zinc-500">Empresa</span>
-                            <span className="truncate font-medium text-white">
-                              {user.companyId ? 'Operação ativa' : 'Sem vínculo'}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-zinc-500">Perfil</span>
-                            <span className="font-medium text-white">{user.role}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
                     <div className="flex-1 rounded-[28px] border border-white/8 bg-white/[0.03] p-4">
                       <div className="flex h-full flex-col">
                         <div className="rounded-[22px] border border-dashed border-white/10 bg-[#12101a] px-4 py-5">
