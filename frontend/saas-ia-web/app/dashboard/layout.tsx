@@ -252,7 +252,7 @@ export default function DashboardLayout({
                 <div className="flex items-center justify-between border-b border-white/8 px-4 py-4">
                   <div className="min-w-0">
                     <div className="text-[10px] uppercase tracking-[0.22em] text-violet-200/70">IA Assistant</div>
-                    <div className="mt-1 truncate text-sm font-medium text-white">Copiloto Elyon</div>
+                    <div className="mt-1 truncate text-sm font-medium text-white">Copiloto ELYON OS</div>
                   </div>
 
                   <button
