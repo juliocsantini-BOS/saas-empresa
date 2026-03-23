@@ -254,8 +254,7 @@ export function CrmExecutiveHero({
   onManagePipeline?: () => void;
 }) {
   return (
-    <CrmPanel className="overflow-hidden p-4">
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,0.82fr)]">
+    <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,0.82fr)]">
         <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.18),transparent_34%),radial-gradient(circle_at_top_right,rgba(93,156,255,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
           <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(139,92,246,0.5),transparent)]" />
           <div className="inline-flex items-center gap-2 rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em] text-[#E9DDFF]">
@@ -359,7 +358,6 @@ export function CrmExecutiveHero({
           </div>
         </div>
       </div>
-    </CrmPanel>
   );
 }
 
