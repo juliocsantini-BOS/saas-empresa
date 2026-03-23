@@ -241,8 +241,8 @@ export default function DashboardLayout({
           </div>
 
           <div
-            className={`hidden h-full shrink-0 border-l border-white/8 bg-[#120f1e] transition-[width] duration-300 xl:block ${
-              aiExpanded ? 'w-[312px]' : 'w-[86px]'
+            className={`hidden h-full shrink-0 border-l border-white/8 bg-[#110f1b] transition-[width] duration-300 xl:block ${
+              aiExpanded ? 'w-[292px]' : 'w-[82px]'
             }`}
           >
             <div className="flex h-full flex-col">
@@ -264,21 +264,38 @@ export default function DashboardLayout({
               <div className="flex-1 overflow-y-auto p-3">
                 {aiExpanded ? (
                   <div className="flex h-full flex-col">
-                    <div className="rounded-[24px] border border-white/8 bg-white/[0.04] p-4">
-                      <div className="text-sm text-zinc-400">Boa tarde,</div>
-                      <div className="mt-1 text-3xl font-semibold leading-tight text-white">
-                        {user.name?.split(' ')[0] || 'Usuário'}
+                    <div className="rounded-[26px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(180deg,rgba(160,102,255,1),rgba(113,58,220,1))] text-[10px] font-semibold text-white">
+                            IA
+                          </div>
+                          <div className="text-xs font-medium text-zinc-300">AI Assistant</div>
+                        </div>
+                        <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[10px] text-zinc-400">
+                          Go to AI
+                        </span>
                       </div>
 
-                      <div className="mt-4 rounded-[20px] border border-white/8 bg-[#1a1628] p-4">
-                        <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Análise</div>
+                      <div className="mt-5">
+                        <div className="text-sm text-zinc-400">Boa tarde,</div>
+                        <div className="mt-1 text-[30px] font-semibold leading-[1.05] text-white">
+                          {user.name?.split(' ')[0] || 'Usuário'}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 rounded-[22px] border border-white/8 bg-[#181523] p-4">
+                        <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+                          <span className="h-2 w-2 rounded-full bg-violet-300 shadow-[0_0_10px_rgba(196,181,253,0.7)]" />
+                          Análise ativa
+                        </div>
                         <p className="mt-3 text-sm leading-6 text-zinc-300">
-                          Analise mercado, execução, demanda e comportamento operacional em tempo real.
+                          Analise tendências, demanda e ritmo da operação para transformar dados em ação executiva.
                         </p>
                       </div>
                     </div>
 
-                    <div className="mt-4 space-y-3">
+                    <div className="mt-4 space-y-2.5">
                       {assistantPrompts.map((prompt) => (
                         <button
                           key={prompt}
@@ -291,6 +308,9 @@ export default function DashboardLayout({
                     </div>
 
                     <div className="mt-auto pt-4">
+                      <div className="mb-3 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3 text-xs leading-5 text-zinc-400">
+                        Processe insights, comandos e diagnósticos sem sair da tela atual.
+                      </div>
                       <button
                         type="button"
                         className="w-full rounded-[18px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] px-4 py-3 text-sm font-medium text-white shadow-[0_16px_36px_rgba(91,33,182,0.25)] transition hover:-translate-y-0.5"
@@ -301,20 +321,25 @@ export default function DashboardLayout({
                   </div>
                 ) : (
                   <div className="flex h-full flex-col items-center justify-between py-2">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-300/18 bg-violet-500/14 text-sm font-semibold text-white">
-                      IA
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="text-[10px] uppercase tracking-[0.24em] text-violet-200/70 [writing-mode:vertical-rl]">
+                        IA Assistant
+                      </div>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-[20px] border border-violet-300/18 bg-violet-500/14 text-sm font-semibold text-white">
+                        IA
+                      </div>
                     </div>
 
                     <div className="space-y-3">
-                      <div className="h-10 w-10 rounded-2xl border border-white/8 bg-white/[0.03]" />
-                      <div className="h-10 w-10 rounded-2xl border border-white/8 bg-white/[0.03]" />
-                      <div className="h-10 w-10 rounded-2xl border border-white/8 bg-white/[0.03]" />
+                      <div className="h-11 w-11 rounded-[18px] border border-white/8 bg-white/[0.03]" />
+                      <div className="h-11 w-11 rounded-[18px] border border-white/8 bg-white/[0.03]" />
+                      <div className="h-11 w-11 rounded-[18px] border border-white/8 bg-white/[0.03]" />
                     </div>
 
                     <button
                       type="button"
                       onClick={() => setAiExpanded(true)}
-                      className="h-11 w-11 rounded-2xl bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] text-sm font-semibold text-white shadow-[0_16px_36px_rgba(91,33,182,0.25)]"
+                      className="h-12 w-12 rounded-[20px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] text-sm font-semibold text-white shadow-[0_16px_36px_rgba(91,33,182,0.25)]"
                     >
                       +
                     </button>
