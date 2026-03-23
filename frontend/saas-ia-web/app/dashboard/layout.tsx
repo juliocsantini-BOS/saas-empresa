@@ -75,11 +75,7 @@ function getUserInitials(user: CurrentUser | null) {
     .join('');
 }
 
-const assistantPrompts = [
-  'Resuma a operação do dia.',
-  'Aponte gargalos críticos.',
-  'Monte um plano executivo.',
-];
+const assistantPrompts = ['Resuma a operação do dia.', 'Aponte gargalos críticos.', 'Monte um plano executivo.'];
 
 export default function DashboardLayout({
   children,
@@ -140,8 +136,8 @@ export default function DashboardLayout({
   return (
     <main className="h-screen overflow-hidden bg-[#09090f] text-white">
       <div className="flex h-full overflow-hidden">
-        <aside className="hidden h-full w-[236px] shrink-0 border-r border-white/8 bg-[#0d0c16] lg:flex lg:flex-col lg:overflow-hidden">
-          <div className="px-3.5 pb-1.5 pt-3.5">
+        <aside className="hidden h-full w-[236px] shrink-0 border-r border-white/8 bg-[#0d0c16] lg:flex lg:flex-col">
+          <div className="px-3.5 pb-1 pt-3">
             <div className="flex items-center gap-3 rounded-[20px] border border-white/8 bg-white/[0.03] px-3.5 py-2.5">
               <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-sm font-semibold text-white">
                 EO
@@ -153,15 +149,15 @@ export default function DashboardLayout({
             </div>
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col justify-between px-3.5 pb-3">
-            <div className="space-y-2.5">
+          <div className="flex min-h-0 flex-1 flex-col justify-between px-3.5 pb-2">
+            <div className="space-y-2">
               {menuGroups.map((group) => (
                 <div key={group.title}>
-                  <div className="mb-1 px-2.5 text-[8px] uppercase tracking-[0.28em] text-zinc-500">
+                  <div className="mb-0.5 px-2.5 text-[8px] uppercase tracking-[0.24em] text-zinc-500">
                     {group.title}
                   </div>
 
-                  <nav className="space-y-0.5">
+                  <nav className="space-y-px">
                     {group.items.map((item) => {
                       const active =
                         pathname === item.href ||
@@ -173,8 +169,8 @@ export default function DashboardLayout({
                           href={item.href}
                           className={
                             active
-                              ? 'flex items-center gap-3 rounded-[15px] border border-violet-300/14 bg-[linear-gradient(180deg,rgba(141,92,246,0.18),rgba(141,92,246,0.08))] px-3.5 py-2.5 text-[12px] font-medium text-white'
-                              : 'flex items-center gap-3 rounded-[15px] border border-transparent px-3.5 py-2.5 text-[12px] text-zinc-400 transition hover:border-white/8 hover:bg-white/[0.03] hover:text-white'
+                              ? 'flex items-center gap-3 rounded-[15px] border border-violet-300/14 bg-[linear-gradient(180deg,rgba(141,92,246,0.18),rgba(141,92,246,0.08))] px-3.5 py-2 text-[12px] font-medium text-white'
+                              : 'flex items-center gap-3 rounded-[15px] border border-transparent px-3.5 py-2 text-[12px] text-zinc-400 transition hover:border-white/8 hover:bg-white/[0.03] hover:text-white'
                           }
                         >
                           <span
@@ -193,13 +189,13 @@ export default function DashboardLayout({
               ))}
             </div>
 
-            <div className="flex items-center gap-2 rounded-[14px] border border-white/8 bg-white/[0.03] px-2.5 py-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-[10px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-[10px] font-semibold text-white">
+            <div className="flex items-center gap-2 rounded-[14px] border border-white/8 bg-white/[0.03] px-2.5 py-1.5">
+              <div className="flex h-6 w-6 items-center justify-center rounded-[9px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-[9px] font-semibold text-white">
                 {userInitials}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[10px] font-medium leading-none text-white">{user.name || 'Usuário'}</div>
-                <div className="mt-1 truncate text-[9px] leading-none text-zinc-500">{user.role}</div>
+                <div className="mt-0.5 truncate text-[9px] leading-none text-zinc-500">{user.role}</div>
               </div>
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.7)]" />
             </div>
@@ -245,7 +241,7 @@ export default function DashboardLayout({
               aiExpanded ? 'translate-x-0 opacity-100' : 'translate-x-[108%] opacity-0'
             } transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]`}
           >
-            <div className="pointer-events-auto h-full border-l border-white/8 bg-[#110f1b]/96 backdrop-blur-xl shadow-[-24px_0_80px_rgba(0,0,0,0.42)]">
+            <div className="pointer-events-auto h-full border-l border-white/8 bg-[#110f1b]/96 shadow-[-24px_0_80px_rgba(0,0,0,0.42)] backdrop-blur-xl">
               <div className="flex h-full flex-col">
                 <div className="flex items-center justify-between border-b border-white/8 px-4 py-4">
                   <div className="min-w-0">
