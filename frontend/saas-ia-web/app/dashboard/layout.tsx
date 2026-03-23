@@ -75,7 +75,11 @@ function getUserInitials(user: CurrentUser | null) {
     .join('');
 }
 
-const assistantPrompts = ['Resuma a operação do dia.', 'Aponte gargalos críticos.', 'Monte um plano executivo.'];
+const assistantPrompts = [
+  'Resuma a operação do dia.',
+  'Aponte gargalos críticos.',
+  'Monte um plano executivo.',
+];
 
 export default function DashboardLayout({
   children,
@@ -194,7 +198,9 @@ export default function DashboardLayout({
                 {userInitials}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[10px] font-medium leading-none text-white">{user.name || 'Usuário'}</div>
+                <div className="truncate text-[10px] font-medium leading-none text-white">
+                  {user.name || 'Usuário'}
+                </div>
                 <div className="mt-0.5 truncate text-[9px] leading-none text-zinc-500">{user.role}</div>
               </div>
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(74,222,128,0.7)]" />
@@ -210,7 +216,8 @@ export default function DashboardLayout({
                   <div className="mb-1 text-[10px] uppercase tracking-[0.3em] text-violet-200/60">Workspace</div>
                   <h1 className="text-3xl font-semibold tracking-tight text-white">{pageTitle}</h1>
                   <p className="mt-1 text-sm text-zinc-500">
-                    Sistema operacional empresarial guiado por IA, módulos conectados e execução em tempo real.
+                    Sistema operacional empresarial guiado por IA, módulos conectados e execução em
+                    tempo real.
                   </p>
                 </div>
 
@@ -218,7 +225,7 @@ export default function DashboardLayout({
                   <button
                     type="button"
                     onClick={() => setAiExpanded((current) => !current)}
-                    className="hidden rounded-[18px] border border-violet-300/16 bg-violet-500/10 px-4 py-3 text-sm font-medium text-white transition hover:bg-violet-500/15 xl:inline-flex"
+                    className="hidden rounded-[18px] border border-violet-300/16 bg-violet-500/10 px-4 py-3 text-sm font-medium text-white transition hover:border-violet-300/26 hover:bg-violet-500/15 xl:inline-flex"
                   >
                     IA
                   </button>
@@ -237,11 +244,15 @@ export default function DashboardLayout({
           </div>
 
           <div
-            className={`pointer-events-none absolute inset-y-0 right-0 z-30 hidden w-[296px] xl:block ${
-              aiExpanded ? 'translate-x-0 opacity-100' : 'translate-x-[108%] opacity-0'
+            className={`pointer-events-none absolute inset-y-0 right-0 z-30 hidden w-[322px] xl:block ${
+              aiExpanded ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
             } transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]`}
           >
-            <div className="pointer-events-auto h-full border-l border-white/8 bg-[#110f1b]/96 shadow-[-24px_0_80px_rgba(0,0,0,0.42)] backdrop-blur-xl">
+            <div
+              className={`pointer-events-auto h-full border-l border-white/8 bg-[#110f1b]/95 shadow-[-32px_0_90px_rgba(0,0,0,0.52)] backdrop-blur-2xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                aiExpanded ? 'scale-100' : 'scale-[0.985]'
+              }`}
+            >
               <div className="flex h-full flex-col">
                 <div className="flex items-center justify-between border-b border-white/8 px-4 py-4">
                   <div className="min-w-0">
@@ -252,24 +263,24 @@ export default function DashboardLayout({
                   <button
                     type="button"
                     onClick={() => setAiExpanded(false)}
-                    className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300"
+                    className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300 transition hover:bg-white/[0.08]"
                   >
                     ×
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-3">
+                <div className="elyon-scroll flex-1 overflow-y-auto p-3">
                   <div className="flex h-full flex-col">
-                    <div className="rounded-[26px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
+                    <div className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(180deg,rgba(160,102,255,1),rgba(113,58,220,1))] text-[10px] font-semibold text-white">
                             IA
                           </div>
-                          <div className="text-xs font-medium text-zinc-300">AI Assistant</div>
+                          <div className="text-xs font-medium text-zinc-300">Assistant</div>
                         </div>
                         <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[10px] text-zinc-400">
-                          Go to AI
+                          Ativo
                         </span>
                       </div>
 
@@ -286,7 +297,8 @@ export default function DashboardLayout({
                           Análise ativa
                         </div>
                         <p className="mt-3 text-sm leading-6 text-zinc-300">
-                          Analise tendências, demanda e ritmo da operação para transformar dados em ação executiva.
+                          Analise tendências, gargalos e ritmo da operação para transformar dados em
+                          ação executiva.
                         </p>
                       </div>
                     </div>
@@ -301,6 +313,26 @@ export default function DashboardLayout({
                           {prompt}
                         </button>
                       ))}
+                    </div>
+
+                    <div className="mt-4 rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
+                      <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">
+                        Workspace Context
+                      </div>
+                      <div className="mt-3 space-y-3 text-sm text-zinc-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-500">Empresa</span>
+                          <span className="font-medium text-white">{user.companyId ? 'Ativa' : 'Sem vínculo'}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-500">Perfil</span>
+                          <span className="font-medium text-white">{user.role}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-500">Modo</span>
+                          <span className="font-medium text-white">Operacional</span>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-auto pt-4">
