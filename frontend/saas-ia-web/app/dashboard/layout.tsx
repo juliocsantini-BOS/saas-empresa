@@ -206,22 +206,10 @@ export default function DashboardLayout({
         <section className="relative flex min-w-0 flex-1 overflow-hidden">
           <div className="dashboard-scroll min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
             <div className="px-4 py-4 md:px-6 xl:px-8">
-              <header className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-3">
-                <div className="min-w-0">
-                  <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="text-[9px] uppercase tracking-[0.28em] text-violet-200/55">Workspace</span>
-                    <span className="inline-flex rounded-full border border-violet-400/14 bg-violet-500/8 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.2em] text-violet-100/70">
-                      Tempo real
-                    </span>
-                  </div>
-                  <h1 className="text-[1.7rem] font-semibold tracking-tight text-white">{pageTitle}</h1>
-                  <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-zinc-500">
-                    Sistema operacional empresarial guiado por IA, módulos conectados e execução em
-                    tempo real.
-                  </p>
-                </div>
+              <header className="mb-4 flex items-center justify-between gap-3 py-1">
+                <h1 className="min-w-0 text-[2rem] font-semibold tracking-tight text-white">{pageTitle}</h1>
 
-                <div className="flex items-center gap-2 self-start">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setAiExpanded((current) => !current)}
@@ -313,3 +301,4 @@ export default function DashboardLayout({
     </main>
   );
 }
+
