@@ -193,25 +193,15 @@ export default function DashboardLayout({
               ))}
             </div>
 
-            <div className="rounded-[18px] border border-white/8 bg-white/[0.03] p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-sm font-semibold text-white">
-                  {userInitials}
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-[12px] font-medium text-white">
-                    {user.name || 'Usuário'}
-                  </div>
-                  <div className="truncate text-[10px] text-zinc-500">{user.email || user.role}</div>
-                </div>
+            <div className="flex items-center gap-2.5 rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-[12px] bg-[linear-gradient(180deg,rgba(141,92,246,0.95),rgba(92,52,196,0.95))] text-[11px] font-semibold text-white">
+                {userInitials}
               </div>
-
-              <div className="mt-2 flex items-center justify-between rounded-[14px] border border-white/8 bg-black/20 px-2.5 py-1.5 text-[10px] text-zinc-400">
-                <span>{user.role}</span>
-                <span className="rounded-full border border-white/8 bg-white/5 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.16em] text-zinc-300">
-                  online
-                </span>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[11px] font-medium text-white">{user.name || 'Usuário'}</div>
+                <div className="truncate text-[10px] text-zinc-500">{user.role}</div>
               </div>
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(74,222,128,0.7)]" />
             </div>
           </div>
         </aside>
