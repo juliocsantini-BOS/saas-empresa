@@ -265,30 +265,24 @@ export default function DashboardLayout({
                 </div>
 
                 <div className="ai-drawer-scroll flex-1 overflow-y-auto p-3">
-                  <div className="flex h-full flex-col gap-4">
-                    <div className="flex-1 rounded-[28px] border border-white/8 bg-white/[0.03] p-4">
-                      <div className="flex h-full flex-col">
-                        <div className="mt-auto">
-                          <div className="rounded-[24px] border border-white/8 bg-[#12101a] p-3">
-                            <textarea
-                              value={aiMessage}
-                              onChange={(event) => setAiMessage(event.target.value)}
-                              rows={6}
-                              placeholder="Escreva uma mensagem para a IA..."
-                              className="w-full resize-none border-0 bg-transparent text-sm leading-6 text-white outline-none placeholder:text-zinc-500"
-                            />
+                  <div className="mt-auto">
+                    <div className="rounded-[24px] border border-white/8 bg-[#12101a] p-3">
+                      <textarea
+                        value={aiMessage}
+                        onChange={(event) => setAiMessage(event.target.value)}
+                        rows={6}
+                        placeholder="Escreva uma mensagem para a IA..."
+                        className="w-full resize-none border-0 bg-transparent text-sm leading-6 text-white outline-none placeholder:text-zinc-500"
+                      />
 
-                            <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/8 pt-3">
-                              <div className="text-[11px] text-zinc-500">Assistente contextual</div>
-                              <button
-                                type="button"
-                                className="rounded-[16px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] px-4 py-2.5 text-sm font-medium text-white shadow-[0_12px_28px_rgba(91,33,182,0.24)] transition hover:-translate-y-0.5"
-                              >
-                                Enviar
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                      <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/8 pt-3">
+                        <div className="text-[11px] text-zinc-500">Assistente contextual</div>
+                        <button
+                          type="button"
+                          className="rounded-[16px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] px-4 py-2.5 text-sm font-medium text-white shadow-[0_12px_28px_rgba(91,33,182,0.24)] transition hover:-translate-y-0.5"
+                        >
+                          Enviar
+                        </button>
                       </div>
                     </div>
                   </div>
