@@ -75,12 +75,6 @@ function getUserInitials(user: CurrentUser | null) {
     .join('');
 }
 
-const assistantPrompts = [
-  'Resuma a operação do dia.',
-  'Aponte gargalos críticos.',
-  'Monte um plano executivo.',
-];
-
 export default function DashboardLayout({
   children,
 }: {
@@ -92,6 +86,7 @@ export default function DashboardLayout({
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [aiExpanded, setAiExpanded] = useState(false);
+  const [aiMessage, setAiMessage] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -270,81 +265,68 @@ export default function DashboardLayout({
                 </div>
 
                 <div className="ai-drawer-scroll flex-1 overflow-y-auto p-3">
-                  <div className="flex h-full flex-col">
-                    <div className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(180deg,rgba(160,102,255,1),rgba(113,58,220,1))] text-[10px] font-semibold text-white">
-                            IA
+                  <div className="flex h-full flex-col gap-4">
+                    <div className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.22)]">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[linear-gradient(180deg,rgba(160,102,255,1),rgba(113,58,220,1))] text-xs font-semibold text-white">
+                          IA
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-white">Copiloto Elyon</div>
+                          <div className="mt-0.5 text-xs text-zinc-400">
+                            Assistente operacional em qualquer tela
                           </div>
-                          <div className="text-xs font-medium text-zinc-300">Assistant</div>
-                        </div>
-                        <span className="rounded-full border border-white/8 bg-white/[0.04] px-2 py-1 text-[10px] text-zinc-400">
-                          Ativo
-                        </span>
-                      </div>
-
-                      <div className="mt-5">
-                        <div className="text-sm text-zinc-400">Boa tarde,</div>
-                        <div className="mt-1 text-[30px] font-semibold leading-[1.05] text-white">
-                          {user.name?.split(' ')[0] || 'Usuário'}
                         </div>
                       </div>
 
-                      <div className="mt-5 rounded-[22px] border border-white/8 bg-[#181523] p-4">
-                        <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-zinc-500">
-                          <span className="h-2 w-2 rounded-full bg-violet-300 shadow-[0_0_10px_rgba(196,181,253,0.7)]" />
-                          Análise ativa
-                        </div>
-                        <p className="mt-3 text-sm leading-6 text-zinc-300">
-                          Analise tendências, gargalos e ritmo da operação para transformar dados em
-                          ação executiva.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 space-y-2.5">
-                      {assistantPrompts.map((prompt) => (
-                        <button
-                          key={prompt}
-                          type="button"
-                          className="w-full rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3 text-left text-sm text-zinc-300 transition hover:border-violet-300/18 hover:bg-white/[0.05] hover:text-white"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
-                      <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">
-                        Workspace Context
-                      </div>
-                      <div className="mt-3 space-y-3 text-sm text-zinc-300">
-                        <div className="flex items-center justify-between">
-                          <span className="text-zinc-500">Empresa</span>
-                          <span className="font-medium text-white">{user.companyId ? 'Ativa' : 'Sem vínculo'}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-zinc-500">Perfil</span>
-                          <span className="font-medium text-white">{user.role}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-zinc-500">Modo</span>
-                          <span className="font-medium text-white">Operacional</span>
+                      <div className="mt-5 rounded-[22px] border border-white/8 bg-[#161421] px-4 py-3">
+                        <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Contexto</div>
+                        <div className="mt-3 space-y-2.5 text-sm text-zinc-300">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-zinc-500">Empresa</span>
+                            <span className="truncate font-medium text-white">
+                              {user.companyId ? 'Operação ativa' : 'Sem vínculo'}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-zinc-500">Perfil</span>
+                            <span className="font-medium text-white">{user.role}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-auto pt-4">
-                      <div className="mb-3 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3 text-xs leading-5 text-zinc-400">
-                        Processe insights, comandos e diagnósticos sem sair da tela atual.
+                    <div className="flex-1 rounded-[28px] border border-white/8 bg-white/[0.03] p-4">
+                      <div className="flex h-full flex-col">
+                        <div className="rounded-[22px] border border-dashed border-white/10 bg-[#12101a] px-4 py-5">
+                          <div className="text-sm font-medium text-white">Pronto para ajudar</div>
+                          <p className="mt-2 text-sm leading-6 text-zinc-400">
+                            Faça perguntas, peça resumos e acione análises sem sair da tela atual.
+                          </p>
+                        </div>
+
+                        <div className="mt-auto pt-4">
+                          <div className="rounded-[24px] border border-white/8 bg-[#12101a] p-3">
+                            <textarea
+                              value={aiMessage}
+                              onChange={(event) => setAiMessage(event.target.value)}
+                              rows={6}
+                              placeholder="Escreva uma mensagem para a IA..."
+                              className="w-full resize-none border-0 bg-transparent text-sm leading-6 text-white outline-none placeholder:text-zinc-500"
+                            />
+
+                            <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/8 pt-3">
+                              <div className="text-[11px] text-zinc-500">Assistente contextual</div>
+                              <button
+                                type="button"
+                                className="rounded-[16px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] px-4 py-2.5 text-sm font-medium text-white shadow-[0_12px_28px_rgba(91,33,182,0.24)] transition hover:-translate-y-0.5"
+                              >
+                                Enviar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <button
-                        type="button"
-                        className="w-full rounded-[18px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] px-4 py-3 text-sm font-medium text-white shadow-[0_16px_36px_rgba(91,33,182,0.25)] transition hover:-translate-y-0.5"
-                      >
-                        Analisar minha operação
-                      </button>
                     </div>
                   </div>
                 </div>
