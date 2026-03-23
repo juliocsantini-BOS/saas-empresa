@@ -268,14 +268,7 @@ export default function DashboardLayout({
                   <div className="flex h-full flex-col gap-4">
                     <div className="flex-1 rounded-[28px] border border-white/8 bg-white/[0.03] p-4">
                       <div className="flex h-full flex-col">
-                        <div className="rounded-[22px] border border-dashed border-white/10 bg-[#12101a] px-4 py-5">
-                          <div className="text-sm font-medium text-white">Pronto para ajudar</div>
-                          <p className="mt-2 text-sm leading-6 text-zinc-400">
-                            Faça perguntas, peça resumos e acione análises sem sair da tela atual.
-                          </p>
-                        </div>
-
-                        <div className="mt-auto pt-4">
+                        <div className="mt-auto">
                           <div className="rounded-[24px] border border-white/8 bg-[#12101a] p-3">
                             <textarea
                               value={aiMessage}
