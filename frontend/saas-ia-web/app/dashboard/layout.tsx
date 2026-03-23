@@ -206,7 +206,7 @@ export default function DashboardLayout({
           </div>
         </aside>
 
-        <section className="flex min-w-0 flex-1 overflow-hidden">
+        <section className="relative flex min-w-0 flex-1 overflow-hidden">
           <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
             <div className="px-4 py-4 md:px-6 xl:px-8">
               <header className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-white/8 bg-white/[0.03] px-5 py-4">
@@ -241,28 +241,28 @@ export default function DashboardLayout({
           </div>
 
           <div
-            className={`hidden h-full shrink-0 border-l border-white/8 bg-[#110f1b] transition-[width] duration-300 xl:block ${
-              aiExpanded ? 'w-[292px]' : 'w-[82px]'
-            }`}
+            className={`pointer-events-none absolute inset-y-0 right-0 z-30 hidden w-[296px] xl:block ${
+              aiExpanded ? 'translate-x-0 opacity-100' : 'translate-x-[108%] opacity-0'
+            } transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]`}
           >
-            <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between border-b border-white/8 px-4 py-4">
-                <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-violet-200/70">IA Assistant</div>
-                  {aiExpanded ? <div className="mt-1 truncate text-sm font-medium text-white">Copiloto Elyon</div> : null}
+            <div className="pointer-events-auto h-full border-l border-white/8 bg-[#110f1b]/96 backdrop-blur-xl shadow-[-24px_0_80px_rgba(0,0,0,0.42)]">
+              <div className="flex h-full flex-col">
+                <div className="flex items-center justify-between border-b border-white/8 px-4 py-4">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-violet-200/70">IA Assistant</div>
+                    <div className="mt-1 truncate text-sm font-medium text-white">Copiloto Elyon</div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setAiExpanded(false)}
+                    className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300"
+                  >
+                    ×
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setAiExpanded((current) => !current)}
-                  className="rounded-full border border-white/8 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300"
-                >
-                  {aiExpanded ? '×' : '+'}
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-3">
-                {aiExpanded ? (
+                <div className="flex-1 overflow-y-auto p-3">
                   <div className="flex h-full flex-col">
                     <div className="rounded-[26px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
                       <div className="flex items-center justify-between">
@@ -319,32 +319,7 @@ export default function DashboardLayout({
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="flex h-full flex-col items-center justify-between py-2">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="text-[10px] uppercase tracking-[0.24em] text-violet-200/70 [writing-mode:vertical-rl]">
-                        IA Assistant
-                      </div>
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[20px] border border-violet-300/18 bg-violet-500/14 text-sm font-semibold text-white">
-                        IA
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="h-11 w-11 rounded-[18px] border border-white/8 bg-white/[0.03]" />
-                      <div className="h-11 w-11 rounded-[18px] border border-white/8 bg-white/[0.03]" />
-                      <div className="h-11 w-11 rounded-[18px] border border-white/8 bg-white/[0.03]" />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setAiExpanded(true)}
-                      className="h-12 w-12 rounded-[20px] bg-[linear-gradient(180deg,#8d5cf6,#6c35d6)] text-sm font-semibold text-white shadow-[0_16px_36px_rgba(91,33,182,0.25)]"
-                    >
-                      +
-                    </button>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
