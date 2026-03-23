@@ -209,7 +209,7 @@ export default function DashboardLayout({
         </aside>
 
         <section className="relative flex min-w-0 flex-1 overflow-hidden">
-          <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="dashboard-scroll min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
             <div className="px-4 py-4 md:px-6 xl:px-8">
               <header className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-white/8 bg-white/[0.03] px-5 py-4">
                 <div>
@@ -269,7 +269,7 @@ export default function DashboardLayout({
                   </button>
                 </div>
 
-                <div className="elyon-scroll flex-1 overflow-y-auto p-3">
+                <div className="ai-drawer-scroll flex-1 overflow-y-auto p-3">
                   <div className="flex h-full flex-col">
                     <div className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
                       <div className="flex items-center justify-between">
