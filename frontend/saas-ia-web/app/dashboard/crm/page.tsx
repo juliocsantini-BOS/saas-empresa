@@ -1004,6 +1004,53 @@ export default function CrmPage() {
     };
   }, [selectedLead]);
 
+  const conversationCoachingSummary = useMemo(() => {
+    const recentInsights = conversationInsights.slice(0, 12);
+    const insightsWithSentiment = recentInsights.filter(
+      (insight) =>
+        insight.sentimentScore !== null && insight.sentimentScore !== undefined,
+    );
+    const averageSentiment = insightsWithSentiment.length
+      ? Math.round(
+          insightsWithSentiment.reduce(
+            (sum, insight) => sum + Number(insight.sentimentScore || 0),
+            0,
+          ) / insightsWithSentiment.length,
+        )
+      : null;
+    const coachingCoverage = recentInsights.length
+      ? Math.round(
+          (recentInsights.filter((insight) => insight.coachingNotes?.trim()).length /
+            recentInsights.length) *
+            100,
+        )
+      : 0;
+    const sourceCounts = recentInsights.reduce<Record<string, number>>((acc, insight) => {
+      const key = normalizeUiText(insight.sourceType || 'CALL');
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+    const dominantSource =
+      Object.entries(sourceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Sem fonte dominante';
+    const negativeCount = recentInsights.filter(
+      (insight) => Number(insight.sentimentScore || 0) < 0,
+    ).length;
+
+    return {
+      total: recentInsights.length,
+      averageSentiment,
+      coachingCoverage,
+      dominantSource,
+      negativeCount,
+      alert:
+        negativeCount > 0
+          ? 'Conversas com sentimento negativo pedem acompanhamento imediato.'
+          : coachingCoverage < 60 && recentInsights.length > 0
+            ? 'Falta consolidar notas de coaching em boa parte das conversas.'
+            : 'Camada de coaching está saudável neste recorte.',
+    };
+  }, [conversationInsights]);
+
   const selectedAccountSummary = useMemo(() => {
     if (!selectedLead?.companyName?.trim()) return null;
 
@@ -2801,6 +2848,37 @@ export default function CrmPage() {
                       ))
                     )}
                   </div>
+
+                  <div className="mt-4 rounded-[22px] border border-white/10 bg-black/20 p-3.5">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      Coaching comercial
+                    </div>
+                    <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                      <MiniStat
+                        label="Insights recentes"
+                        value={String(conversationCoachingSummary.total)}
+                      />
+                      <MiniStat
+                        label="Cobertura de coaching"
+                        value={`${conversationCoachingSummary.coachingCoverage}%`}
+                      />
+                      <MiniStat
+                        label="Sentimento médio"
+                        value={
+                          conversationCoachingSummary.averageSentiment !== null
+                            ? String(conversationCoachingSummary.averageSentiment)
+                            : 'Sem score'
+                        }
+                      />
+                      <MiniStat
+                        label="Canal dominante"
+                        value={conversationCoachingSummary.dominantSource}
+                      />
+                    </div>
+                    <div className="mt-3 text-xs leading-5 text-zinc-400">
+                      {conversationCoachingSummary.alert}
+                    </div>
+                  </div>
                 </div>
               </div>
             </CrmPanel>
@@ -3538,6 +3616,47 @@ export default function CrmPage() {
                         {STATUS_LABELS[status]}
                       </button>
                     ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedLead ? (
+                <div className="mb-4 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                        Conversation intelligence
+                      </div>
+                      <div className="mt-2 text-[15px] font-medium leading-6 text-white">
+                        Coaching e sinais da conversa comercial
+                      </div>
+                    </div>
+                    <div className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-300">
+                      {conversationCoachingSummary.total} insight(s)
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2.5 sm:grid-cols-3">
+                    <MiniStat
+                      label="Sentimento médio"
+                      value={
+                        conversationCoachingSummary.averageSentiment !== null
+                          ? String(conversationCoachingSummary.averageSentiment)
+                          : 'Sem score'
+                      }
+                    />
+                    <MiniStat
+                      label="Cobertura de coaching"
+                      value={`${conversationCoachingSummary.coachingCoverage}%`}
+                    />
+                    <MiniStat
+                      label="Canal dominante"
+                      value={conversationCoachingSummary.dominantSource}
+                    />
+                  </div>
+
+                  <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-3 text-sm text-zinc-300">
+                    {conversationCoachingSummary.alert}
                   </div>
                 </div>
               ) : null}
