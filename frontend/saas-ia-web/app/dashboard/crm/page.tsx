@@ -2010,6 +2010,55 @@ export default function CrmPage() {
 
         <CrmPanel className="p-4 md:p-5">
           <CrmSectionHeader
+            eyebrow="Cockpit executivo"
+            title="Decisão rápida em um olhar"
+            description="Leitura visual de conversão, concentração de receita e tendência de fechamento para priorizar ações do time."
+          />
+
+          <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-4">
+            <ReportBarChartCard
+              title="Conversão por etapa"
+              subtitle="Onde o funil acelera ou trava"
+              accent="purple"
+              rows={stageConversionReport.slice(0, 6).map((item) => ({
+                label: STATUS_LABELS[item.label as LeadStatus] || item.label,
+                value: item.rate || 0,
+                helper: `${item.count} lead(s)`,
+                valueLabel: `${item.rate || 0}%`,
+              }))}
+            />
+            <ReportBarChartCard
+              title="Valor por origem"
+              subtitle="Canais que trazem receita"
+              accent="blue"
+              rows={sourceConversionReport.slice(0, 6).map((item) => ({
+                label: item.label,
+                value: item.value || 0,
+                helper: `${item.count} lead(s) · ${item.rate || 0}% conv.`,
+                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
+              }))}
+            />
+            <ReportBarChartCard
+              title="Pipeline por responsável"
+              subtitle="Concentração financeira por owner"
+              accent="green"
+              rows={pipelineValueByOwnerReport.slice(0, 6).map((item) => ({
+                label: item.label,
+                value: item.value || 0,
+                helper: `${item.count} lead(s)`,
+                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
+              }))}
+            />
+            <WonLostTrendCard
+              title="Tendência de ganho/perda"
+              subtitle="Pulso recente do fechamento"
+              rows={wonLostByPeriodReport.slice(-6)}
+            />
+          </div>
+        </CrmPanel>
+
+        <CrmPanel className="p-4 md:p-5">
+          <CrmSectionHeader
             eyebrow="Filtros inteligentes"
             title="Controle de leitura do CRM"
             description="Ajuste a visão comercial sem perder os indicadores principais da tela."
@@ -2316,55 +2365,6 @@ export default function CrmPage() {
             {normalizeUiText(error)}
           </div>
         ) : null}
-
-        <CrmPanel className="p-4 md:p-5">
-          <CrmSectionHeader
-            eyebrow="Cockpit executivo"
-            title="Decisão rápida em um olhar"
-            description="Leitura visual de conversão, concentração de receita e tendência de fechamento para priorizar ações do time."
-          />
-
-          <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-4">
-            <ReportBarChartCard
-              title="Conversão por etapa"
-              subtitle="Onde o funil acelera ou trava"
-              accent="purple"
-              rows={stageConversionReport.slice(0, 6).map((item) => ({
-                label: STATUS_LABELS[item.label as LeadStatus] || item.label,
-                value: item.rate || 0,
-                helper: `${item.count} lead(s)`,
-                valueLabel: `${item.rate || 0}%`,
-              }))}
-            />
-            <ReportBarChartCard
-              title="Valor por origem"
-              subtitle="Canais que trazem receita"
-              accent="blue"
-              rows={sourceConversionReport.slice(0, 6).map((item) => ({
-                label: item.label,
-                value: item.value || 0,
-                helper: `${item.count} lead(s) · ${item.rate || 0}% conv.`,
-                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
-              }))}
-            />
-            <ReportBarChartCard
-              title="Pipeline por responsável"
-              subtitle="Concentração financeira por owner"
-              accent="green"
-              rows={pipelineValueByOwnerReport.slice(0, 6).map((item) => ({
-                label: item.label,
-                value: item.value || 0,
-                helper: `${item.count} lead(s)`,
-                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
-              }))}
-            />
-            <WonLostTrendCard
-              title="Tendência de ganho/perda"
-              subtitle="Pulso recente do fechamento"
-              rows={wonLostByPeriodReport.slice(-6)}
-            />
-          </div>
-        </CrmPanel>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(360px,0.82fr)] 2xl:grid-cols-[minmax(0,1.55fr)_minmax(380px,0.82fr)]">
           <div ref={pipelineRef} className="min-w-0 space-y-5">
@@ -6196,7 +6196,7 @@ function ReportBarChartCard({
           </div>
         ) : (
           topRows.map((row) => {
-            const width = maxValue > 0 ? Math.max((row.value / maxValue) * 100, 8) : 0;
+            const width = maxValue > 0 ? Math.max((row.value / maxValue) * 100, 8) : 18;
 
             return (
               <div key={`${title}-${row.label}`} className="space-y-2">
