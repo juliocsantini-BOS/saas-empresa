@@ -1699,95 +1699,75 @@ export default function CrmPage() {
           />
         </div>
 
-        <CrmPanel className="p-4">
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-            <div className="rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.14))] p-3.5">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
-                    Pipeline momentum
-                  </div>
-                  <div className="mt-1 text-[17px] font-semibold tracking-[-0.03em] text-white">
-                    Fast executive read
-                  </div>
-                </div>
-                <div className="rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#E9DDFF]">
-                  Live signal
-                </div>
-              </div>
+        <CrmPanel className="p-4 md:p-5">
+          <CrmSectionHeader
+            eyebrow="Executive analytics"
+            title="Painel executivo de performance comercial"
+            description="Uma camada visual mais premium para ler tendencia, composicao do funil, distribuicao de receita e foco de execucao."
+          />
 
-              <div className="grid gap-2.5 md:grid-cols-3">
-                {pipelineTotals.slice(0, 3).map((item) => (
-                  <div
-                    key={item.status}
-                    className="rounded-[20px] border border-white/10 bg-black/20 p-3"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                        {STATUS_LABELS[item.status]}
-                      </div>
-                      <div
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{
-                          background:
-                            item.status === dominantStatus ? '#8B5CF6' : 'rgba(255,255,255,0.28)',
-                          boxShadow:
-                            item.status === dominantStatus
-                              ? '0 0 14px rgba(139,92,246,0.55)'
-                              : 'none',
-                        }}
-                      />
-                    </div>
-                    <div className="mt-2.5 text-[22px] font-semibold tracking-[-0.03em] text-white">
-                      {item.count}
-                    </div>
-                    <div className="mt-1 text-[11px] text-zinc-400">
-                      {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'} forecast
-                    </div>
-                    <div className="mt-2.5 h-1.5 rounded-full bg-white/5">
-                      <div
-                        className="h-1.5 rounded-full bg-[linear-gradient(90deg,#8B5CF6,#DDD6FE)]"
-                        style={{
-                          width: `${Math.max(10, Math.min(100, item.avgProbability || 0))}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
+            <ExecutiveAreaChartCard
+              title="Ritmo de fechamento"
+              subtitle="Ganhos e perdas recentes do CRM filtrado"
+              rows={wonLostByPeriodReport.slice(-6)}
+            />
+            <ExecutiveDonutCard
+              title="Composicao do pipeline"
+              subtitle="Distribuicao visual por etapa"
+              rows={pipelineTotals.map((item) => ({
+                label: STATUS_LABELS[item.status],
+                value: item.count,
+                helper: canSeeValues ? formatMoney(item.totalValue) : `${item.count} lead(s)`,
+              }))}
+            />
+          </div>
 
-            <div className="grid gap-2.5 sm:grid-cols-2">
-              <ExecutiveSpotlightCard
-                label="Owner líder"
-                value={topOwner ? topOwner[0] : 'Sem dados'}
-                helper={topOwner ? `${topOwner[1]} lead(s) na carteira` : 'Sem sinal ativo de ownership'}
-              />
-              <ExecutiveSpotlightCard
-                label="Meta atual"
-                value={
-                  currentSalesTarget && canSeeValues
-                    ? formatMoney(currentSalesTarget.targetValue)
-                    : currentSalesTarget
-                      ? `${currentSalesTarget.targetDeals || 0} negócios`
-                      : 'Não definida'
-                }
-                helper={
-                  currentSalesTarget ? `${currentTargetProgress}% da meta coberta` : 'Crie uma meta para acompanhar a execução'
-                }
-              />
-              <ExecutiveSpotlightCard
-                label="Leads parados"
-                value={String(stats.stalledLeads)}
-                helper="Negócios com baixa atividade recente"
-                accent={stats.stalledLeads > 0 ? 'danger' : 'success'}
-              />
-              <ExecutiveSpotlightCard
-                label="Tarefas abertas"
-                value={String(totalOpenTasks)}
-                helper="Follow-ups comerciais pendentes"
-              />
-            </div>
+          <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+            <ExecutiveColumnChartCard
+              title="Receita por owner"
+              subtitle="Concentracao do pipeline nas carteiras principais"
+              rows={pipelineValueByOwnerReport.slice(0, 6).map((item) => ({
+                label: item.label,
+                value: item.value || 0,
+                helper: `${item.count} lead(s)`,
+                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
+              }))}
+            />
+            <ExecutiveRankCard
+              title="Prioridades do comercial"
+              subtitle="Onde agir primeiro para proteger forecast e conversao"
+              rows={[
+                {
+                  label: topOwner ? `Owner lider: ${topOwner[0]}` : 'Owner lider sem dado',
+                  value: topOwner ? `${topOwner[1]} lead(s)` : 'Sem carteira destaque',
+                  helper: 'Maior volume de oportunidades em andamento',
+                },
+                {
+                  label: `Leads parados`,
+                  value: `${stats.stalledLeads}`,
+                  helper: 'Negocios com baixa atividade recente',
+                },
+                {
+                  label: `Tarefas abertas`,
+                  value: `${totalOpenTasks}`,
+                  helper: 'Follow-ups pendentes no recorte atual',
+                },
+                {
+                  label: 'Meta atual',
+                  value:
+                    currentSalesTarget && canSeeValues
+                      ? formatMoney(currentSalesTarget.targetValue)
+                      : currentSalesTarget
+                        ? `${currentSalesTarget.targetDeals || 0} negocios`
+                        : 'Nao definida',
+                  helper:
+                    currentSalesTarget
+                      ? `${currentTargetProgress}% da meta coberta`
+                      : 'Cadastre uma meta para acompanhar a execucao',
+                },
+              ]}
+            />
           </div>
         </CrmPanel>
 
@@ -2036,55 +2016,6 @@ export default function CrmPage() {
               ]}
               actionLabel="Ajustar"
               onAction={() => setIsForecastWorkspaceOpen(true)}
-            />
-          </div>
-        </CrmPanel>
-
-        <CrmPanel className="p-4 md:p-5">
-          <CrmSectionHeader
-            eyebrow="Cockpit executivo"
-            title="Decisão rápida em um olhar"
-            description="Leitura visual de conversão, concentração de receita e tendência de fechamento para priorizar ações do time."
-          />
-
-          <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-4">
-            <ReportBarChartCard
-              title="Conversão por etapa"
-              subtitle="Onde o funil acelera ou trava"
-              accent="purple"
-              rows={stageConversionReport.slice(0, 6).map((item) => ({
-                label: STATUS_LABELS[item.label as LeadStatus] || item.label,
-                value: item.rate || 0,
-                helper: `${item.count} lead(s)`,
-                valueLabel: `${item.rate || 0}%`,
-              }))}
-            />
-            <ReportBarChartCard
-              title="Valor por origem"
-              subtitle="Canais que trazem receita"
-              accent="blue"
-              rows={sourceConversionReport.slice(0, 6).map((item) => ({
-                label: item.label,
-                value: item.value || 0,
-                helper: `${item.count} lead(s) · ${item.rate || 0}% conv.`,
-                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
-              }))}
-            />
-            <ReportBarChartCard
-              title="Pipeline por responsável"
-              subtitle="Concentração financeira por owner"
-              accent="green"
-              rows={pipelineValueByOwnerReport.slice(0, 6).map((item) => ({
-                label: item.label,
-                value: item.value || 0,
-                helper: `${item.count} lead(s)`,
-                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
-              }))}
-            />
-            <WonLostTrendCard
-              title="Tendência de ganho/perda"
-              subtitle="Pulso recente do fechamento"
-              rows={wonLostByPeriodReport.slice(-6)}
             />
           </div>
         </CrmPanel>
@@ -6318,6 +6249,302 @@ function WonLostTrendCard({
             );
           })
         )}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveAreaChartCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ period: string; won: number; lost: number }>;
+}) {
+  const points = rows.slice(0, 6);
+  const totals = points.map((row) => row.won + row.lost);
+  const max = Math.max(...totals, 1);
+
+  const buildPath = (values: number[]) =>
+    values
+      .map((value, index) => {
+        const x = values.length === 1 ? 12 : 12 + (index / Math.max(values.length - 1, 1)) * 76;
+        const y = 84 - (value / max) * 54;
+        return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ');
+
+  const totalPath = buildPath(totals);
+  const wonPath = buildPath(points.map((row) => row.won));
+  const focusIndex = points.length > 0 ? Math.floor(points.length / 2) : 0;
+  const focusValue = totals[focusIndex] || 0;
+  const focusX = points.length <= 1 ? 12 : 12 + (focusIndex / Math.max(points.length - 1, 1)) * 76;
+  const focusY = 84 - (focusValue / max) * 54;
+
+  return (
+    <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(120,168,255,0.1),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(6,10,20,0.34))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+        <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white">
+          {points.reduce((sum, row) => sum + row.won, 0)} ganhos
+        </div>
+      </div>
+
+      <div className="mt-5">
+        {points.length === 0 ? (
+          <div className="rounded-[22px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-14 text-center text-sm text-zinc-500">
+            Sem dados para este recorte.
+          </div>
+        ) : (
+          <>
+            <div className="relative h-[260px] rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.18))] p-4">
+              <div className="pointer-events-none absolute inset-4 grid grid-rows-4">
+                {[0, 1, 2, 3].map((line) => (
+                  <div
+                    key={line}
+                    className="border-b border-dashed border-white/10 last:border-b-0"
+                  />
+                ))}
+              </div>
+              <svg viewBox="0 0 100 100" className="relative h-full w-full overflow-visible">
+                <defs>
+                  <linearGradient id="crm-area-fill" x1="0%" x2="0%" y1="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(191,219,254,0.9)" />
+                    <stop offset="100%" stopColor="rgba(191,219,254,0.03)" />
+                  </linearGradient>
+                </defs>
+                <path d={`${totalPath} L 88 96 L 12 96 Z`} fill="url(#crm-area-fill)" opacity="0.95" />
+                <path d={totalPath} fill="none" stroke="rgba(226,232,240,0.95)" strokeWidth="1.6" />
+                <path d={wonPath} fill="none" stroke="rgba(56,189,248,0.95)" strokeWidth="1.25" />
+                <line
+                  x1={focusX}
+                  y1="14"
+                  x2={focusX}
+                  y2="96"
+                  stroke="rgba(255,255,255,0.18)"
+                  strokeDasharray="2.5 3"
+                />
+                <circle cx={focusX} cy={focusY} r="2.4" fill="white" stroke="rgba(56,189,248,0.95)" strokeWidth="1.4" />
+              </svg>
+              <div className="absolute left-[52%] top-6 -translate-x-1/2 rounded-[18px] border border-white/10 bg-[#BFC8D8] px-3 py-2 text-center text-[#1B2433] shadow-[0_18px_48px_rgba(0,0,0,0.24)]">
+                <div className="text-lg font-semibold">{focusValue}</div>
+                <div className="text-xs">{points[focusIndex]?.period || 'Sem periodo'}</div>
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-6 gap-2 text-center text-xs text-zinc-500">
+              {points.map((row) => (
+                <div key={row.period}>{normalizeUiText(row.period)}</div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveDonutCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: number; helper: string }>;
+}) {
+  const items = rows.filter((row) => row.value > 0).slice(0, 5);
+  const total = items.reduce((sum, row) => sum + row.value, 0);
+  const palette = ['#DCEFFF', '#FFC98B', '#DFF0AE', '#8D95A6', '#7DD3FC'];
+
+  const segments = items.reduce<
+    Array<{ label: string; value: number; helper: string; color: string; start: number; angle: number }>
+  >((acc, item, index) => {
+    const angle = total > 0 ? (item.value / total) * 360 : 0;
+    const start = acc.length === 0 ? 0 : acc[acc.length - 1].start + acc[acc.length - 1].angle;
+    return [
+      ...acc,
+      { ...item, color: palette[index % palette.length], start, angle },
+    ];
+  }, []);
+
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-semibold text-white">{total}</div>
+          <div className="text-xs text-zinc-500">oportunidades</div>
+        </div>
+      </div>
+
+      <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center">
+        <div className="relative mx-auto h-[220px] w-[220px] shrink-0">
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                segments.length === 0
+                  ? 'conic-gradient(rgba(255,255,255,0.08) 0 360deg)'
+                  : `conic-gradient(${segments
+                      .map((segment) => `${segment.color} ${segment.start}deg ${segment.start + segment.angle}deg`)
+                      .join(', ')})`,
+            }}
+          />
+          <div className="absolute inset-[48px] rounded-full border border-white/10 bg-[#0F1524]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Mix do funil</div>
+            <div className="mt-2 text-3xl font-semibold text-white">{total}</div>
+            <div className="mt-1 text-xs text-zinc-500">etapas com volume</div>
+          </div>
+        </div>
+
+        <div className="flex-1 space-y-2.5">
+          {segments.length === 0 ? (
+            <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+              Sem dados para este recorte.
+            </div>
+          ) : (
+            segments.map((segment) => (
+              <div
+                key={segment.label}
+                className="rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: segment.color }}
+                      />
+                      <span className="truncate text-sm font-medium text-white">
+                        {segment.label}
+                      </span>
+                    </div>
+                    <div className="mt-1 text-xs text-zinc-500">{segment.helper}</div>
+                  </div>
+                  <div className="shrink-0 text-sm font-medium text-white">
+                    {total > 0 ? `${Math.round((segment.value / total) * 100)}%` : '0%'}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveColumnChartCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: number; helper: string; valueLabel: string }>;
+}) {
+  const items = rows.filter((row) => row.value >= 0).slice(0, 6);
+  const max = Math.max(...items.map((row) => row.value), 1);
+
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(88,196,255,0.08),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+      </div>
+
+      <div className="mt-5">
+        {items.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-12 text-center text-sm text-zinc-500">
+            Sem dados para este recorte.
+          </div>
+        ) : (
+          <>
+            <div className="flex h-[240px] items-end gap-3 rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.18))] p-4">
+              {items.map((item, index) => {
+                const height = Math.max((item.value / max) * 100, 14);
+                const active = index === items.length - 2 || index === items.length - 1;
+                return (
+                  <div key={item.label} className="flex min-w-0 flex-1 flex-col justify-end gap-3">
+                    <div className="text-center text-xs text-zinc-400">{item.valueLabel}</div>
+                    <div
+                      className={
+                        active
+                          ? 'rounded-t-[14px] bg-[linear-gradient(180deg,#41E0D0,#5D8BFF)] shadow-[0_0_22px_rgba(93,139,255,0.22)]'
+                          : 'rounded-t-[14px] bg-[linear-gradient(180deg,#CFE3EA,#8FB0C7)]'
+                      }
+                      style={{ height: `${height}%` }}
+                    />
+                    <div className="text-center text-xs text-zinc-500">{normalizeUiText(item.label)}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 grid gap-2 md:grid-cols-3">
+              {items.slice(0, 3).map((item) => (
+                <MiniStat
+                  key={`${title}-${item.label}`}
+                  label={normalizeUiText(item.label)}
+                  value={item.helper}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveRankCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: string; helper: string }>;
+}) {
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.04),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {rows.map((row, index) => (
+          <div
+            key={`${title}-${row.label}`}
+            className="rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-xs text-zinc-300">
+                  0{index + 1}
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-white">{row.label}</div>
+                  <div className="mt-1 text-xs text-zinc-500">{row.helper}</div>
+                </div>
+              </div>
+              <div className="shrink-0 text-sm font-medium text-white">{row.value}</div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
