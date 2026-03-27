@@ -2052,12 +2052,6 @@ export default function CrmPage() {
                 value={statusFilter === 'ALL' ? 'Todos' : FILTER_STATUS_LABELS[statusFilter]}
               />
               <CompactFilterStat
-                label="Temperatura"
-                value={
-                  temperatureFilter === 'ALL' ? 'Todas' : TEMPERATURE_LABELS[temperatureFilter]
-                }
-              />
-              <CompactFilterStat
                 label="Responsável"
                 value={
                   ownerFilter === 'ALL'
@@ -2066,11 +2060,19 @@ export default function CrmPage() {
                 }
               />
               <CompactFilterStat
-                label="Filial"
+                label="Fechamento"
                 value={
-                  branchFilter === 'ALL'
-                    ? 'Todas'
-                    : branchOptions.find((item) => item.id === branchFilter)?.name || 'Selecionada'
+                  expectedCloseDateFrom || expectedCloseDateTo
+                    ? `${expectedCloseDateFrom ? formatDateShort(expectedCloseDateFrom) : '...'} - ${expectedCloseDateTo ? formatDateShort(expectedCloseDateTo) : '...'}`
+                    : 'Todas datas'
+                }
+              />
+              <CompactFilterStat
+                label="Valor"
+                value={
+                  dealValueMin || dealValueMax
+                    ? `${dealValueMin || '0'} - ${dealValueMax || '...'}`
+                    : 'Todos os valores'
                 }
               />
             </div>
@@ -2173,17 +2175,6 @@ export default function CrmPage() {
                 onChange={(value) => setStatusFilter(value as 'ALL' | LeadStatus)}
               />
               <FilterGroup
-                label="Temperatura"
-                options={[
-                  { id: 'ALL', label: TEMPERATURE_LABELS.ALL },
-                  { id: 'HOT', label: TEMPERATURE_LABELS.HOT },
-                  { id: 'WARM', label: TEMPERATURE_LABELS.WARM },
-                  { id: 'COLD', label: TEMPERATURE_LABELS.COLD },
-                ]}
-                value={temperatureFilter}
-                onChange={(value) => setTemperatureFilter(value as TemperatureFilter)}
-              />
-              <FilterGroup
                 label="Responsável"
                 options={[
                   { id: 'ALL', label: 'Todos' },
@@ -2193,45 +2184,56 @@ export default function CrmPage() {
                 onChange={setOwnerFilter}
               />
               <FilterGroup
-                label="Filial"
+                label="Próximo passo vencido"
+                options={[
+                  { id: 'ALL', label: 'Todos' },
+                  { id: 'YES', label: 'Somente vencidos' },
+                ]}
+                value={overdueNextStepOnly}
+                onChange={(value) => setOverdueNextStepOnly(value as 'ALL' | 'YES')}
+              />
+              <FilterGroup
+                label="Prioridade"
                 options={[
                   { id: 'ALL', label: 'Todas' },
-                  ...branchOptions.map((item) => ({ id: item.id, label: item.name })),
+                  { id: 'LOW', label: PRIORITY_LABELS.LOW },
+                  { id: 'MEDIUM', label: PRIORITY_LABELS.MEDIUM },
+                  { id: 'HIGH', label: PRIORITY_LABELS.HIGH },
+                  { id: 'URGENT', label: PRIORITY_LABELS.URGENT },
                 ]}
-                value={branchFilter}
-                onChange={setBranchFilter}
+                value={priorityFilter}
+                onChange={(value) =>
+                  setPriorityFilter(value as 'ALL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT')
+                }
               />
             </div>
           </div>
 
-          {departmentOptions.length > 0 ? (
-            <div className="mt-4">
-              <FilterGroup
-                label="Departamento"
-                options={[
-                  { id: 'ALL', label: 'Todos' },
-                  ...departmentOptions.map((item) => ({ id: item.id, label: item.name })),
-                ]}
-                value={departmentFilter}
-                onChange={setDepartmentFilter}
-              />
-            </div>
-          ) : null}
-
           <div className="mt-3 grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
-            <FilterGroup
-              label="Prioridade"
-              options={[
-                { id: 'ALL', label: 'Todas' },
-                { id: 'LOW', label: PRIORITY_LABELS.LOW },
-                { id: 'MEDIUM', label: PRIORITY_LABELS.MEDIUM },
-                { id: 'HIGH', label: PRIORITY_LABELS.HIGH },
-                { id: 'URGENT', label: PRIORITY_LABELS.URGENT },
-              ]}
-              value={priorityFilter}
-              onChange={(value) =>
-                setPriorityFilter(value as 'ALL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT')
-              }
+            <DateRangeFilterGroup
+              label="Fechamento previsto"
+              fromValue={expectedCloseDateFrom}
+              toValue={expectedCloseDateTo}
+              onFromChange={setExpectedCloseDateFrom}
+              onToChange={setExpectedCloseDateTo}
+            />
+            <RangeFilterGroup
+              label="Valor do negócio"
+              minValue={dealValueMin}
+              maxValue={dealValueMax}
+              minPlaceholder="Mín."
+              maxPlaceholder="Máx."
+              onMinChange={setDealValueMin}
+              onMaxChange={setDealValueMax}
+            />
+            <RangeFilterGroup
+              label="Probabilidade (%)"
+              minValue={probabilityMin}
+              maxValue={probabilityMax}
+              minPlaceholder="Mín."
+              maxPlaceholder="Máx."
+              onMinChange={setProbabilityMin}
+              onMaxChange={setProbabilityMax}
             />
             <FilterGroup
               label="Origem"
@@ -2241,6 +2243,29 @@ export default function CrmPage() {
               ]}
               value={sourceFilter}
               onChange={setSourceFilter}
+            />
+          </div>
+
+          <div className="mt-3 grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
+            <FilterGroup
+              label="Filial"
+              options={[
+                { id: 'ALL', label: 'Todas' },
+                ...branchOptions.map((item) => ({ id: item.id, label: item.name })),
+              ]}
+              value={branchFilter}
+              onChange={setBranchFilter}
+            />
+            <FilterGroup
+              label="Temperatura"
+              options={[
+                { id: 'ALL', label: TEMPERATURE_LABELS.ALL },
+                { id: 'HOT', label: TEMPERATURE_LABELS.HOT },
+                { id: 'WARM', label: TEMPERATURE_LABELS.WARM },
+                { id: 'COLD', label: TEMPERATURE_LABELS.COLD },
+              ]}
+              value={temperatureFilter}
+              onChange={(value) => setTemperatureFilter(value as TemperatureFilter)}
             />
             <FilterGroup
               label="Tarefas abertas"
@@ -2262,50 +2287,24 @@ export default function CrmPage() {
             />
           </div>
 
-          <div className="mt-3 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-            <FilterGroup
-              label="Próximo passo vencido"
-              options={[
-                { id: 'ALL', label: 'Todos' },
-                { id: 'YES', label: 'Somente vencidos' },
-              ]}
-              value={overdueNextStepOnly}
-              onChange={(value) => setOverdueNextStepOnly(value as 'ALL' | 'YES')}
-            />
-            <RangeFilterGroup
-              label="Probabilidade (%)"
-              minValue={probabilityMin}
-              maxValue={probabilityMax}
-              minPlaceholder="Mín."
-              maxPlaceholder="Máx."
-              onMinChange={setProbabilityMin}
-              onMaxChange={setProbabilityMax}
-            />
-            <RangeFilterGroup
-              label="Valor do negócio"
-              minValue={dealValueMin}
-              maxValue={dealValueMax}
-              minPlaceholder="Mín."
-              maxPlaceholder="Máx."
-              onMinChange={setDealValueMin}
-              onMaxChange={setDealValueMax}
-            />
-          </div>
-
           <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {departmentOptions.length > 0 ? (
+              <FilterGroup
+                label="Departamento"
+                options={[
+                  { id: 'ALL', label: 'Todos' },
+                  ...departmentOptions.map((item) => ({ id: item.id, label: item.name })),
+                ]}
+                value={departmentFilter}
+                onChange={setDepartmentFilter}
+              />
+            ) : null}
             <DateRangeFilterGroup
               label="Criação do lead"
               fromValue={createdAtFrom}
               toValue={createdAtTo}
               onFromChange={setCreatedAtFrom}
               onToChange={setCreatedAtTo}
-            />
-            <DateRangeFilterGroup
-              label="Fechamento previsto"
-              fromValue={expectedCloseDateFrom}
-              toValue={expectedCloseDateTo}
-              onFromChange={setExpectedCloseDateFrom}
-              onToChange={setExpectedCloseDateTo}
             />
           </div>
             </>
