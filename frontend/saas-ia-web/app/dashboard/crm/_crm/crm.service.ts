@@ -953,6 +953,21 @@ export async function createCrmDocument(
   return response.data;
 }
 
+export async function updateCrmDocumentSignatureStatus(
+  documentId: string,
+  headers: AuthHeaders,
+  input: Record<string, unknown>,
+) {
+  const response = await axios.patch<CrmDocument>(
+    `${API_URL}/v1/crm/documents/${documentId}/signature-status`,
+    input,
+    {
+      headers,
+    },
+  );
+  return response.data;
+}
+
 export async function listCrmRoutingRules(
   headers: AuthHeaders,
 ): Promise<CrmRoutingRule[]> {

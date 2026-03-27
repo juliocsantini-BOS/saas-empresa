@@ -3,9 +3,9 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from "@nestjs/common";
-import { Prisma, Role } from "@prisma/client";
-import { PrismaService } from "../prisma/prisma.service";
+} from '@nestjs/common';
+import { Prisma, Role } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 type Actor = {
   id: string;
@@ -18,23 +18,23 @@ export class CrmDocumentsService {
   constructor(private readonly prisma: PrismaService) {}
 
   private ensureCompanyId(actor: Actor) {
-    const companyId = String(actor.companyId ?? "").trim();
+    const companyId = String(actor.companyId ?? '').trim();
     if (!companyId) {
-      throw new ForbiddenException("Company obrigatória.");
+      throw new ForbiddenException('Company obrigatória.');
     }
     return companyId;
   }
 
   private trim(value: unknown) {
-    const normalized = String(value ?? "").trim();
+    const normalized = String(value ?? '').trim();
     return normalized || null;
   }
 
   private decimal(value: unknown) {
-    if (value === undefined || value === null || value === "") return null;
+    if (value === undefined || value === null || value === '') return null;
     const parsed = Number(value);
     if (!Number.isFinite(parsed) || parsed < 0) {
-      throw new BadRequestException("Valor monetário inválido.");
+      throw new BadRequestException('Valor monetário inválido.');
     }
     return new Prisma.Decimal(parsed);
   }
@@ -44,7 +44,7 @@ export class CrmDocumentsService {
     if (!raw) return null;
     const parsed = new Date(raw);
     if (Number.isNaN(parsed.getTime())) {
-      throw new BadRequestException("Data inválida.");
+      throw new BadRequestException('Data inválida.');
     }
     return parsed;
   }
@@ -54,13 +54,13 @@ export class CrmDocumentsService {
     return (this.prisma as any).crmQuote.findMany({
       where: { companyId },
       include: {
-        items: { orderBy: [{ sortOrder: "asc" }] },
+        items: { orderBy: [{ sortOrder: 'asc' }] },
         lead: { select: { id: true, name: true, status: true } },
         account: { select: { id: true, name: true } },
         contact: { select: { id: true, fullName: true, email: true } },
         ownerUser: { select: { id: true, name: true, email: true } },
       },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
   }
 
@@ -68,7 +68,7 @@ export class CrmDocumentsService {
     const companyId = this.ensureCompanyId(actor);
     const title = this.trim(body?.title);
     if (!title) {
-      throw new BadRequestException("title é obrigatório.");
+      throw new BadRequestException('title é obrigatório.');
     }
 
     const items = Array.isArray(body?.items) ? body.items : [];
@@ -99,8 +99,8 @@ export class CrmDocumentsService {
           companyId,
           number,
           title,
-          status: this.trim(body?.status) || "DRAFT",
-          currency: this.trim(body?.currency) || "BRL",
+          status: this.trim(body?.status) || 'DRAFT',
+          currency: this.trim(body?.currency) || 'BRL',
           subtotal,
           discount,
           total,
@@ -128,7 +128,7 @@ export class CrmDocumentsService {
 
       return (tx as any).crmQuote.findUnique({
         where: { id: quote.id },
-        include: { items: { orderBy: [{ sortOrder: "asc" }] } },
+        include: { items: { orderBy: [{ sortOrder: 'asc' }] } },
       });
     });
   }
@@ -141,21 +141,21 @@ export class CrmDocumentsService {
     });
 
     if (!existing) {
-      throw new NotFoundException("Quote não encontrado.");
+      throw new NotFoundException('Quote não encontrado.');
     }
 
     const status = this.trim(body?.status);
-    if (!status) throw new BadRequestException("status é obrigatório.");
+    if (!status) throw new BadRequestException('status é obrigatório.');
 
     const now = new Date();
     return (this.prisma as any).crmQuote.update({
       where: { id: quoteId },
       data: {
         status,
-        viewedAt: status === "VIEWED" ? now : undefined,
-        approvedAt: status === "APPROVED" ? now : undefined,
-        signedAt: status === "SIGNED" ? now : undefined,
-        rejectedAt: status === "REJECTED" ? now : undefined,
+        viewedAt: status === 'VIEWED' ? now : undefined,
+        approvedAt: status === 'APPROVED' ? now : undefined,
+        signedAt: status === 'SIGNED' ? now : undefined,
+        rejectedAt: status === 'REJECTED' ? now : undefined,
       },
     });
   }
@@ -165,13 +165,15 @@ export class CrmDocumentsService {
     return (this.prisma as any).crmDocument.findMany({
       where: { companyId },
       include: {
-        quote: { select: { id: true, number: true, title: true, status: true } },
+        quote: {
+          select: { id: true, number: true, title: true, status: true },
+        },
         lead: { select: { id: true, name: true, status: true } },
         account: { select: { id: true, name: true } },
         contact: { select: { id: true, fullName: true, email: true } },
         user: { select: { id: true, name: true, email: true } },
       },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
   }
 
@@ -180,7 +182,7 @@ export class CrmDocumentsService {
     const title = this.trim(body?.title);
     const type = this.trim(body?.type);
     if (!title || !type) {
-      throw new BadRequestException("title e type são obrigatórios.");
+      throw new BadRequestException('title e type são obrigatórios.');
     }
 
     return (this.prisma as any).crmDocument.create({
@@ -188,7 +190,7 @@ export class CrmDocumentsService {
         companyId,
         title,
         type,
-        signatureStatus: this.trim(body?.signatureStatus) || "NOT_SENT",
+        signatureStatus: this.trim(body?.signatureStatus) || 'NOT_SENT',
         fileUrl: this.trim(body?.fileUrl),
         contentHtml: this.trim(body?.contentHtml),
         quoteId: this.trim(body?.quoteId),
@@ -201,6 +203,63 @@ export class CrmDocumentsService {
         sentAt: this.normalizeDate(body?.sentAt),
         openedAt: this.normalizeDate(body?.openedAt),
         signedAt: this.normalizeDate(body?.signedAt),
+      },
+    });
+  }
+
+  async updateDocumentSignatureStatus(
+    actor: Actor,
+    documentId: string,
+    body: any,
+  ) {
+    const companyId = this.ensureCompanyId(actor);
+    const existing = await (this.prisma as any).crmDocument.findFirst({
+      where: { id: documentId, companyId },
+      select: {
+        id: true,
+        signatureStatus: true,
+        sentAt: true,
+        openedAt: true,
+        signedAt: true,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Documento não encontrado.');
+    }
+
+    const status = this.trim(body?.signatureStatus);
+    if (!status) {
+      throw new BadRequestException('signatureStatus é obrigatório.');
+    }
+
+    const now = new Date();
+
+    return (this.prisma as any).crmDocument.update({
+      where: { id: documentId },
+      data: {
+        signatureStatus: status,
+        provider: this.trim(body?.provider) ?? undefined,
+        externalDocumentId: this.trim(body?.externalDocumentId) ?? undefined,
+        fileUrl: this.trim(body?.fileUrl) ?? undefined,
+        sentAt:
+          status === 'SENT'
+            ? existing.sentAt || now
+            : body?.sentAt !== undefined
+              ? this.normalizeDate(body?.sentAt)
+              : undefined,
+        openedAt:
+          status === 'OPENED'
+            ? existing.openedAt || now
+            : body?.openedAt !== undefined
+              ? this.normalizeDate(body?.openedAt)
+              : undefined,
+        signedAt:
+          status === 'SIGNED'
+            ? existing.signedAt || now
+            : body?.signedAt !== undefined
+              ? this.normalizeDate(body?.signedAt)
+              : undefined,
       },
     });
   }

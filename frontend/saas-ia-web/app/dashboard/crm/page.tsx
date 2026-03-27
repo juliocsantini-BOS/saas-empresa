@@ -58,6 +58,7 @@ import {
   listCrmRoutingRules,
   listCrmSequences,
   syncCrmChannelIntegration,
+  updateCrmDocumentSignatureStatus,
 } from './_crm/crm.service';
 import type { AuthHeaders, CrmLeadsQueryParams } from './_crm/crm.service';
 import {
@@ -1579,6 +1580,27 @@ export default function CrmPage() {
     } catch (workspaceError: unknown) {
       setError(
         getErrorMessage(workspaceError, 'Não foi possível salvar proposal, quote ou documento.'),
+      );
+    } finally {
+      setSavingEnterpriseAction(false);
+    }
+  }
+
+  async function handleUpdateDocumentSignatureStatus(
+    documentId: string,
+    signatureStatus: 'SENT' | 'OPENED' | 'SIGNED',
+  ) {
+    try {
+      setSavingEnterpriseAction(true);
+      setError(null);
+      await updateCrmDocumentSignatureStatus(documentId, authHeaders, {
+        signatureStatus,
+        provider: documentForm.provider.trim() || undefined,
+      });
+      await loadEnterpriseHub();
+    } catch (workspaceError: unknown) {
+      setError(
+        getErrorMessage(workspaceError, 'Nao foi possivel atualizar o status de assinatura.'),
       );
     } finally {
       setSavingEnterpriseAction(false);
@@ -4130,6 +4152,71 @@ export default function CrmPage() {
                   placeholder="Head de vendas, diretor comercial..."
                 />
               </FormField>
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-[24px] border border-white/10 bg-white/[0.03] p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                  Signature desk
+                </div>
+                <div className="mt-1 text-sm text-zinc-400">
+                  Atualize o andamento comercial dos documentos sem sair do CRM.
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {documents.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-white/10 px-4 py-5 text-sm text-zinc-500">
+                  Nenhum documento comercial gerado ainda.
+                </div>
+              ) : (
+                documents.slice(0, 4).map((document) => (
+                  <div
+                    key={document.id}
+                    className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-white">
+                          {normalizeUiText(document.title)}
+                        </div>
+                        <div className="mt-1 text-xs text-zinc-500">
+                          {normalizeUiText(document.type)} ·{' '}
+                          {normalizeUiText(document.provider || 'Provider pendente')}
+                        </div>
+                      </div>
+                      <div className="text-xs uppercase tracking-[0.18em] text-zinc-400">
+                        {normalizeUiText(document.signatureStatus)}
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void handleUpdateDocumentSignatureStatus(document.id, 'SENT')}
+                        className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-200 transition hover:bg-white/10"
+                      >
+                        Marcar enviado
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleUpdateDocumentSignatureStatus(document.id, 'OPENED')}
+                        className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-200 transition hover:bg-white/10"
+                      >
+                        Marcar aberto
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleUpdateDocumentSignatureStatus(document.id, 'SIGNED')}
+                        className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-medium text-emerald-200 transition hover:bg-emerald-400/15"
+                      >
+                        Marcar assinado
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </EnterpriseWorkspaceModal>
