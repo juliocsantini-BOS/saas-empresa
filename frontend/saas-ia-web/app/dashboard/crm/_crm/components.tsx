@@ -326,6 +326,55 @@ export function CrmExecutiveHero({
               <div className="mt-1 text-xs text-zinc-400">Maturidade média do funil</div>
             </div>
           </div>
+
+          <div className="mt-4 rounded-[22px] border border-white/10 bg-black/20 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+                  Quick decision radar
+                </div>
+                <div className="mt-1 text-sm font-medium text-white">Graficos rapidos</div>
+              </div>
+              <div className="rounded-full border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#E9DDFF]">
+                Above the fold
+              </div>
+            </div>
+
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              {safeCharts.length === 0 ? (
+                <div className="md:col-span-3 rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-3 py-4 text-sm text-zinc-500">
+                  Sem dados no recorte atual.
+                </div>
+              ) : (
+                safeCharts.map((item) => {
+                  const width = maxChartValue > 0 ? Math.max((item.value / maxChartValue) * 100, 18) : 18;
+
+                  return (
+                    <div
+                      key={item.label}
+                      className="rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.16))] p-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                            {item.label}
+                          </div>
+                          <div className="mt-1 truncate text-sm font-medium text-white">{item.valueLabel}</div>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-zinc-400">{item.helper}</div>
+                      <div className="mt-3 h-2.5 rounded-full bg-white/[0.05]">
+                        <div
+                          className="h-2.5 rounded-full bg-[linear-gradient(90deg,rgba(139,92,246,0.95),rgba(221,214,254,0.92))]"
+                          style={{ width: `${width}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-3 xl:self-stretch">
@@ -369,43 +418,6 @@ export function CrmExecutiveHero({
             </div>
           </div>
 
-          <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-            <div className="text-sm font-medium text-white">Gráficos rápidos</div>
-            <div className="mt-1.5 text-[13px] leading-5 text-zinc-500">
-              Snapshot visual para decisão imediata.
-            </div>
-            <div className="mt-3 space-y-2.5">
-              {safeCharts.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-3 py-4 text-sm text-zinc-500">
-                  Sem dados no recorte atual.
-                </div>
-              ) : (
-                safeCharts.map((item) => {
-                  const width = maxChartValue > 0 ? Math.max((item.value / maxChartValue) * 100, 18) : 18;
-
-                  return (
-                    <div key={item.label} className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="truncate text-xs uppercase tracking-[0.18em] text-zinc-500">
-                            {item.label}
-                          </div>
-                          <div className="mt-0.5 text-[11px] text-zinc-400">{item.helper}</div>
-                        </div>
-                        <div className="shrink-0 text-sm font-medium text-white">{item.valueLabel}</div>
-                      </div>
-                      <div className="h-2 rounded-full bg-white/[0.05]">
-                        <div
-                          className="h-2 rounded-full bg-[linear-gradient(90deg,rgba(139,92,246,0.95),rgba(221,214,254,0.92))]"
-                          style={{ width: `${width}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
         </div>
       </div>
   );
