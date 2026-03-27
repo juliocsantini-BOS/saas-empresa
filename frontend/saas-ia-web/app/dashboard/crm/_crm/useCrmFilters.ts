@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   getAverageProbability,
   getBranchOptions,
@@ -23,48 +23,60 @@ import {
   getWonLostByPeriodReport,
   getLossReasonsBreakdownReport,
   getOpenTasksByOwnerReport,
-} from './crm.selectors';
-import type { CrmFiltersState } from './crm.selectors';
-import type { CrmLeadsQueryParams } from './crm.service';
+} from "./crm.selectors";
+import type { CrmFiltersState } from "./crm.selectors";
+import type { CrmLeadsQueryParams } from "./crm.service";
 import type {
   BooleanFilter,
+  CrmAnalyticsResponse,
   CrmSavedViewFilters,
   ExtendedLeadItem,
   LeadPriority,
   LeadStatus,
   TemperatureFilter,
-} from './types';
+} from "./types";
 
-type SortBy = 'createdAt' | 'updatedAt' | 'expectedCloseDate' | 'lastActivityAt';
-type SortOrder = 'asc' | 'desc';
+type SortBy =
+  | "createdAt"
+  | "updatedAt"
+  | "expectedCloseDate"
+  | "lastActivityAt";
+type SortOrder = "asc" | "desc";
 
-export function useCrmFilters(leads: ExtendedLeadItem[]) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | LeadStatus>('ALL');
-  const [temperatureFilter, setTemperatureFilter] = useState<TemperatureFilter>('ALL');
-  const [priorityFilter, setPriorityFilter] = useState<'ALL' | LeadPriority>('ALL');
-  const [sourceFilter, setSourceFilter] = useState('ALL');
-  const [ownerFilter, setOwnerFilter] = useState('ALL');
-  const [branchFilter, setBranchFilter] = useState('ALL');
-  const [departmentFilter, setDepartmentFilter] = useState('ALL');
+export function useCrmFilters(
+  leads: ExtendedLeadItem[],
+  analyticsResponse?: CrmAnalyticsResponse | null,
+) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | LeadStatus>("ALL");
+  const [temperatureFilter, setTemperatureFilter] =
+    useState<TemperatureFilter>("ALL");
+  const [priorityFilter, setPriorityFilter] = useState<"ALL" | LeadPriority>(
+    "ALL",
+  );
+  const [sourceFilter, setSourceFilter] = useState("ALL");
+  const [ownerFilter, setOwnerFilter] = useState("ALL");
+  const [branchFilter, setBranchFilter] = useState("ALL");
+  const [departmentFilter, setDepartmentFilter] = useState("ALL");
 
-  const [openTasksOnly, setOpenTasksOnly] = useState<BooleanFilter>('ALL');
-  const [stalledOnly, setStalledOnly] = useState<BooleanFilter>('ALL');
-  const [overdueNextStepOnly, setOverdueNextStepOnly] = useState<BooleanFilter>('ALL');
+  const [openTasksOnly, setOpenTasksOnly] = useState<BooleanFilter>("ALL");
+  const [stalledOnly, setStalledOnly] = useState<BooleanFilter>("ALL");
+  const [overdueNextStepOnly, setOverdueNextStepOnly] =
+    useState<BooleanFilter>("ALL");
 
-  const [probabilityMin, setProbabilityMin] = useState('');
-  const [probabilityMax, setProbabilityMax] = useState('');
-  const [dealValueMin, setDealValueMin] = useState('');
-  const [dealValueMax, setDealValueMax] = useState('');
-  const [createdAtFrom, setCreatedAtFrom] = useState('');
-  const [createdAtTo, setCreatedAtTo] = useState('');
-  const [expectedCloseDateFrom, setExpectedCloseDateFrom] = useState('');
-  const [expectedCloseDateTo, setExpectedCloseDateTo] = useState('');
+  const [probabilityMin, setProbabilityMin] = useState("");
+  const [probabilityMax, setProbabilityMax] = useState("");
+  const [dealValueMin, setDealValueMin] = useState("");
+  const [dealValueMax, setDealValueMax] = useState("");
+  const [createdAtFrom, setCreatedAtFrom] = useState("");
+  const [createdAtTo, setCreatedAtTo] = useState("");
+  const [expectedCloseDateFrom, setExpectedCloseDateFrom] = useState("");
+  const [expectedCloseDateTo, setExpectedCloseDateTo] = useState("");
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [sortBy, setSortBy] = useState<SortBy>('updatedAt');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [sortBy, setSortBy] = useState<SortBy>("updatedAt");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   const filters = useMemo<CrmFiltersState>(
     () => ({
@@ -114,12 +126,30 @@ export function useCrmFilters(leads: ExtendedLeadItem[]) {
   const queryParams = useMemo<CrmLeadsQueryParams>(
     () => ({
       q: searchTerm.trim() || undefined,
-      status: statusFilter !== 'ALL' ? statusFilter : undefined,
-      ownerUserId: ownerFilter !== 'ALL' ? ownerFilter : undefined,
-      branchId: branchFilter !== 'ALL' ? branchFilter : undefined,
-      departmentId: departmentFilter !== 'ALL' ? departmentFilter : undefined,
-      source: sourceFilter !== 'ALL' ? sourceFilter : undefined,
-      priority: priorityFilter !== 'ALL' ? priorityFilter : undefined,
+      status: statusFilter !== "ALL" ? statusFilter : undefined,
+      ownerUserId: ownerFilter !== "ALL" ? ownerFilter : undefined,
+      branchId: branchFilter !== "ALL" ? branchFilter : undefined,
+      departmentId: departmentFilter !== "ALL" ? departmentFilter : undefined,
+      source: sourceFilter !== "ALL" ? sourceFilter : undefined,
+      priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+      temperatureFilter:
+        temperatureFilter !== "ALL" ? temperatureFilter : undefined,
+      openTasksOnly: openTasksOnly !== "ALL" ? openTasksOnly : undefined,
+      stalledOnly: stalledOnly !== "ALL" ? stalledOnly : undefined,
+      overdueNextStepOnly:
+        overdueNextStepOnly !== "ALL" ? overdueNextStepOnly : undefined,
+      probabilityMin: probabilityMin.trim()
+        ? Number(probabilityMin)
+        : undefined,
+      probabilityMax: probabilityMax.trim()
+        ? Number(probabilityMax)
+        : undefined,
+      dealValueMin: dealValueMin.trim() ? Number(dealValueMin) : undefined,
+      dealValueMax: dealValueMax.trim() ? Number(dealValueMax) : undefined,
+      createdAtFrom: createdAtFrom || undefined,
+      createdAtTo: createdAtTo || undefined,
+      expectedCloseDateFrom: expectedCloseDateFrom || undefined,
+      expectedCloseDateTo: expectedCloseDateTo || undefined,
       page,
       pageSize,
       sortBy,
@@ -127,29 +157,57 @@ export function useCrmFilters(leads: ExtendedLeadItem[]) {
     }),
     [
       branchFilter,
+      createdAtFrom,
+      createdAtTo,
+      dealValueMax,
+      dealValueMin,
       departmentFilter,
+      expectedCloseDateFrom,
+      expectedCloseDateTo,
+      openTasksOnly,
+      overdueNextStepOnly,
       ownerFilter,
       page,
       pageSize,
       priorityFilter,
+      probabilityMax,
+      probabilityMin,
       searchTerm,
       sortBy,
       sortOrder,
       sourceFilter,
+      stalledOnly,
       statusFilter,
+      temperatureFilter,
     ],
   );
 
   useEffect(() => {
-    setPage(1);
+    const timer = window.setTimeout(() => {
+      setPage(1);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [
     searchTerm,
     statusFilter,
+    temperatureFilter,
     priorityFilter,
     sourceFilter,
     ownerFilter,
     branchFilter,
     departmentFilter,
+    openTasksOnly,
+    stalledOnly,
+    overdueNextStepOnly,
+    probabilityMin,
+    probabilityMax,
+    dealValueMin,
+    dealValueMax,
+    createdAtFrom,
+    createdAtTo,
+    expectedCloseDateFrom,
+    expectedCloseDateTo,
     sortBy,
     sortOrder,
     pageSize,
@@ -160,93 +218,115 @@ export function useCrmFilters(leads: ExtendedLeadItem[]) {
   const departmentOptions = useMemo(() => getDepartmentOptions(leads), [leads]);
   const sourceOptions = useMemo(() => getSourceOptions(leads), [leads]);
 
-  // Estes filtros continuam locais por enquanto.
-  // Eles agem sobre os leads já carregados pela página atual do backend.
-  const filteredLeads = useMemo(() => getFilteredLeads(leads, filters), [filters, leads]);
+  // Mantemos os selectors locais para derivar cards e relatórios da página.
+  // Os filtros principais agora também são enviados ao backend.
+  const filteredLeads = useMemo(
+    () => getFilteredLeads(leads, filters),
+    [filters, leads],
+  );
+  const analyticsLeads = analyticsResponse?.items ?? filteredLeads;
 
-  const stats = useMemo(() => getCrmStats(filteredLeads), [filteredLeads]);
-  const pipelineGroups = useMemo(() => getPipelineGroups(filteredLeads), [filteredLeads]);
-  const pipelineTotals = useMemo(() => getPipelineTotals(pipelineGroups), [pipelineGroups]);
-  const dominantStatus = useMemo(() => getDominantStatus(pipelineTotals), [pipelineTotals]);
-  const topOwner = useMemo(() => getTopOwner(filteredLeads), [filteredLeads]);
-  const totalPipelineValue = useMemo(() => getTotalPipelineValue(pipelineTotals), [pipelineTotals]);
-  const totalForecast = useMemo(() => getTotalForecast(pipelineTotals), [pipelineTotals]);
-  const averageProbability = useMemo(() => getAverageProbability(filteredLeads), [filteredLeads]);
+  const stats = useMemo(() => getCrmStats(analyticsLeads), [analyticsLeads]);
+  const pipelineGroups = useMemo(
+    () => getPipelineGroups(analyticsLeads),
+    [analyticsLeads],
+  );
+  const pipelineTotals = useMemo(
+    () => getPipelineTotals(pipelineGroups),
+    [pipelineGroups],
+  );
+  const dominantStatus = useMemo(
+    () => getDominantStatus(pipelineTotals),
+    [pipelineTotals],
+  );
+  const topOwner = useMemo(() => getTopOwner(analyticsLeads), [analyticsLeads]);
+  const totalPipelineValue = useMemo(
+    () => getTotalPipelineValue(pipelineTotals),
+    [pipelineTotals],
+  );
+  const totalForecast = useMemo(
+    () => getTotalForecast(pipelineTotals),
+    [pipelineTotals],
+  );
+  const averageProbability = useMemo(
+    () => getAverageProbability(analyticsLeads),
+    [analyticsLeads],
+  );
 
   const stageConversionReport = useMemo(
-    () => getStageConversionReport(filteredLeads),
-    [filteredLeads],
+    () => getStageConversionReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const sourceConversionReport = useMemo(
-    () => getSourceConversionReport(filteredLeads),
-    [filteredLeads],
+    () => getSourceConversionReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const pipelineValueByOwnerReport = useMemo(
-    () => getPipelineValueByOwnerReport(filteredLeads),
-    [filteredLeads],
+    () => getPipelineValueByOwnerReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const pipelineValueByBranchReport = useMemo(
-    () => getPipelineValueByBranchReport(filteredLeads),
-    [filteredLeads],
+    () => getPipelineValueByBranchReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const pipelineValueByDepartmentReport = useMemo(
-    () => getPipelineValueByDepartmentReport(filteredLeads),
-    [filteredLeads],
+    () => getPipelineValueByDepartmentReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const wonLostByPeriodReport = useMemo(
-    () => getWonLostByPeriodReport(filteredLeads),
-    [filteredLeads],
+    () => getWonLostByPeriodReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const lossReasonsBreakdownReport = useMemo(
-    () => getLossReasonsBreakdownReport(filteredLeads),
-    [filteredLeads],
+    () => getLossReasonsBreakdownReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const stageAgingReport = useMemo(
-    () => getStageAgingReport(filteredLeads),
-    [filteredLeads],
+    () => getStageAgingReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const stalledLeadsByOwnerReport = useMemo(
-    () => getStalledLeadsByOwnerReport(filteredLeads),
-    [filteredLeads],
+    () => getStalledLeadsByOwnerReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   const openTasksByOwnerReport = useMemo(
-    () => getOpenTasksByOwnerReport(filteredLeads),
-    [filteredLeads],
+    () => getOpenTasksByOwnerReport(analyticsLeads),
+    [analyticsLeads],
   );
 
   function resetFilters() {
-    setSearchTerm('');
-    setStatusFilter('ALL');
-    setTemperatureFilter('ALL');
-    setPriorityFilter('ALL');
-    setSourceFilter('ALL');
-    setOwnerFilter('ALL');
-    setBranchFilter('ALL');
-    setDepartmentFilter('ALL');
-    setOpenTasksOnly('ALL');
-    setStalledOnly('ALL');
-    setOverdueNextStepOnly('ALL');
-    setProbabilityMin('');
-    setProbabilityMax('');
-    setDealValueMin('');
-    setDealValueMax('');
-    setCreatedAtFrom('');
-    setCreatedAtTo('');
-    setExpectedCloseDateFrom('');
-    setExpectedCloseDateTo('');
+    setSearchTerm("");
+    setStatusFilter("ALL");
+    setTemperatureFilter("ALL");
+    setPriorityFilter("ALL");
+    setSourceFilter("ALL");
+    setOwnerFilter("ALL");
+    setBranchFilter("ALL");
+    setDepartmentFilter("ALL");
+    setOpenTasksOnly("ALL");
+    setStalledOnly("ALL");
+    setOverdueNextStepOnly("ALL");
+    setProbabilityMin("");
+    setProbabilityMax("");
+    setDealValueMin("");
+    setDealValueMax("");
+    setCreatedAtFrom("");
+    setCreatedAtTo("");
+    setExpectedCloseDateFrom("");
+    setExpectedCloseDateTo("");
     setPage(1);
     setPageSize(20);
-    setSortBy('updatedAt');
-    setSortOrder('desc');
+    setSortBy("updatedAt");
+    setSortOrder("desc");
   }
 
   function getSavableFilters(): CrmSavedViewFilters {
@@ -278,29 +358,35 @@ export function useCrmFilters(leads: ExtendedLeadItem[]) {
   }
 
   function applySavedFilters(savedFilters: CrmSavedViewFilters) {
-    setSearchTerm(savedFilters.searchTerm || '');
-    setStatusFilter((savedFilters.statusFilter as 'ALL' | LeadStatus) || 'ALL');
-    setTemperatureFilter((savedFilters.temperatureFilter as TemperatureFilter) || 'ALL');
-    setPriorityFilter((savedFilters.priorityFilter as 'ALL' | LeadPriority) || 'ALL');
-    setSourceFilter(savedFilters.sourceFilter || 'ALL');
-    setOwnerFilter(savedFilters.ownerFilter || 'ALL');
-    setBranchFilter(savedFilters.branchFilter || 'ALL');
-    setDepartmentFilter(savedFilters.departmentFilter || 'ALL');
-    setOpenTasksOnly((savedFilters.openTasksOnly as BooleanFilter) || 'ALL');
-    setStalledOnly((savedFilters.stalledOnly as BooleanFilter) || 'ALL');
-    setOverdueNextStepOnly((savedFilters.overdueNextStepOnly as BooleanFilter) || 'ALL');
-    setProbabilityMin(savedFilters.probabilityMin || '');
-    setProbabilityMax(savedFilters.probabilityMax || '');
-    setDealValueMin(savedFilters.dealValueMin || '');
-    setDealValueMax(savedFilters.dealValueMax || '');
-    setCreatedAtFrom(savedFilters.createdAtFrom || '');
-    setCreatedAtTo(savedFilters.createdAtTo || '');
-    setExpectedCloseDateFrom(savedFilters.expectedCloseDateFrom || '');
-    setExpectedCloseDateTo(savedFilters.expectedCloseDateTo || '');
+    setSearchTerm(savedFilters.searchTerm || "");
+    setStatusFilter((savedFilters.statusFilter as "ALL" | LeadStatus) || "ALL");
+    setTemperatureFilter(
+      (savedFilters.temperatureFilter as TemperatureFilter) || "ALL",
+    );
+    setPriorityFilter(
+      (savedFilters.priorityFilter as "ALL" | LeadPriority) || "ALL",
+    );
+    setSourceFilter(savedFilters.sourceFilter || "ALL");
+    setOwnerFilter(savedFilters.ownerFilter || "ALL");
+    setBranchFilter(savedFilters.branchFilter || "ALL");
+    setDepartmentFilter(savedFilters.departmentFilter || "ALL");
+    setOpenTasksOnly((savedFilters.openTasksOnly as BooleanFilter) || "ALL");
+    setStalledOnly((savedFilters.stalledOnly as BooleanFilter) || "ALL");
+    setOverdueNextStepOnly(
+      (savedFilters.overdueNextStepOnly as BooleanFilter) || "ALL",
+    );
+    setProbabilityMin(savedFilters.probabilityMin || "");
+    setProbabilityMax(savedFilters.probabilityMax || "");
+    setDealValueMin(savedFilters.dealValueMin || "");
+    setDealValueMax(savedFilters.dealValueMax || "");
+    setCreatedAtFrom(savedFilters.createdAtFrom || "");
+    setCreatedAtTo(savedFilters.createdAtTo || "");
+    setExpectedCloseDateFrom(savedFilters.expectedCloseDateFrom || "");
+    setExpectedCloseDateTo(savedFilters.expectedCloseDateTo || "");
     setPage(Number(savedFilters.page || 1));
     setPageSize(Number(savedFilters.pageSize || 20));
-    setSortBy((savedFilters.sortBy as SortBy) || 'updatedAt');
-    setSortOrder((savedFilters.sortOrder as SortOrder) || 'desc');
+    setSortBy((savedFilters.sortBy as SortBy) || "updatedAt");
+    setSortOrder((savedFilters.sortOrder as SortOrder) || "desc");
   }
 
   return {

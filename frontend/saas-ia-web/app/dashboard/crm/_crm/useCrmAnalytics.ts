@@ -1,24 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { getCrmLeads } from "./crm.service";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { getCrmAnalytics } from './crm.service';
 import type {
   AuthHeaders,
+  CrmAnalyticsApiResponse,
   CrmLeadsQueryParams,
-  PaginatedCrmLeadsResponse,
-} from "./crm.service";
-import type { ExtendedLeadItem } from "./types";
+} from './crm.service';
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (
-    typeof error === "object" &&
+    typeof error === 'object' &&
     error !== null &&
-    "response" in error &&
-    typeof error.response === "object" &&
+    'response' in error &&
+    typeof error.response === 'object' &&
     error.response !== null &&
-    "data" in error.response &&
-    typeof error.response.data === "object" &&
+    'data' in error.response &&
+    typeof error.response.data === 'object' &&
     error.response.data !== null &&
-    "message" in error.response.data &&
-    typeof error.response.data.message === "string"
+    'message' in error.response.data &&
+    typeof error.response.data.message === 'string'
   ) {
     return error.response.data.message;
   }
@@ -30,22 +29,18 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-const DEFAULT_RESPONSE: PaginatedCrmLeadsResponse = {
+const DEFAULT_RESPONSE: CrmAnalyticsApiResponse = {
   items: [],
   total: 0,
-  page: 1,
-  pageSize: 20,
-  totalPages: 0,
 };
 
-export function useCrmLeads(
+export function useCrmAnalytics(
   authHeaders: AuthHeaders,
   params: CrmLeadsQueryParams = {},
 ) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [response, setResponse] =
-    useState<PaginatedCrmLeadsResponse>(DEFAULT_RESPONSE);
+  const [response, setResponse] = useState<CrmAnalyticsApiResponse>(DEFAULT_RESPONSE);
 
   const normalizedParams = useMemo<CrmLeadsQueryParams>(
     () => ({
@@ -71,23 +66,24 @@ export function useCrmLeads(
       accountId: params.accountId,
       contactId: params.contactId,
       forecastCategory: params.forecastCategory,
-      page: params.page ?? 1,
-      pageSize: params.pageSize ?? 20,
-      sortBy: params.sortBy ?? "updatedAt",
-      sortOrder: params.sortOrder ?? "desc",
+      sortBy: params.sortBy ?? 'updatedAt',
+      sortOrder: params.sortOrder ?? 'desc',
     }),
     [
+      params.accountId,
       params.branchId,
-      params.departmentId,
+      params.contactId,
+      params.createdAtFrom,
+      params.createdAtTo,
       params.dealValueMax,
       params.dealValueMin,
+      params.departmentId,
       params.expectedCloseDateFrom,
       params.expectedCloseDateTo,
       params.forecastCategory,
       params.openTasksOnly,
+      params.overdueNextStepOnly,
       params.ownerUserId,
-      params.page,
-      params.pageSize,
       params.priority,
       params.probabilityMax,
       params.probabilityMin,
@@ -98,11 +94,6 @@ export function useCrmLeads(
       params.stalledOnly,
       params.status,
       params.temperatureFilter,
-      params.overdueNextStepOnly,
-      params.createdAtFrom,
-      params.createdAtTo,
-      params.accountId,
-      params.contactId,
     ],
   );
 
@@ -110,20 +101,13 @@ export function useCrmLeads(
     try {
       setLoading(true);
       setError(null);
-
-      const data = await getCrmLeads(authHeaders, normalizedParams);
-
+      const data = await getCrmAnalytics(authHeaders, normalizedParams);
       setResponse({
         items: Array.isArray(data?.items) ? data.items : [],
         total: Number(data?.total ?? 0),
-        page: Number(data?.page ?? normalizedParams.page ?? 1),
-        pageSize: Number(data?.pageSize ?? normalizedParams.pageSize ?? 20),
-        totalPages: Number(data?.totalPages ?? 0),
       });
-    } catch (error: unknown) {
-      setError(
-        getErrorMessage(error, "Não foi possível carregar os leads do CRM."),
-      );
+    } catch (analyticsError: unknown) {
+      setError(getErrorMessage(analyticsError, 'Nao foi possivel carregar os analytics do CRM.'));
       setResponse(DEFAULT_RESPONSE);
     } finally {
       setLoading(false);
@@ -134,18 +118,12 @@ export function useCrmLeads(
     void reload();
   }, [reload]);
 
-  const leads: ExtendedLeadItem[] = response.items;
-
   return {
     error,
-    leads,
     items: response.items,
     loading,
-    page: response.page,
-    pageSize: response.pageSize,
     reload,
     setError,
     total: response.total,
-    totalPages: response.totalPages,
   };
 }

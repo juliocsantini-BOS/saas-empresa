@@ -267,6 +267,11 @@ export type LeadTask = {
   } | null;
 };
 
+export type CrmAnalyticsResponse = {
+  items: ExtendedLeadItem[];
+  total: number;
+};
+
 export type PipelineStageSummary = {
   status: LeadStatus;
   count: number;

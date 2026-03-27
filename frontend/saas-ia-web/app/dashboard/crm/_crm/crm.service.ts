@@ -1,8 +1,9 @@
-import axios from 'axios';
-import { API_URL } from './constants';
+import axios from "axios";
+import { API_URL } from "./constants";
 import type {
   ActivityComposerType,
   CrmAccount,
+  CrmAnalyticsResponse,
   CrmContact,
   CrmConversationInsight,
   CrmChannelIntegration,
@@ -28,7 +29,7 @@ import type {
   ExtendedLeadItem,
   LeadActivity,
   LeadTask,
-} from './types';
+} from "./types";
 
 export type AuthHeaders = Record<string, string>;
 
@@ -40,13 +41,25 @@ export type CrmLeadsQueryParams = {
   departmentId?: string;
   source?: string;
   priority?: string;
+  temperatureFilter?: "ALL" | "HOT" | "WARM" | "COLD";
+  openTasksOnly?: "ALL" | "YES";
+  stalledOnly?: "ALL" | "YES";
+  overdueNextStepOnly?: "ALL" | "YES";
+  probabilityMin?: number;
+  probabilityMax?: number;
+  dealValueMin?: number;
+  dealValueMax?: number;
+  createdAtFrom?: string;
+  createdAtTo?: string;
+  expectedCloseDateFrom?: string;
+  expectedCloseDateTo?: string;
   accountId?: string;
   contactId?: string;
   forecastCategory?: string;
   page?: number;
   pageSize?: number;
-  sortBy?: 'createdAt' | 'updatedAt' | 'expectedCloseDate' | 'lastActivityAt';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "createdAt" | "updatedAt" | "expectedCloseDate" | "lastActivityAt";
+  sortOrder?: "asc" | "desc";
 };
 
 export type PaginatedCrmLeadsResponse = {
@@ -56,6 +69,8 @@ export type PaginatedCrmLeadsResponse = {
   pageSize: number;
   totalPages: number;
 };
+
+export type CrmAnalyticsApiResponse = CrmAnalyticsResponse;
 
 export type CrmLeadDetailsResponse = ExtendedLeadItem & {
   activities: LeadActivity[];
@@ -81,15 +96,15 @@ type SavedViewApiItem = {
 };
 
 function cleanString(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
+  if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed || undefined;
 }
 
 function cleanNumber(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === "number" && Number.isFinite(value)) return value;
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     const trimmed = value.trim();
     if (!trimmed) return undefined;
     const parsed = Number(trimmed);
@@ -103,7 +118,7 @@ function buildLeadPayload(form: CreateLeadForm | EditLeadForm) {
   const raw = form as Record<string, unknown>;
 
   return {
-    name: cleanString(raw.name) ?? '',
+    name: cleanString(raw.name) ?? "",
     phone: cleanString(raw.phone),
     whatsapp: cleanString(raw.whatsapp),
     email: cleanString(raw.email),
@@ -141,12 +156,33 @@ export async function getCrmLeads(
   headers: AuthHeaders,
   params: CrmLeadsQueryParams = {},
 ): Promise<PaginatedCrmLeadsResponse> {
-  const response = await axios.get<PaginatedCrmLeadsResponse>(`${API_URL}/v1/crm/leads`, {
-    headers,
-    params,
-  });
+  const response = await axios.get<PaginatedCrmLeadsResponse>(
+    `${API_URL}/v1/crm/leads`,
+    {
+      headers,
+      params,
+    },
+  );
 
   return response.data;
+}
+
+export async function getCrmAnalytics(
+  headers: AuthHeaders,
+  params: CrmLeadsQueryParams = {},
+): Promise<CrmAnalyticsApiResponse> {
+  const response = await axios.get<CrmAnalyticsApiResponse>(
+    `${API_URL}/v1/crm/leads/analytics`,
+    {
+      headers,
+      params,
+    },
+  );
+
+  return {
+    items: Array.isArray(response.data?.items) ? response.data.items : [],
+    total: Number(response.data?.total ?? 0),
+  };
 }
 
 export async function getCrmLeadDetails(
@@ -210,10 +246,7 @@ export async function createCrmSavedView(
   };
 }
 
-export async function deleteCrmSavedView(
-  headers: AuthHeaders,
-  viewId: string,
-) {
+export async function deleteCrmSavedView(headers: AuthHeaders, viewId: string) {
   const response = await axios.delete(
     `${API_URL}/v1/crm/leads/saved-views/${viewId}`,
     { headers },
@@ -234,10 +267,7 @@ export async function getCrmLeadActivities(
   return response.data;
 }
 
-export async function getCrmLeadTasks(
-  leadId: string,
-  headers: AuthHeaders,
-) {
+export async function getCrmLeadTasks(leadId: string, headers: AuthHeaders) {
   const response = await axios.get<LeadTask[]>(
     `${API_URL}/v1/crm/leads/${leadId}/tasks`,
     { headers },
@@ -270,7 +300,7 @@ export async function createCrmLeadTask(
   const response = await axios.post(
     `${API_URL}/v1/crm/leads/${leadId}/tasks`,
     {
-      title: cleanString(raw.title) ?? '',
+      title: cleanString(raw.title) ?? "",
       description: cleanString(raw.description),
       dueAt: cleanString(raw.dueAt),
       assignedUserId: cleanString(raw.assignedUserId),
@@ -358,14 +388,14 @@ export async function updateCrmLeadStatus(
 export async function updateCrmLeadOutcome(
   headers: AuthHeaders,
   leadId: string,
-  input: { status: 'WON' | 'LOST'; lostReason?: string },
+  input: { status: "WON" | "LOST"; lostReason?: string },
 ) {
   const response = await axios.patch(
     `${API_URL}/v1/crm/leads/${leadId}`,
     {
       status: input.status,
       lostReason:
-        input.status === 'LOST'
+        input.status === "LOST"
           ? input.lostReason?.trim() || undefined
           : undefined,
     },
@@ -388,10 +418,7 @@ export async function completeCrmLeadTask(
   return response.data;
 }
 
-export async function reopenCrmLeadTask(
-  headers: AuthHeaders,
-  taskId: string,
-) {
+export async function reopenCrmLeadTask(headers: AuthHeaders, taskId: string) {
   const response = await axios.patch(
     `${API_URL}/v1/crm/leads/tasks/${taskId}/reopen`,
     undefined,
@@ -401,10 +428,7 @@ export async function reopenCrmLeadTask(
   return response.data;
 }
 
-export async function deleteCrmLead(
-  headers: AuthHeaders,
-  leadId: string,
-) {
+export async function deleteCrmLead(headers: AuthHeaders, leadId: string) {
   const response = await axios.delete(`${API_URL}/v1/crm/leads/${leadId}`, {
     headers,
   });
@@ -424,9 +448,12 @@ export async function getCrmPipeline(headers: AuthHeaders) {
 export async function listCrmPipelines(
   headers: AuthHeaders,
 ): Promise<CrmPipeline[]> {
-  const response = await axios.get<CrmPipeline[]>(`${API_URL}/v1/crm/pipelines`, {
-    headers,
-  });
+  const response = await axios.get<CrmPipeline[]>(
+    `${API_URL}/v1/crm/pipelines`,
+    {
+      headers,
+    },
+  );
 
   return Array.isArray(response.data) ? response.data : [];
 }
@@ -470,9 +497,12 @@ export async function deleteCrmPipeline(
   headers: AuthHeaders,
   pipelineId: string,
 ) {
-  const response = await axios.delete(`${API_URL}/v1/crm/pipelines/${pipelineId}`, {
-    headers,
-  });
+  const response = await axios.delete(
+    `${API_URL}/v1/crm/pipelines/${pipelineId}`,
+    {
+      headers,
+    },
+  );
 
   return response.data;
 }
@@ -561,13 +591,24 @@ export async function deleteCrmSalesTarget(
   return response.data;
 }
 
-export async function listCrmAccounts(headers: AuthHeaders): Promise<CrmAccount[]> {
-  const response = await axios.get<CrmAccount[]>(`${API_URL}/v1/crm/accounts`, { headers });
+export async function listCrmAccounts(
+  headers: AuthHeaders,
+): Promise<CrmAccount[]> {
+  const response = await axios.get<CrmAccount[]>(`${API_URL}/v1/crm/accounts`, {
+    headers,
+  });
   return Array.isArray(response.data) ? response.data : [];
 }
 
-export async function createCrmAccount(headers: AuthHeaders, input: Partial<CrmAccount>) {
-  const response = await axios.post<CrmAccount>(`${API_URL}/v1/crm/accounts`, input, { headers });
+export async function createCrmAccount(
+  headers: AuthHeaders,
+  input: Partial<CrmAccount>,
+) {
+  const response = await axios.post<CrmAccount>(
+    `${API_URL}/v1/crm/accounts`,
+    input,
+    { headers },
+  );
   return response.data;
 }
 
@@ -595,10 +636,15 @@ export async function listCrmContacts(
   return Array.isArray(response.data) ? response.data : [];
 }
 
-export async function listCrmMailboxes(headers: AuthHeaders): Promise<CrmMailbox[]> {
-  const response = await axios.get<CrmMailbox[]>(`${API_URL}/v1/crm/engagement/mailboxes`, {
-    headers,
-  });
+export async function listCrmMailboxes(
+  headers: AuthHeaders,
+): Promise<CrmMailbox[]> {
+  const response = await axios.get<CrmMailbox[]>(
+    `${API_URL}/v1/crm/engagement/mailboxes`,
+    {
+      headers,
+    },
+  );
   return Array.isArray(response.data) ? response.data : [];
 }
 
@@ -700,7 +746,11 @@ export async function createCrmOmnichannelMessage(
 
 export async function createCrmMailbox(
   headers: AuthHeaders,
-  input: Partial<CrmMailbox> & { provider: string; emailAddress: string; label?: string },
+  input: Partial<CrmMailbox> & {
+    provider: string;
+    emailAddress: string;
+    label?: string;
+  },
 ) {
   const response = await axios.post<CrmMailbox>(
     `${API_URL}/v1/crm/engagement/mailboxes`,
@@ -722,7 +772,11 @@ export async function listCrmEmailTemplates(
 
 export async function createCrmEmailTemplate(
   headers: AuthHeaders,
-  input: Partial<CrmEmailTemplate> & { name: string; subject: string; body: string },
+  input: Partial<CrmEmailTemplate> & {
+    name: string;
+    subject: string;
+    body: string;
+  },
 ) {
   const response = await axios.post<CrmEmailTemplate>(
     `${API_URL}/v1/crm/engagement/templates`,
@@ -732,10 +786,15 @@ export async function createCrmEmailTemplate(
   return response.data;
 }
 
-export async function listCrmSequences(headers: AuthHeaders): Promise<CrmSequence[]> {
-  const response = await axios.get<CrmSequence[]>(`${API_URL}/v1/crm/engagement/sequences`, {
-    headers,
-  });
+export async function listCrmSequences(
+  headers: AuthHeaders,
+): Promise<CrmSequence[]> {
+  const response = await axios.get<CrmSequence[]>(
+    `${API_URL}/v1/crm/engagement/sequences`,
+    {
+      headers,
+    },
+  );
   return Array.isArray(response.data) ? response.data : [];
 }
 
@@ -779,10 +838,15 @@ export async function enrollCrmSequence(
   return response.data;
 }
 
-export async function listCrmInbox(headers: AuthHeaders): Promise<CrmEmailMessage[]> {
-  const response = await axios.get<CrmEmailMessage[]>(`${API_URL}/v1/crm/engagement/inbox`, {
-    headers,
-  });
+export async function listCrmInbox(
+  headers: AuthHeaders,
+): Promise<CrmEmailMessage[]> {
+  const response = await axios.get<CrmEmailMessage[]>(
+    `${API_URL}/v1/crm/engagement/inbox`,
+    {
+      headers,
+    },
+  );
   return Array.isArray(response.data) ? response.data : [];
 }
 
@@ -834,7 +898,9 @@ export async function createCrmConversationInsight(
 }
 
 export async function listCrmQuotes(headers: AuthHeaders): Promise<CrmQuote[]> {
-  const response = await axios.get<CrmQuote[]>(`${API_URL}/v1/crm/quotes`, { headers });
+  const response = await axios.get<CrmQuote[]>(`${API_URL}/v1/crm/quotes`, {
+    headers,
+  });
   return Array.isArray(response.data) ? response.data : [];
 }
 
@@ -842,7 +908,11 @@ export async function createCrmQuote(
   headers: AuthHeaders,
   input: Record<string, unknown>,
 ) {
-  const response = await axios.post<CrmQuote>(`${API_URL}/v1/crm/quotes`, input, { headers });
+  const response = await axios.post<CrmQuote>(
+    `${API_URL}/v1/crm/quotes`,
+    input,
+    { headers },
+  );
   return response.data;
 }
 
@@ -859,8 +929,13 @@ export async function updateCrmQuoteStatus(
   return response.data;
 }
 
-export async function listCrmDocuments(headers: AuthHeaders): Promise<CrmDocument[]> {
-  const response = await axios.get<CrmDocument[]>(`${API_URL}/v1/crm/documents`, { headers });
+export async function listCrmDocuments(
+  headers: AuthHeaders,
+): Promise<CrmDocument[]> {
+  const response = await axios.get<CrmDocument[]>(
+    `${API_URL}/v1/crm/documents`,
+    { headers },
+  );
   return Array.isArray(response.data) ? response.data : [];
 }
 
@@ -868,16 +943,25 @@ export async function createCrmDocument(
   headers: AuthHeaders,
   input: Record<string, unknown>,
 ) {
-  const response = await axios.post<CrmDocument>(`${API_URL}/v1/crm/documents`, input, {
-    headers,
-  });
+  const response = await axios.post<CrmDocument>(
+    `${API_URL}/v1/crm/documents`,
+    input,
+    {
+      headers,
+    },
+  );
   return response.data;
 }
 
-export async function listCrmRoutingRules(headers: AuthHeaders): Promise<CrmRoutingRule[]> {
-  const response = await axios.get<CrmRoutingRule[]>(`${API_URL}/v1/crm/routing/rules`, {
-    headers,
-  });
+export async function listCrmRoutingRules(
+  headers: AuthHeaders,
+): Promise<CrmRoutingRule[]> {
+  const response = await axios.get<CrmRoutingRule[]>(
+    `${API_URL}/v1/crm/routing/rules`,
+    {
+      headers,
+    },
+  );
   return Array.isArray(response.data) ? response.data : [];
 }
 
@@ -910,7 +994,9 @@ export async function getCrmForecastSummary(headers: AuthHeaders): Promise<{
   snapshots: CrmForecastSnapshot[];
   adjustments?: Array<Record<string, unknown>>;
 }> {
-  const response = await axios.get(`${API_URL}/v1/crm/forecast/summary`, { headers });
+  const response = await axios.get(`${API_URL}/v1/crm/forecast/summary`, {
+    headers,
+  });
   return response.data as {
     totals: Record<string, number>;
     snapshots: CrmForecastSnapshot[];

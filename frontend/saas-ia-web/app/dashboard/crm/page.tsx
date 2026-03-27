@@ -93,6 +93,7 @@ import { useLeadNotes } from './_crm/useLeadNotes';
 import { useLeadStatusUpdate } from './_crm/useLeadStatusUpdate';
 import { useLeadTaskCreate } from './_crm/useLeadTaskCreate';
 import { useLeadDetails } from './_crm/useLeadDetails';
+import { useCrmAnalytics } from './_crm/useCrmAnalytics';
 import { useCrmLeads } from './_crm/useCrmLeads';
 import { useCrmPermissions } from './_crm/useCrmPermissions';
 import { useCrmSavedViews } from './_crm/useCrmSavedViews';
@@ -344,6 +345,10 @@ export default function CrmPage() {
   } = useCrmLeads(authHeaders, crmQueryParams);
 
   const {
+    items: analyticsItems,
+  } = useCrmAnalytics(authHeaders, crmQueryParams);
+
+  const {
     averageProbability,
     applySavedFilters,
     branchFilter,
@@ -409,7 +414,7 @@ export default function CrmPage() {
     wonLostByPeriodReport,
     lossReasonsBreakdownReport,
     openTasksByOwnerReport,
-  } = useCrmFilters(leads);
+  } = useCrmFilters(leads, { items: analyticsItems, total: analyticsItems.length });
 
   useEffect(() => {
     setCrmQueryParams(queryParams);
@@ -6266,6 +6271,15 @@ function ExecutiveAreaChartCard({
   const points = rows.slice(0, 6);
   const totals = points.map((row) => row.won + row.lost);
   const max = Math.max(...totals, 1);
+  const currentTotal = totals[totals.length - 1] || 0;
+  const previousTotal = totals[totals.length - 2] || 0;
+  const delta = currentTotal - previousTotal;
+  const deltaLabel =
+    previousTotal > 0
+      ? `${delta >= 0 ? '+' : ''}${Math.round((delta / previousTotal) * 100)}%`
+      : currentTotal > 0
+        ? '+100%'
+        : '0%';
 
   const buildPath = (values: number[]) =>
     values
@@ -6290,8 +6304,18 @@ function ExecutiveAreaChartCard({
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
           <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
         </div>
-        <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white">
-          {points.reduce((sum, row) => sum + row.won, 0)} ganhos
+        <div className="text-right">
+          <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white">
+            {points.reduce((sum, row) => sum + row.won, 0)} ganhos
+          </div>
+          <div
+            className={classNames(
+              'mt-2 text-xs',
+              delta >= 0 ? 'text-emerald-300' : 'text-amber-200',
+            )}
+          >
+            {deltaLabel} vs periodo anterior
+          </div>
         </div>
       </div>
 
@@ -6360,6 +6384,8 @@ function ExecutiveDonutCard({
   const items = rows.filter((row) => row.value > 0).slice(0, 5);
   const total = items.reduce((sum, row) => sum + row.value, 0);
   const palette = ['#DCEFFF', '#FFC98B', '#DFF0AE', '#8D95A6', '#7DD3FC'];
+  const dominantSegment =
+    [...items].sort((a, b) => b.value - a.value)[0] || null;
 
   const segments = items.reduce<
     Array<{ label: string; value: number; helper: string; color: string; start: number; angle: number }>
@@ -6382,6 +6408,11 @@ function ExecutiveDonutCard({
         <div className="text-right">
           <div className="text-2xl font-semibold text-white">{total}</div>
           <div className="text-xs text-zinc-500">oportunidades</div>
+          <div className="mt-2 text-xs text-zinc-400">
+            {dominantSegment
+              ? `${Math.round((dominantSegment.value / Math.max(total, 1)) * 100)}% em ${normalizeUiText(dominantSegment.label)}`
+              : 'Sem concentracao dominante'}
+          </div>
         </div>
       </div>
 
@@ -6454,6 +6485,8 @@ function ExecutiveColumnChartCard({
 }) {
   const items = rows.filter((row) => row.value >= 0).slice(0, 6);
   const max = Math.max(...items.map((row) => row.value), 1);
+  const topItem = [...items].sort((a, b) => b.value - a.value)[0] || null;
+  const topShare = topItem ? Math.round((topItem.value / Math.max(items.reduce((sum, row) => sum + row.value, 0), 1)) * 100) : 0;
 
   return (
     <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(88,196,255,0.08),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
@@ -6461,6 +6494,9 @@ function ExecutiveColumnChartCard({
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
           <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+        <div className="text-right text-xs text-zinc-400">
+          {topItem ? `${normalizeUiText(topItem.label)} lidera com ${topShare}%` : 'Sem owner lider'}
         </div>
       </div>
 

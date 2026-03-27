@@ -3,17 +3,17 @@
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from "@nestjs/common";
-import { CrmLeadStatus, Prisma, Role } from "@prisma/client";
-import { PrismaService } from "../prisma/prisma.service";
-import { CreateCrmLeadDto } from "./dto/create-crm-lead.dto";
-import { UpdateCrmLeadDto } from "./dto/update-crm-lead.dto";
-import { CreateCrmLeadTaskDto } from "./dto/create-crm-lead-task.dto";
-import { CreateCrmLeadActivityDto } from "./dto/create-crm-lead-activity.dto";
-import { CreateCrmSavedViewDto } from "./dto/create-crm-saved-view.dto";
-import { ListCrmLeadsQueryDto } from "./dto/list-crm-leads.query.dto";
-import { AutomationEngine } from "../automation/automation.engine";
-import { PermissionsCacheService } from "../common/permissions/permissions-cache.service";
+} from '@nestjs/common';
+import { CrmLeadStatus, Prisma, Role } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateCrmLeadDto } from './dto/create-crm-lead.dto';
+import { UpdateCrmLeadDto } from './dto/update-crm-lead.dto';
+import { CreateCrmLeadTaskDto } from './dto/create-crm-lead-task.dto';
+import { CreateCrmLeadActivityDto } from './dto/create-crm-lead-activity.dto';
+import { CreateCrmSavedViewDto } from './dto/create-crm-saved-view.dto';
+import { ListCrmLeadsQueryDto } from './dto/list-crm-leads.query.dto';
+import { AutomationEngine } from '../automation/automation.engine';
+import { PermissionsCacheService } from '../common/permissions/permissions-cache.service';
 
 type CrmActor = {
   id: string;
@@ -23,21 +23,21 @@ type CrmActor = {
   departmentId?: string | null;
 };
 
-const CRM_READ_OWN = "crm.read.own";
-const CRM_READ_DEPARTMENT = "crm.read.department";
-const CRM_READ_BRANCH = "crm.read.branch";
-const CRM_READ_COMPANY = "crm.read.company";
-const CRM_VALUES_READ = "crm.values.read";
-const CRM_LOSS_REASONS_READ = "crm.loss_reasons.read";
-const CRM_LEADS_EDIT = "crm.leads.edit";
-const CRM_LEADS_STATUS = "crm.leads.status";
-const CRM_LEADS_CLOSE = "crm.leads.close";
-const CRM_ACTIVITIES_CREATE = "crm.activities.create";
-const CRM_TASKS_CREATE = "crm.tasks.create";
-const CRM_TASKS_UPDATE = "crm.tasks.update";
-const CRM_BULK_UPDATE = "crm.bulk.update";
-const CRM_SAVED_VIEWS_CREATE = "crm.saved_views.create";
-const CRM_SAVED_VIEWS_DELETE = "crm.saved_views.delete";
+const CRM_READ_OWN = 'crm.read.own';
+const CRM_READ_DEPARTMENT = 'crm.read.department';
+const CRM_READ_BRANCH = 'crm.read.branch';
+const CRM_READ_COMPANY = 'crm.read.company';
+const CRM_VALUES_READ = 'crm.values.read';
+const CRM_LOSS_REASONS_READ = 'crm.loss_reasons.read';
+const CRM_LEADS_EDIT = 'crm.leads.edit';
+const CRM_LEADS_STATUS = 'crm.leads.status';
+const CRM_LEADS_CLOSE = 'crm.leads.close';
+const CRM_ACTIVITIES_CREATE = 'crm.activities.create';
+const CRM_TASKS_CREATE = 'crm.tasks.create';
+const CRM_TASKS_UPDATE = 'crm.tasks.update';
+const CRM_BULK_UPDATE = 'crm.bulk.update';
+const CRM_SAVED_VIEWS_CREATE = 'crm.saved_views.create';
+const CRM_SAVED_VIEWS_DELETE = 'crm.saved_views.delete';
 
 @Injectable()
 export class CrmLeadsService {
@@ -48,9 +48,9 @@ export class CrmLeadsService {
   ) {}
 
   private ensureCompanyId(companyId: string) {
-    const cid = String(companyId ?? "").trim();
+    const cid = String(companyId ?? '').trim();
     if (!cid) {
-      throw new BadRequestException("Token sem companyId.");
+      throw new BadRequestException('Token sem companyId.');
     }
     return cid;
   }
@@ -76,8 +76,10 @@ export class CrmLeadsService {
       ]);
     }
 
-    const companyId = this.ensureCompanyId(String(actor.companyId ?? "").trim());
-      return this.permsCache.getEffectivePermissions({
+    const companyId = this.ensureCompanyId(
+      String(actor.companyId ?? '').trim(),
+    );
+    return this.permsCache.getEffectivePermissions({
       userId: actor.id,
       role: actor.role,
       companyId,
@@ -90,11 +92,16 @@ export class CrmLeadsService {
     }
   }
 
-  private buildLeadScopeWhere(actor: CrmActor, perms: Set<string>): Prisma.CrmLeadWhereInput {
-    const companyId = this.ensureCompanyId(String(actor.companyId ?? "").trim());
-    const userId = String(actor.id ?? "").trim();
-    const branchId = String(actor.branchId ?? "").trim();
-    const departmentId = String(actor.departmentId ?? "").trim();
+  private buildLeadScopeWhere(
+    actor: CrmActor,
+    perms: Set<string>,
+  ): Prisma.CrmLeadWhereInput {
+    const companyId = this.ensureCompanyId(
+      String(actor.companyId ?? '').trim(),
+    );
+    const userId = String(actor.id ?? '').trim();
+    const branchId = String(actor.branchId ?? '').trim();
+    const departmentId = String(actor.departmentId ?? '').trim();
 
     if (perms.has(CRM_READ_COMPANY)) {
       return { companyId };
@@ -121,7 +128,7 @@ export class CrmLeadsService {
       };
     }
 
-    throw new ForbiddenException("VocÃƒÂª nÃƒÂ£o tem acesso aos leads do CRM.");
+    throw new ForbiddenException('VocÃƒÂª nÃƒÂ£o tem acesso aos leads do CRM.');
   }
 
   private sanitizeLead<T extends { dealValue?: unknown; lostReason?: unknown }>(
@@ -147,12 +154,12 @@ export class CrmLeadsService {
   ): T {
     if (
       !perms.has(CRM_LOSS_REASONS_READ) &&
-      activity.type === "LEAD_LOST" &&
-      typeof activity.description === "string"
+      activity.type === 'LEAD_LOST' &&
+      typeof activity.description === 'string'
     ) {
       return {
         ...activity,
-        description: activity.description.replace(/ Â· Motivo:.*$/u, ""),
+        description: activity.description.replace(/ Â· Motivo:.*$/u, ''),
       };
     }
 
@@ -167,26 +174,32 @@ export class CrmLeadsService {
 
     if (!allowed.includes(raw)) {
       throw new BadRequestException(
-        "status invÃ¡lido. Use: " + allowed.join(", "),
+        'status invÃ¡lido. Use: ' + allowed.join(', '),
       );
     }
 
     return raw as CrmLeadStatus;
   }
 
-  private normalizeProbability(value?: number | null): number | undefined | null {
+  private normalizeProbability(
+    value?: number | null,
+  ): number | undefined | null {
     if (value === undefined) return undefined;
     if (value === null) return null;
 
     const parsed = Number(value);
     if (!Number.isInteger(parsed) || parsed < 0 || parsed > 100) {
-      throw new BadRequestException("probability deve ser um inteiro entre 0 e 100.");
+      throw new BadRequestException(
+        'probability deve ser um inteiro entre 0 e 100.',
+      );
     }
 
     return parsed;
   }
 
-  private normalizeMoney(value?: string | number | null): Prisma.Decimal | undefined | null {
+  private normalizeMoney(
+    value?: string | number | null,
+  ): Prisma.Decimal | undefined | null {
     if (value === undefined) return undefined;
     if (value === null) return null;
 
@@ -197,15 +210,15 @@ export class CrmLeadsService {
 
     const brazilianPattern = /^-?\d{1,3}(\.\d{3})*,\d+$/;
     if (brazilianPattern.test(normalized)) {
-      normalized = normalized.replace(/\./g, "").replace(",", ".");
+      normalized = normalized.replace(/\./g, '').replace(',', '.');
     } else {
-      normalized = normalized.replace(",", ".");
+      normalized = normalized.replace(',', '.');
     }
 
     try {
       return new Prisma.Decimal(normalized);
     } catch {
-      throw new BadRequestException("dealValue invÃ¡lido.");
+      throw new BadRequestException('dealValue invÃ¡lido.');
     }
   }
 
@@ -218,13 +231,15 @@ export class CrmLeadsService {
 
     const parsed = new Date(raw);
     if (Number.isNaN(parsed.getTime())) {
-      throw new BadRequestException("Data invÃ¡lida.");
+      throw new BadRequestException('Data invÃ¡lida.');
     }
 
     return parsed;
   }
 
-  private normalizeOptionalString(value?: string | null): string | undefined | null {
+  private normalizeOptionalString(
+    value?: string | null,
+  ): string | undefined | null {
     if (value === undefined) return undefined;
     if (value === null) return null;
 
@@ -232,20 +247,23 @@ export class CrmLeadsService {
     return trimmed || null;
   }
 
-  private normalizeSavedViewFilters(input: Record<string, unknown>): Prisma.JsonObject {
-    const asString = (value: unknown) => (typeof value === "string" ? value : "");
+  private normalizeSavedViewFilters(
+    input: Record<string, unknown>,
+  ): Prisma.JsonObject {
+    const asString = (value: unknown) =>
+      typeof value === 'string' ? value : '';
 
     const filters: Prisma.JsonObject = {
       searchTerm: asString(input.searchTerm),
-      statusFilter: asString(input.statusFilter) || "ALL",
-      temperatureFilter: asString(input.temperatureFilter) || "ALL",
-      priorityFilter: asString(input.priorityFilter) || "ALL",
-      sourceFilter: asString(input.sourceFilter) || "ALL",
-      ownerFilter: asString(input.ownerFilter) || "ALL",
-      departmentFilter: asString(input.departmentFilter) || "ALL",
-      openTasksOnly: asString(input.openTasksOnly) || "ALL",
-      stalledOnly: asString(input.stalledOnly) || "ALL",
-      overdueNextStepOnly: asString(input.overdueNextStepOnly) || "ALL",
+      statusFilter: asString(input.statusFilter) || 'ALL',
+      temperatureFilter: asString(input.temperatureFilter) || 'ALL',
+      priorityFilter: asString(input.priorityFilter) || 'ALL',
+      sourceFilter: asString(input.sourceFilter) || 'ALL',
+      ownerFilter: asString(input.ownerFilter) || 'ALL',
+      departmentFilter: asString(input.departmentFilter) || 'ALL',
+      openTasksOnly: asString(input.openTasksOnly) || 'ALL',
+      stalledOnly: asString(input.stalledOnly) || 'ALL',
+      overdueNextStepOnly: asString(input.overdueNextStepOnly) || 'ALL',
       probabilityMin: asString(input.probabilityMin),
       probabilityMax: asString(input.probabilityMax),
       dealValueMin: asString(input.dealValueMin),
@@ -265,15 +283,24 @@ export class CrmLeadsService {
     query: ListCrmLeadsQueryDto,
   ): Record<string, unknown> {
     const scopedWhere = this.buildLeadScopeWhere(actor, perms);
-    const andFilters: Array<Record<string, unknown>> = [scopedWhere as Record<string, unknown>];
+    const andFilters: Array<Record<string, unknown>> = [
+      scopedWhere as Record<string, unknown>,
+    ];
 
     if (query.q) {
       andFilters.push({
         OR: [
-          { name: { contains: query.q, mode: "insensitive" } },
-          { email: { contains: query.q, mode: "insensitive" } },
-          { phone: { contains: query.q, mode: "insensitive" } },
-          { companyName: { contains: query.q, mode: "insensitive" } },
+          { name: { contains: query.q, mode: 'insensitive' } },
+          { email: { contains: query.q, mode: 'insensitive' } },
+          { phone: { contains: query.q, mode: 'insensitive' } },
+          { whatsapp: { contains: query.q, mode: 'insensitive' } },
+          { companyName: { contains: query.q, mode: 'insensitive' } },
+          { source: { contains: query.q, mode: 'insensitive' } },
+          {
+            ownerUser: {
+              is: { name: { contains: query.q, mode: 'insensitive' } },
+            },
+          },
         ],
       });
     }
@@ -302,6 +329,86 @@ export class CrmLeadsService {
       andFilters.push({ priority: query.priority });
     }
 
+    if (query.openTasksOnly === 'YES') {
+      andFilters.push({ tasks: { some: { completedAt: null } } });
+    }
+
+    if (query.stalledOnly === 'YES') {
+      const threshold = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+      andFilters.push({
+        OR: [
+          { lastActivityAt: { lt: threshold } },
+          { AND: [{ lastActivityAt: null }, { updatedAt: { lt: threshold } }] },
+        ],
+      });
+    }
+
+    if (query.overdueNextStepOnly === 'YES') {
+      andFilters.push({ nextStepDueAt: { lt: new Date() } });
+    }
+
+    if (
+      typeof query.probabilityMin === 'number' ||
+      typeof query.probabilityMax === 'number'
+    ) {
+      andFilters.push({
+        probability: {
+          ...(typeof query.probabilityMin === 'number'
+            ? { gte: query.probabilityMin }
+            : {}),
+          ...(typeof query.probabilityMax === 'number'
+            ? { lte: query.probabilityMax }
+            : {}),
+        },
+      });
+    }
+
+    if (
+      typeof query.dealValueMin === 'number' ||
+      typeof query.dealValueMax === 'number'
+    ) {
+      andFilters.push({
+        dealValue: {
+          ...(typeof query.dealValueMin === 'number'
+            ? { gte: query.dealValueMin }
+            : {}),
+          ...(typeof query.dealValueMax === 'number'
+            ? { lte: query.dealValueMax }
+            : {}),
+        },
+      });
+    }
+
+    if (query.createdAtFrom || query.createdAtTo) {
+      const createdAt: Record<string, Date> = {};
+      if (query.createdAtFrom) {
+        const from = new Date(query.createdAtFrom);
+        from.setHours(0, 0, 0, 0);
+        createdAt.gte = from;
+      }
+      if (query.createdAtTo) {
+        const to = new Date(query.createdAtTo);
+        to.setHours(23, 59, 59, 999);
+        createdAt.lte = to;
+      }
+      andFilters.push({ createdAt });
+    }
+
+    if (query.expectedCloseDateFrom || query.expectedCloseDateTo) {
+      const expectedCloseDate: Record<string, Date> = {};
+      if (query.expectedCloseDateFrom) {
+        const from = new Date(query.expectedCloseDateFrom);
+        from.setHours(0, 0, 0, 0);
+        expectedCloseDate.gte = from;
+      }
+      if (query.expectedCloseDateTo) {
+        const to = new Date(query.expectedCloseDateTo);
+        to.setHours(23, 59, 59, 999);
+        expectedCloseDate.lte = to;
+      }
+      andFilters.push({ expectedCloseDate });
+    }
+
     if (query.accountId) {
       andFilters.push({ accountId: query.accountId });
     }
@@ -319,13 +426,127 @@ export class CrmLeadsService {
       : { AND: andFilters };
   }
 
+  private getLeadTemperatureScore(input: {
+    phone?: string | null;
+    email?: string | null;
+    companyName?: string | null;
+    notes?: string | null;
+    dealValue?: Prisma.Decimal | number | string | null;
+    expectedCloseDate?: Date | string | null;
+    nextStep?: string | null;
+    status: CrmLeadStatus;
+    probability?: number | null;
+  }) {
+    let score = 0;
+
+    if (input.phone) score += 10;
+    if (input.email) score += 10;
+    if (input.companyName) score += 10;
+    if (input.notes) score += 5;
+    if (input.dealValue !== undefined && input.dealValue !== null) score += 10;
+    if (input.expectedCloseDate) score += 5;
+    if (input.nextStep) score += 5;
+
+    switch (input.status) {
+      case CrmLeadStatus.CONTACTED:
+        score += 10;
+        break;
+      case CrmLeadStatus.PROPOSAL:
+        score += 20;
+        break;
+      case CrmLeadStatus.NEGOTIATION:
+        score += 30;
+        break;
+      case CrmLeadStatus.WON:
+        score += 50;
+        break;
+      case CrmLeadStatus.LOST:
+        score = Math.max(0, score - 20);
+        break;
+      default:
+        break;
+    }
+
+    const probability = Math.max(
+      0,
+      Math.min(100, Math.round(Number(input.probability ?? 0))),
+    );
+    score += Math.round(probability * 0.15);
+
+    return Math.max(0, Math.min(score, 100));
+  }
+
+  private matchesTemperatureFilter(
+    input: Parameters<CrmLeadsService['getLeadTemperatureScore']>[0],
+    filter?: 'ALL' | 'HOT' | 'WARM' | 'COLD',
+  ) {
+    if (!filter || filter === 'ALL') return true;
+
+    const score = this.getLeadTemperatureScore(input);
+    if (filter === 'HOT') return score >= 75;
+    if (filter === 'WARM') return score >= 45 && score < 75;
+    return score < 45;
+  }
+
+  private async applyTemperatureFilterToWhere(
+    actor: CrmActor,
+    perms: Set<string>,
+    query: ListCrmLeadsQueryDto,
+    where: Record<string, unknown>,
+  ) {
+    if (!query.temperatureFilter || query.temperatureFilter === 'ALL') {
+      return where;
+    }
+
+    const candidates = await (this.prisma as any).crmLead.findMany({
+      where,
+      select: {
+        id: true,
+        phone: true,
+        email: true,
+        companyName: true,
+        notes: true,
+        dealValue: true,
+        expectedCloseDate: true,
+        nextStep: true,
+        status: true,
+        probability: true,
+      },
+    });
+
+    const matchingIds = candidates
+      .filter((lead) =>
+        this.matchesTemperatureFilter(
+          {
+            phone: lead.phone ?? null,
+            email: lead.email ?? null,
+            companyName: lead.companyName ?? null,
+            notes: lead.notes ?? null,
+            dealValue: lead.dealValue ?? null,
+            expectedCloseDate: lead.expectedCloseDate ?? null,
+            nextStep: lead.nextStep ?? null,
+            status: lead.status,
+            probability: lead.probability ?? 0,
+          },
+          query.temperatureFilter,
+        ),
+      )
+      .map((lead) => String(lead.id));
+
+    if (!matchingIds.length) {
+      return { AND: [where, { id: '__no_matching_temperature_filter__' }] };
+    }
+
+    return { AND: [where, { id: { in: matchingIds } }] };
+  }
+
   private buildLeadListOrderBy(
     query: ListCrmLeadsQueryDto,
   ): Array<Record<string, unknown>> {
-    const sortBy = query.sortBy ?? "updatedAt";
-    const sortOrder = query.sortOrder ?? "desc";
+    const sortBy = query.sortBy ?? 'updatedAt';
+    const sortOrder = query.sortOrder ?? 'desc';
 
-    return [{ [sortBy]: sortOrder }, { createdAt: "desc" }];
+    return [{ [sortBy]: sortOrder }, { createdAt: 'desc' }];
   }
 
   private leadInclude() {
@@ -385,7 +606,11 @@ export class CrmLeadsService {
     } as const;
   }
 
-  private async ensureLeadExists(id: string, actor: CrmActor, perms?: Set<string>) {
+  private async ensureLeadExists(
+    id: string,
+    actor: CrmActor,
+    perms?: Set<string>,
+  ) {
     const effectivePerms = perms ?? (await this.getPermissions(actor));
     const scopedWhere = this.buildLeadScopeWhere(actor, effectivePerms);
 
@@ -407,7 +632,7 @@ export class CrmLeadsService {
     });
 
     if (!lead) {
-      throw new NotFoundException("Lead nÃ£o encontrado");
+      throw new NotFoundException('Lead nÃ£o encontrado');
     }
 
     return lead;
@@ -438,7 +663,9 @@ export class CrmLeadsService {
       });
 
       if (!owner) {
-        throw new BadRequestException("ownerUserId invÃ¡lido para esta empresa.");
+        throw new BadRequestException(
+          'ownerUserId invÃ¡lido para esta empresa.',
+        );
       }
     }
 
@@ -452,7 +679,7 @@ export class CrmLeadsService {
       });
 
       if (!branch) {
-        throw new BadRequestException("branchId invÃ¡lido para esta empresa.");
+        throw new BadRequestException('branchId invÃ¡lido para esta empresa.');
       }
     }
 
@@ -467,7 +694,9 @@ export class CrmLeadsService {
       });
 
       if (!department) {
-        throw new BadRequestException("departmentId invÃ¡lido para esta empresa.");
+        throw new BadRequestException(
+          'departmentId invÃ¡lido para esta empresa.',
+        );
       }
     }
 
@@ -481,7 +710,7 @@ export class CrmLeadsService {
       });
 
       if (!account) {
-        throw new BadRequestException("accountId inválido para esta empresa.");
+        throw new BadRequestException('accountId inválido para esta empresa.');
       }
     }
 
@@ -496,7 +725,7 @@ export class CrmLeadsService {
       });
 
       if (!contact) {
-        throw new BadRequestException("contactId inválido para esta empresa.");
+        throw new BadRequestException('contactId inválido para esta empresa.');
       }
     }
   }
@@ -506,11 +735,11 @@ export class CrmLeadsService {
     if (value === null) return null;
 
     const raw = String(value).trim().toUpperCase();
-    const allowed = ["PIPELINE", "BEST_CASE", "COMMIT", "CLOSED"];
+    const allowed = ['PIPELINE', 'BEST_CASE', 'COMMIT', 'CLOSED'];
     if (!raw) return null;
     if (!allowed.includes(raw)) {
       throw new BadRequestException(
-        "forecastCategory inválido. Use: " + allowed.join(", "),
+        'forecastCategory inválido. Use: ' + allowed.join(', '),
       );
     }
     return raw;
@@ -559,7 +788,11 @@ export class CrmLeadsService {
       }
     }
 
-    if (!contactId && accountId && (input.email || input.phone || input.whatsapp || input.name)) {
+    if (
+      !contactId &&
+      accountId &&
+      (input.email || input.phone || input.whatsapp || input.name)
+    ) {
       const contactOr = [
         input.email ? { email: input.email } : undefined,
         input.phone ? { phone: input.phone } : undefined,
@@ -578,13 +811,13 @@ export class CrmLeadsService {
       if (existingContact) {
         contactId = existingContact.id;
       } else {
-        const fullName = String(input.name ?? "").trim() || "Contato CRM";
+        const fullName = String(input.name ?? '').trim() || 'Contato CRM';
         const createdContact = await (this.prisma as any).crmContact.create({
           data: {
             companyId: input.companyId,
             accountId,
-            firstName: fullName.split(" ")[0] || fullName,
-            lastName: fullName.split(" ").slice(1).join(" ") || null,
+            firstName: fullName.split(' ')[0] || fullName,
+            lastName: fullName.split(' ').slice(1).join(' ') || null,
             fullName,
             email: input.email ?? null,
             phone: input.phone ?? null,
@@ -618,21 +851,26 @@ export class CrmLeadsService {
         companyId: input.companyId,
         isActive: true,
       },
-      orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
+      orderBy: [{ priority: 'desc' }, { updatedAt: 'desc' }],
     });
 
     const matchedRule = rules.find((rule: any) => {
       if (rule.source && rule.source !== input.source) return false;
       if (rule.branchId && rule.branchId !== input.branchId) return false;
-      if (rule.departmentId && rule.departmentId !== input.departmentId) return false;
+      if (rule.departmentId && rule.departmentId !== input.departmentId)
+        return false;
       return true;
     });
 
     if (!matchedRule) return;
 
-    const ownerPool = Array.isArray(matchedRule.ownerPoolJson) ? matchedRule.ownerPoolJson : [];
+    const ownerPool = Array.isArray(matchedRule.ownerPoolJson)
+      ? matchedRule.ownerPoolJson
+      : [];
     const nextOwnerId =
-      ownerPool.find((candidate: unknown) => typeof candidate === "string" && candidate) || null;
+      ownerPool.find(
+        (candidate: unknown) => typeof candidate === 'string' && candidate,
+      ) || null;
 
     if (!nextOwnerId) return;
 
@@ -647,8 +885,8 @@ export class CrmLeadsService {
         routingRuleId: matchedRule.id,
         leadId: input.leadId,
         assignedUserId: nextOwnerId,
-        status: "APPLIED",
-        reason: "Lead distribuído automaticamente por regra de roteamento.",
+        status: 'APPLIED',
+        reason: 'Lead distribuído automaticamente por regra de roteamento.',
       },
     });
 
@@ -666,8 +904,10 @@ export class CrmLeadsService {
     description: string;
   }) {
     const now = new Date();
-    const shouldUpdateContact = ["CALL", "MESSAGE", "MEETING"].includes(
-      String(input.type ?? "").trim().toUpperCase(),
+    const shouldUpdateContact = ['CALL', 'MESSAGE', 'MEETING'].includes(
+      String(input.type ?? '')
+        .trim()
+        .toUpperCase(),
     );
 
     const [activity] = await this.prisma.$transaction([
@@ -692,18 +932,21 @@ export class CrmLeadsService {
     return activity;
   }
 
-  async create(input: {
-    actor: CrmActor;
-    body: CreateCrmLeadDto;
-  }) {
-    const companyId = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+  async create(input: { actor: CrmActor; body: CreateCrmLeadDto }) {
+    const companyId = this.ensureCompanyId(
+      String(input.actor.companyId ?? '').trim(),
+    );
     const perms = await this.getPermissions(input.actor);
-    this.ensurePermission(perms, CRM_LEADS_EDIT, "VocÃƒÂª nÃƒÂ£o pode criar ou editar leads do CRM.");
+    this.ensurePermission(
+      perms,
+      CRM_LEADS_EDIT,
+      'VocÃƒÂª nÃƒÂ£o pode criar ou editar leads do CRM.',
+    );
     const body = input.body;
 
-    const name = String(body?.name ?? "").trim();
+    const name = String(body?.name ?? '').trim();
     if (!name) {
-      throw new BadRequestException("name Ã© obrigatÃ³rio");
+      throw new BadRequestException('name Ã© obrigatÃ³rio');
     }
 
     const ownerUserId = body?.ownerUserId
@@ -744,7 +987,9 @@ export class CrmLeadsService {
     const status = this.normalizeStatus(body?.status) ?? CrmLeadStatus.NEW;
     const lostReason = this.normalizeOptionalString(body?.lostReason);
     if (status === CrmLeadStatus.LOST && !lostReason) {
-      throw new BadRequestException("lostReason Ã© obrigatÃ³rio quando status = LOST.");
+      throw new BadRequestException(
+        'lostReason Ã© obrigatÃ³rio quando status = LOST.',
+      );
     }
 
     const dealValue = this.normalizeMoney(body?.dealValue);
@@ -784,22 +1029,27 @@ export class CrmLeadsService {
         accountId: accountAndContact.accountId,
         contactId: accountAndContact.contactId,
         dealValue,
-        currency: this.normalizeOptionalString(body?.currency) ?? "BRL",
+        currency: this.normalizeOptionalString(body?.currency) ?? 'BRL',
         probability,
         source: this.normalizeOptionalString(body?.source) ?? null,
         sourceDetail: this.normalizeOptionalString(body?.sourceDetail) ?? null,
         priority: this.normalizeOptionalString(body?.priority) ?? null,
         competitor: this.normalizeOptionalString(body?.competitor) ?? null,
         wonReason: this.normalizeOptionalString(body?.wonReason) ?? null,
-        forecastCategory: this.normalizeForecastCategory(body?.forecastCategory) ?? "PIPELINE",
+        forecastCategory:
+          this.normalizeForecastCategory(body?.forecastCategory) ?? 'PIPELINE',
         nextStep: this.normalizeOptionalString(body?.nextStep) ?? null,
         nextStepDueAt: this.normalizeDate(body?.nextStepDueAt) ?? null,
         nextMeetingAt: this.normalizeDate(body?.nextMeetingAt) ?? null,
         expectedCloseDate: this.normalizeDate(body?.expectedCloseDate) ?? null,
         lostReason: lostReason ?? null,
         statusChangedAt: new Date(),
-        ...(status === CrmLeadStatus.WON ? { wonAt: new Date(), lostAt: null } : {}),
-        ...(status === CrmLeadStatus.LOST ? { lostAt: new Date(), wonAt: null } : {}),
+        ...(status === CrmLeadStatus.WON
+          ? { wonAt: new Date(), lostAt: null }
+          : {}),
+        ...(status === CrmLeadStatus.LOST
+          ? { lostAt: new Date(), wonAt: null }
+          : {}),
       },
       include: this.leadInclude(),
     });
@@ -808,14 +1058,14 @@ export class CrmLeadsService {
       companyId,
       leadId: lead.id,
       userId: input.actor.id,
-      type: "LEAD_CREATED",
+      type: 'LEAD_CREATED',
       description: `Lead criado: ${lead.name}`,
     });
 
     await this.automationEngine.handleEvent({
       companyId,
-      module: "CRM",
-      triggerType: "LEAD_CREATED",
+      module: 'CRM',
+      triggerType: 'LEAD_CREATED',
       payload: {
         leadId: lead.id,
         leadName: lead.name,
@@ -832,7 +1082,7 @@ export class CrmLeadsService {
       source: lead.source ?? null,
       branchId: lead.branchId ?? null,
       departmentId: lead.departmentId ?? null,
-      ownerUserId: body?.ownerUserId ? lead.ownerUserId ?? null : null,
+      ownerUserId: body?.ownerUserId ? (lead.ownerUserId ?? null) : null,
     });
 
     const finalLead = await (this.prisma as any).crmLead.findUnique({
@@ -843,12 +1093,15 @@ export class CrmLeadsService {
     return this.sanitizeLead(finalLead ?? lead, perms);
   }
 
-  async findAll(
-    actor: CrmActor,
-    query: ListCrmLeadsQueryDto,
-  ) {
+  async findAll(actor: CrmActor, query: ListCrmLeadsQueryDto) {
     const perms = await this.getPermissions(actor);
-    const where = this.buildLeadListWhere(actor, perms, query);
+    const baseWhere = this.buildLeadListWhere(actor, perms, query);
+    const where = await this.applyTemperatureFilterToWhere(
+      actor,
+      perms,
+      query,
+      baseWhere,
+    );
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 20;
     const skip = (page - 1) * pageSize;
@@ -873,9 +1126,33 @@ export class CrmLeadsService {
     };
   }
 
+  async analytics(actor: CrmActor, query: ListCrmLeadsQueryDto) {
+    const perms = await this.getPermissions(actor);
+    const baseWhere = this.buildLeadListWhere(actor, perms, query);
+    const where = await this.applyTemperatureFilterToWhere(
+      actor,
+      perms,
+      query,
+      baseWhere,
+    );
+
+    const items = await (this.prisma as any).crmLead.findMany({
+      where,
+      orderBy: this.buildLeadListOrderBy(query),
+      include: this.leadInclude(),
+    });
+
+    const sanitizedItems = items.map((lead) => this.sanitizeLead(lead, perms));
+
+    return {
+      items: sanitizedItems,
+      total: sanitizedItems.length,
+    };
+  }
+
   async findOneDetailed(id: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     const lead = await (this.prisma as any).crmLead.findFirst({
       where: {
@@ -920,7 +1197,7 @@ export class CrmLeadsService {
           },
         },
         activities: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           include: {
             user: {
               select: {
@@ -932,34 +1209,34 @@ export class CrmLeadsService {
           },
         },
         tasks: {
-          orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }],
+          orderBy: [{ dueAt: 'asc' }, { createdAt: 'desc' }],
           include: this.taskInclude(),
         },
         sequenceEnrollments: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           take: 10,
         },
         emailMessages: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           take: 10,
         },
         quotes: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           take: 10,
         },
         documents: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           take: 10,
         },
         conversationInsights: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           take: 10,
         },
       },
     });
 
     if (!lead) {
-      throw new NotFoundException("Lead nÃ£o encontrado");
+      throw new NotFoundException('Lead nÃ£o encontrado');
     }
 
     const sanitizedLead = this.sanitizeLead(lead, perms);
@@ -973,7 +1250,8 @@ export class CrmLeadsService {
       summary: {
         activitiesCount: lead.activities.length,
         openTasksCount: lead.tasks.filter((task) => !task.completedAt).length,
-        completedTasksCount: lead.tasks.filter((task) => !!task.completedAt).length,
+        completedTasksCount: lead.tasks.filter((task) => !!task.completedAt)
+          .length,
         emailMessagesCount: lead.emailMessages.length,
         sequenceEnrollmentsCount: lead.sequenceEnrollments.length,
         quotesCount: lead.quotes.length,
@@ -986,14 +1264,14 @@ export class CrmLeadsService {
   async findSavedViews(actor: CrmActor) {
     const perms = await this.getPermissions(actor);
     this.buildLeadScopeWhere(actor, perms);
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     return this.prisma.crmSavedView.findMany({
       where: {
         companyId: cid,
         userId: actor.id,
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
     });
   }
 
@@ -1002,12 +1280,18 @@ export class CrmLeadsService {
     body: CreateCrmSavedViewDto;
   }) {
     const perms = await this.getPermissions(input.actor);
-    this.ensurePermission(perms, CRM_SAVED_VIEWS_CREATE, "VocÃƒÂª nÃƒÂ£o pode salvar visualizaÃƒÂ§ÃƒÂµes do CRM.");
-    const cid = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
-    const name = String(input.body?.name ?? "").trim();
+    this.ensurePermission(
+      perms,
+      CRM_SAVED_VIEWS_CREATE,
+      'VocÃƒÂª nÃƒÂ£o pode salvar visualizaÃƒÂ§ÃƒÂµes do CRM.',
+    );
+    const cid = this.ensureCompanyId(
+      String(input.actor.companyId ?? '').trim(),
+    );
+    const name = String(input.body?.name ?? '').trim();
 
     if (!name) {
-      throw new BadRequestException("name Ã© obrigatÃ³rio");
+      throw new BadRequestException('name Ã© obrigatÃ³rio');
     }
 
     return this.prisma.crmSavedView.create({
@@ -1022,8 +1306,12 @@ export class CrmLeadsService {
 
   async removeSavedView(viewId: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    this.ensurePermission(perms, CRM_SAVED_VIEWS_DELETE, "VocÃƒÂª nÃƒÂ£o pode excluir visualizaÃƒÂ§ÃƒÂµes do CRM.");
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    this.ensurePermission(
+      perms,
+      CRM_SAVED_VIEWS_DELETE,
+      'VocÃƒÂª nÃƒÂ£o pode excluir visualizaÃƒÂ§ÃƒÂµes do CRM.',
+    );
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     const existing = await this.prisma.crmSavedView.findFirst({
       where: {
@@ -1035,7 +1323,7 @@ export class CrmLeadsService {
     });
 
     if (!existing) {
-      throw new NotFoundException("VisualizaÃ§Ã£o salva nÃ£o encontrada");
+      throw new NotFoundException('VisualizaÃ§Ã£o salva nÃ£o encontrada');
     }
 
     await this.prisma.crmSavedView.delete({
@@ -1047,7 +1335,7 @@ export class CrmLeadsService {
 
   async findActivities(id: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     await this.ensureLeadExists(id, actor, perms);
 
@@ -1056,7 +1344,7 @@ export class CrmLeadsService {
         leadId: id,
         companyId: cid,
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       include: {
         user: {
           select: {
@@ -1077,20 +1365,30 @@ export class CrmLeadsService {
     body: CreateCrmLeadActivityDto;
   }) {
     const perms = await this.getPermissions(input.actor);
-    this.ensurePermission(perms, CRM_ACTIVITIES_CREATE, "VocÃª nÃ£o pode registrar atividades no CRM.");
-    const cid = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+    this.ensurePermission(
+      perms,
+      CRM_ACTIVITIES_CREATE,
+      'VocÃª nÃ£o pode registrar atividades no CRM.',
+    );
+    const cid = this.ensureCompanyId(
+      String(input.actor.companyId ?? '').trim(),
+    );
     await this.ensureLeadExists(input.leadId, input.actor, perms);
 
-    const allowed = ["NOTE", "CALL", "MESSAGE", "MEETING"];
-    const type = String(input.body?.type ?? "").trim().toUpperCase();
+    const allowed = ['NOTE', 'CALL', 'MESSAGE', 'MEETING'];
+    const type = String(input.body?.type ?? '')
+      .trim()
+      .toUpperCase();
 
     if (!allowed.includes(type)) {
-      throw new BadRequestException("type invÃ¡lido. Use: NOTE, CALL, MESSAGE, MEETING");
+      throw new BadRequestException(
+        'type invÃ¡lido. Use: NOTE, CALL, MESSAGE, MEETING',
+      );
     }
 
-    const description = String(input.body?.description ?? "").trim();
+    const description = String(input.body?.description ?? '').trim();
     if (!description) {
-      throw new BadRequestException("description Ã© obrigatÃ³rio");
+      throw new BadRequestException('description Ã© obrigatÃ³rio');
     }
 
     return this.createActivity({
@@ -1104,7 +1402,7 @@ export class CrmLeadsService {
 
   async findTasks(leadId: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     await this.ensureLeadExists(leadId, actor, perms);
 
@@ -1114,9 +1412,9 @@ export class CrmLeadsService {
         companyId: cid,
       },
       orderBy: [
-        { completedAt: "asc" },
-        { dueAt: "asc" },
-        { createdAt: "desc" },
+        { completedAt: 'asc' },
+        { dueAt: 'asc' },
+        { createdAt: 'desc' },
       ],
       include: this.taskInclude(),
     });
@@ -1128,13 +1426,19 @@ export class CrmLeadsService {
     body: CreateCrmLeadTaskDto;
   }) {
     const perms = await this.getPermissions(input.actor);
-    this.ensurePermission(perms, CRM_TASKS_CREATE, "VocÃª nÃ£o pode criar tarefas no CRM.");
-    const cid = this.ensureCompanyId(String(input.actor.companyId ?? "").trim());
+    this.ensurePermission(
+      perms,
+      CRM_TASKS_CREATE,
+      'VocÃª nÃ£o pode criar tarefas no CRM.',
+    );
+    const cid = this.ensureCompanyId(
+      String(input.actor.companyId ?? '').trim(),
+    );
     const lead = await this.ensureLeadExists(input.leadId, input.actor, perms);
 
-    const title = String(input.body?.title ?? "").trim();
+    const title = String(input.body?.title ?? '').trim();
     if (!title) {
-      throw new BadRequestException("title Ã© obrigatÃ³rio");
+      throw new BadRequestException('title Ã© obrigatÃ³rio');
     }
 
     let assignedUserId: string | null = null;
@@ -1150,7 +1454,9 @@ export class CrmLeadsService {
       });
 
       if (!assignedUser) {
-        throw new BadRequestException("assignedUserId invÃ¡lido para esta empresa.");
+        throw new BadRequestException(
+          'assignedUserId invÃ¡lido para esta empresa.',
+        );
       }
     }
 
@@ -1170,14 +1476,14 @@ export class CrmLeadsService {
       companyId: cid,
       leadId: input.leadId,
       userId: input.actor.id,
-      type: "TASK_CREATED",
-      description: `Tarefa criada: ${title}${task.dueAt ? ` (prazo: ${task.dueAt.toISOString()})` : ""}`,
+      type: 'TASK_CREATED',
+      description: `Tarefa criada: ${title}${task.dueAt ? ` (prazo: ${task.dueAt.toISOString()})` : ''}`,
     });
 
     await this.automationEngine.handleEvent({
       companyId: cid,
-      module: "CRM",
-      triggerType: "TASK_CREATED",
+      module: 'CRM',
+      triggerType: 'TASK_CREATED',
       payload: {
         taskId: task.id,
         leadId: input.leadId,
@@ -1195,8 +1501,12 @@ export class CrmLeadsService {
 
   async completeTask(taskId: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    this.ensurePermission(perms, CRM_TASKS_UPDATE, "Voce nao pode concluir tarefas no CRM.");
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    this.ensurePermission(
+      perms,
+      CRM_TASKS_UPDATE,
+      'Voce nao pode concluir tarefas no CRM.',
+    );
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     const task = await this.prisma.crmLeadTask.findFirst({
       where: {
@@ -1223,7 +1533,7 @@ export class CrmLeadsService {
     });
 
     if (!task) {
-      throw new NotFoundException("Tarefa nÃ£o encontrada");
+      throw new NotFoundException('Tarefa nÃ£o encontrada');
     }
 
     await this.ensureLeadExists(task.leadId, actor, perms);
@@ -1247,14 +1557,14 @@ export class CrmLeadsService {
       companyId: cid,
       leadId: task.leadId,
       userId: actor.id,
-      type: "TASK_DONE",
+      type: 'TASK_DONE',
       description: `Tarefa concluÃ­da: ${task.title}`,
     });
 
     await this.automationEngine.handleEvent({
       companyId: cid,
-      module: "CRM",
-      triggerType: "TASK_COMPLETED",
+      module: 'CRM',
+      triggerType: 'TASK_COMPLETED',
       payload: {
         taskId: task.id,
         leadId: task.leadId,
@@ -1273,8 +1583,12 @@ export class CrmLeadsService {
 
   async reopenTask(taskId: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    this.ensurePermission(perms, CRM_TASKS_UPDATE, "Voce nao pode reabrir tarefas no CRM.");
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    this.ensurePermission(
+      perms,
+      CRM_TASKS_UPDATE,
+      'Voce nao pode reabrir tarefas no CRM.',
+    );
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
 
     const task = await this.prisma.crmLeadTask.findFirst({
       where: {
@@ -1300,7 +1614,7 @@ export class CrmLeadsService {
     });
 
     if (!task) {
-      throw new NotFoundException("Tarefa nÃ£o encontrada");
+      throw new NotFoundException('Tarefa nÃ£o encontrada');
     }
 
     await this.ensureLeadExists(task.leadId, actor, perms);
@@ -1324,19 +1638,15 @@ export class CrmLeadsService {
       companyId: cid,
       leadId: task.leadId,
       userId: actor.id,
-      type: "TASK_REOPENED",
+      type: 'TASK_REOPENED',
       description: `Tarefa reaberta: ${task.title}`,
     });
 
     return updatedTask;
   }
 
-  async update(
-    id: string,
-    actor: CrmActor,
-    body: UpdateCrmLeadDto,
-  ) {
-    const cid = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+  async update(id: string, actor: CrmActor, body: UpdateCrmLeadDto) {
+    const cid = this.ensureCompanyId(String(actor.companyId ?? '').trim());
     const perms = await this.getPermissions(actor);
 
     const exists = await (this.prisma as any).crmLead.findFirst({
@@ -1346,22 +1656,21 @@ export class CrmLeadsService {
     });
 
     if (!exists) {
-      throw new NotFoundException("Lead nÃ£o encontrado");
+      throw new NotFoundException('Lead nÃ£o encontrado');
     }
 
     const data: Record<string, any> = {};
-    const activityDescriptions: Array<{ type: string; description: string }> = [];
-    let statusChangedPayload:
-      | {
-          leadId: string;
-          leadName: string;
-          ownerUserId: string | null;
-          branchId: string | null;
-          departmentId: string | null;
-          fromStatus: string;
-          toStatus: string;
-        }
-      | null = null;
+    const activityDescriptions: Array<{ type: string; description: string }> =
+      [];
+    let statusChangedPayload: {
+      leadId: string;
+      leadName: string;
+      ownerUserId: string | null;
+      branchId: string | null;
+      departmentId: string | null;
+      fromStatus: string;
+      toStatus: string;
+    } | null = null;
 
     const nextOwnerUserId =
       body.ownerUserId !== undefined
@@ -1394,52 +1703,65 @@ export class CrmLeadsService {
       requestedStatus !== undefined && requestedStatus !== exists.status;
     const wantsClose =
       statusIsChanging &&
-      (requestedStatus === CrmLeadStatus.WON || requestedStatus === CrmLeadStatus.LOST);
+      (requestedStatus === CrmLeadStatus.WON ||
+        requestedStatus === CrmLeadStatus.LOST);
     const wantsStatusChange = statusIsChanging && !wantsClose;
     const wantsEdit = [
-      "name",
-      "phone",
-      "whatsapp",
-      "email",
-      "companyName",
-      "jobTitle",
-      "website",
-      "city",
-      "state",
-      "industry",
-      "companySize",
-      "notes",
-      "dealValue",
-      "currency",
-      "probability",
-      "source",
-      "sourceDetail",
-      "priority",
-      "competitor",
-      "wonReason",
-      "nextStep",
-      "nextStepDueAt",
-      "nextMeetingAt",
-      "expectedCloseDate",
-      "lostReason",
-      "ownerUserId",
-      "branchId",
-      "departmentId",
-      "accountId",
-      "contactId",
-      "forecastCategory",
+      'name',
+      'phone',
+      'whatsapp',
+      'email',
+      'companyName',
+      'jobTitle',
+      'website',
+      'city',
+      'state',
+      'industry',
+      'companySize',
+      'notes',
+      'dealValue',
+      'currency',
+      'probability',
+      'source',
+      'sourceDetail',
+      'priority',
+      'competitor',
+      'wonReason',
+      'nextStep',
+      'nextStepDueAt',
+      'nextMeetingAt',
+      'expectedCloseDate',
+      'lostReason',
+      'ownerUserId',
+      'branchId',
+      'departmentId',
+      'accountId',
+      'contactId',
+      'forecastCategory',
     ].some((key) => body[key as keyof UpdateCrmLeadDto] !== undefined);
 
     if (wantsEdit) {
-      this.ensurePermission(perms, CRM_LEADS_EDIT, "VocÃƒÂª nÃƒÂ£o pode editar leads do CRM.");
+      this.ensurePermission(
+        perms,
+        CRM_LEADS_EDIT,
+        'VocÃƒÂª nÃƒÂ£o pode editar leads do CRM.',
+      );
     }
 
     if (wantsStatusChange) {
-      this.ensurePermission(perms, CRM_LEADS_STATUS, "VocÃƒÂª nÃƒÂ£o pode alterar o status do lead.");
+      this.ensurePermission(
+        perms,
+        CRM_LEADS_STATUS,
+        'VocÃƒÂª nÃƒÂ£o pode alterar o status do lead.',
+      );
     }
 
     if (wantsClose) {
-      this.ensurePermission(perms, CRM_LEADS_CLOSE, "VocÃƒÂª nÃƒÂ£o pode marcar leads como ganhos ou perdidos.");
+      this.ensurePermission(
+        perms,
+        CRM_LEADS_CLOSE,
+        'VocÃƒÂª nÃƒÂ£o pode marcar leads como ganhos ou perdidos.',
+      );
     }
 
     if (
@@ -1476,10 +1798,12 @@ export class CrmLeadsService {
           : exists.name,
       email:
         body.email !== undefined
-          ? this.normalizeOptionalString(body.email)?.toLowerCase() ?? null
+          ? (this.normalizeOptionalString(body.email)?.toLowerCase() ?? null)
           : exists.email,
       phone:
-        body.phone !== undefined ? this.normalizeOptionalString(body.phone) : exists.phone,
+        body.phone !== undefined
+          ? this.normalizeOptionalString(body.phone)
+          : exists.phone,
       whatsapp:
         body.whatsapp !== undefined
           ? this.normalizeOptionalString(body.whatsapp)
@@ -1491,15 +1815,15 @@ export class CrmLeadsService {
     });
 
     if (body.name !== undefined) {
-      const nextValue = body.name ? String(body.name).trim() : "";
+      const nextValue = body.name ? String(body.name).trim() : '';
       if (!nextValue) {
-        throw new BadRequestException("name nÃ£o pode ser vazio.");
+        throw new BadRequestException('name nÃ£o pode ser vazio.');
       }
       if (nextValue !== exists.name) {
         data.name = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: `Nome alterado para ${nextValue || "(vazio)"}`,
+          type: 'LEAD_UPDATED',
+          description: `Nome alterado para ${nextValue || '(vazio)'}`,
         });
       }
     }
@@ -1509,8 +1833,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.phone) {
         data.phone = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Telefone atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Telefone atualizado',
         });
       }
     }
@@ -1520,19 +1844,21 @@ export class CrmLeadsService {
       if (nextValue !== exists.whatsapp) {
         data.whatsapp = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "WhatsApp atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'WhatsApp atualizado',
         });
       }
     }
 
     if (body.email !== undefined) {
-      const nextValue = body.email ? String(body.email).trim().toLowerCase() : null;
+      const nextValue = body.email
+        ? String(body.email).trim().toLowerCase()
+        : null;
       if (nextValue !== exists.email) {
         data.email = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "E-mail atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'E-mail atualizado',
         });
       }
     }
@@ -1544,8 +1870,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.companyName) {
         data.companyName = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Empresa atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Empresa atualizada',
         });
       }
     }
@@ -1555,8 +1881,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.jobTitle) {
         data.jobTitle = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Cargo do contato atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Cargo do contato atualizado',
         });
       }
     }
@@ -1566,8 +1892,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.website) {
         data.website = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Website atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Website atualizado',
         });
       }
     }
@@ -1577,8 +1903,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.city) {
         data.city = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Cidade atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Cidade atualizada',
         });
       }
     }
@@ -1588,8 +1914,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.state) {
         data.state = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Estado atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Estado atualizado',
         });
       }
     }
@@ -1599,8 +1925,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.industry) {
         data.industry = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Segmento atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Segmento atualizado',
         });
       }
     }
@@ -1610,8 +1936,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.companySize) {
         data.companySize = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Porte da empresa atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Porte da empresa atualizado',
         });
       }
     }
@@ -1621,33 +1947,35 @@ export class CrmLeadsService {
       if (nextValue !== exists.notes) {
         data.notes = nextValue;
         activityDescriptions.push({
-          type: "LEAD_NOTE_UPDATED",
-          description: "ObservaÃ§Ãµes atualizadas",
+          type: 'LEAD_NOTE_UPDATED',
+          description: 'ObservaÃ§Ãµes atualizadas',
         });
       }
     }
 
     if (body.dealValue !== undefined) {
       const nextValue = this.normalizeMoney(body.dealValue);
-      const currentValue = exists.dealValue ? exists.dealValue.toString() : null;
+      const currentValue = exists.dealValue
+        ? exists.dealValue.toString()
+        : null;
       const nextComparable = nextValue ? nextValue.toString() : null;
 
       if (nextComparable !== currentValue) {
         data.dealValue = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Valor estimado atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Valor estimado atualizado',
         });
       }
     }
 
     if (body.currency !== undefined) {
-      const nextValue = this.normalizeOptionalString(body.currency) ?? "BRL";
+      const nextValue = this.normalizeOptionalString(body.currency) ?? 'BRL';
       if (nextValue !== exists.currency) {
         data.currency = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Moeda atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Moeda atualizada',
         });
       }
     }
@@ -1657,7 +1985,7 @@ export class CrmLeadsService {
       if (nextValue !== null && nextValue !== exists.probability) {
         data.probability = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
+          type: 'LEAD_UPDATED',
           description: `Probabilidade atualizada para ${nextValue}%`,
         });
       }
@@ -1668,8 +1996,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.source) {
         data.source = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Origem atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Origem atualizada',
         });
       }
     }
@@ -1679,8 +2007,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.sourceDetail) {
         data.sourceDetail = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Detalhe da origem atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Detalhe da origem atualizado',
         });
       }
     }
@@ -1690,8 +2018,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.priority) {
         data.priority = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Prioridade atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Prioridade atualizada',
         });
       }
     }
@@ -1701,8 +2029,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.competitor) {
         data.competitor = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Concorrente atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Concorrente atualizado',
         });
       }
     }
@@ -1712,8 +2040,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.wonReason) {
         data.wonReason = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Motivo de ganho atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Motivo de ganho atualizado',
         });
       }
     }
@@ -1723,8 +2051,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.nextStep) {
         data.nextStep = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "PrÃ³ximo passo atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'PrÃ³ximo passo atualizado',
         });
       }
     }
@@ -1737,8 +2065,8 @@ export class CrmLeadsService {
       if (nextComparable !== currentValue) {
         data.nextStepDueAt = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Prazo do prÃ³ximo passo atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Prazo do prÃ³ximo passo atualizado',
         });
       }
     }
@@ -1751,8 +2079,8 @@ export class CrmLeadsService {
       if (nextComparable !== currentValue) {
         data.nextMeetingAt = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "PrÃ³xima reuniÃ£o atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'PrÃ³xima reuniÃ£o atualizada',
         });
       }
     }
@@ -1765,8 +2093,8 @@ export class CrmLeadsService {
       if (nextComparable !== currentValue) {
         data.expectedCloseDate = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "PrevisÃ£o de fechamento atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'PrevisÃ£o de fechamento atualizada',
         });
       }
     }
@@ -1776,8 +2104,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.lostReason) {
         data.lostReason = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Motivo de perda atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Motivo de perda atualizado',
         });
       }
     }
@@ -1789,7 +2117,9 @@ export class CrmLeadsService {
         : exists.lostReason;
 
     if (effectiveStatus === CrmLeadStatus.LOST && !effectiveLostReason) {
-      throw new BadRequestException("lostReason Ã© obrigatÃ³rio quando status = LOST.");
+      throw new BadRequestException(
+        'lostReason Ã© obrigatÃ³rio quando status = LOST.',
+      );
     }
 
     if (body.status !== undefined) {
@@ -1815,13 +2145,13 @@ export class CrmLeadsService {
         }
 
         activityDescriptions.push({
-          type: "LEAD_STATUS_CHANGED",
+          type: 'LEAD_STATUS_CHANGED',
           description: `Status alterado de ${exists.status} para ${nextStatus}`,
         });
 
         if (nextStatus === CrmLeadStatus.WON) {
           activityDescriptions.push({
-            type: "LEAD_WON",
+            type: 'LEAD_WON',
             description: `Lead marcado como ganho: ${exists.name}`,
           });
         }
@@ -1829,7 +2159,7 @@ export class CrmLeadsService {
         if (nextStatus === CrmLeadStatus.LOST) {
           const lostReason = this.normalizeOptionalString(body.lostReason);
           activityDescriptions.push({
-            type: "LEAD_LOST",
+            type: 'LEAD_LOST',
             description: lostReason
               ? `Lead marcado como perdido: ${exists.name} Â· Motivo: ${lostReason}`
               : `Lead marcado como perdido: ${exists.name}`,
@@ -1853,8 +2183,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.ownerUserId) {
         data.ownerUserId = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "ResponsÃ¡vel atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'ResponsÃ¡vel atualizado',
         });
       }
     }
@@ -1864,8 +2194,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.branchId) {
         data.branchId = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Filial atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Filial atualizada',
         });
       }
     }
@@ -1875,8 +2205,8 @@ export class CrmLeadsService {
       if (nextValue !== exists.departmentId) {
         data.departmentId = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Departamento atualizado",
+          type: 'LEAD_UPDATED',
+          description: 'Departamento atualizado',
         });
       }
     }
@@ -1884,16 +2214,16 @@ export class CrmLeadsService {
     if (linkedAccountAndContact.accountId !== (exists as any).accountId) {
       data.accountId = linkedAccountAndContact.accountId;
       activityDescriptions.push({
-        type: "LEAD_UPDATED",
-        description: "Conta relacionada atualizada",
+        type: 'LEAD_UPDATED',
+        description: 'Conta relacionada atualizada',
       });
     }
 
     if (linkedAccountAndContact.contactId !== (exists as any).contactId) {
       data.contactId = linkedAccountAndContact.contactId;
       activityDescriptions.push({
-        type: "LEAD_UPDATED",
-        description: "Contato relacionado atualizado",
+        type: 'LEAD_UPDATED',
+        description: 'Contato relacionado atualizado',
       });
     }
 
@@ -1902,8 +2232,8 @@ export class CrmLeadsService {
       if (nextValue !== (exists as any).forecastCategory) {
         data.forecastCategory = nextValue;
         activityDescriptions.push({
-          type: "LEAD_UPDATED",
-          description: "Categoria de forecast atualizada",
+          type: 'LEAD_UPDATED',
+          description: 'Categoria de forecast atualizada',
         });
       }
     }
@@ -1931,8 +2261,8 @@ export class CrmLeadsService {
     if (statusChangedPayload) {
       await this.automationEngine.handleEvent({
         companyId: cid,
-        module: "CRM",
-        triggerType: "LEAD_STATUS_CHANGED",
+        module: 'CRM',
+        triggerType: 'LEAD_STATUS_CHANGED',
         payload: statusChangedPayload,
       });
     }
@@ -1951,7 +2281,11 @@ export class CrmLeadsService {
 
   async remove(id: string, actor: CrmActor) {
     const perms = await this.getPermissions(actor);
-    this.ensurePermission(perms, CRM_LEADS_EDIT, "Voce nao pode remover leads do CRM.");
+    this.ensurePermission(
+      perms,
+      CRM_LEADS_EDIT,
+      'Voce nao pode remover leads do CRM.',
+    );
     const exists = await (this.prisma as any).crmLead.findFirst({
       where: {
         AND: [this.buildLeadScopeWhere(actor, perms), { id }],
@@ -1959,7 +2293,7 @@ export class CrmLeadsService {
     });
 
     if (!exists) {
-      throw new NotFoundException("Lead nÃ£o encontrado");
+      throw new NotFoundException('Lead nÃ£o encontrado');
     }
 
     await this.prisma.crmLead.delete({
@@ -1973,7 +2307,7 @@ export class CrmLeadsService {
     const perms = await this.getPermissions(actor);
     const leads = await (this.prisma as any).crmLead.findMany({
       where: this.buildLeadScopeWhere(actor, perms),
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       include: this.leadInclude(),
     });
 
@@ -2003,18 +2337,22 @@ export class CrmLeadsService {
     },
   ) {
     const perms = await this.getPermissions(actor);
-    this.ensurePermission(perms, CRM_BULK_UPDATE, "Voce nao pode executar acoes em lote no CRM.");
+    this.ensurePermission(
+      perms,
+      CRM_BULK_UPDATE,
+      'Voce nao pode executar acoes em lote no CRM.',
+    );
 
     const leadIds = Array.from(
       new Set(
         (Array.isArray(body.leadIds) ? body.leadIds : [])
-          .map((leadId) => String(leadId ?? "").trim())
+          .map((leadId) => String(leadId ?? '').trim())
           .filter(Boolean),
       ),
     );
 
     if (leadIds.length === 0) {
-      throw new BadRequestException("leadIds e obrigatorio.");
+      throw new BadRequestException('leadIds e obrigatorio.');
     }
 
     const payload: UpdateCrmLeadDto = {};
@@ -2028,7 +2366,9 @@ export class CrmLeadsService {
       payload.ownerUserId === undefined &&
       payload.priority === undefined
     ) {
-      throw new BadRequestException("Nenhum campo de atualizacao foi informado.");
+      throw new BadRequestException(
+        'Nenhum campo de atualizacao foi informado.',
+      );
     }
 
     const scopedLeads = await (this.prisma as any).crmLead.findMany({
@@ -2041,7 +2381,9 @@ export class CrmLeadsService {
     });
 
     if (scopedLeads.length === 0) {
-      throw new NotFoundException("Nenhum lead encontrado para atualizacao em lote.");
+      throw new NotFoundException(
+        'Nenhum lead encontrado para atualizacao em lote.',
+      );
     }
 
     return Promise.all(
@@ -2056,14 +2398,20 @@ export class CrmLeadsService {
     stageId: string,
   ) {
     const perms = await this.getPermissions(actor);
-    this.ensurePermission(perms, CRM_LEADS_STATUS, "Você não pode mover leads entre etapas do pipeline.");
+    this.ensurePermission(
+      perms,
+      CRM_LEADS_STATUS,
+      'Você não pode mover leads entre etapas do pipeline.',
+    );
 
-    const companyId = this.ensureCompanyId(String(actor.companyId ?? "").trim());
+    const companyId = this.ensureCompanyId(
+      String(actor.companyId ?? '').trim(),
+    );
     const lead = await this.ensureLeadExists(leadId, actor, perms);
 
     const pipeline = await this.prisma.crmPipeline.findFirst({
       where: {
-        id: String(pipelineId ?? "").trim(),
+        id: String(pipelineId ?? '').trim(),
         companyId,
         isActive: true,
       },
@@ -2073,12 +2421,12 @@ export class CrmLeadsService {
     });
 
     if (!pipeline) {
-      throw new NotFoundException("Pipeline não encontrado");
+      throw new NotFoundException('Pipeline não encontrado');
     }
 
     const stage = await this.prisma.crmPipelineStage.findFirst({
       where: {
-        id: String(stageId ?? "").trim(),
+        id: String(stageId ?? '').trim(),
         pipelineId: pipeline.id,
         companyId,
         isActive: true,
@@ -2092,7 +2440,7 @@ export class CrmLeadsService {
     });
 
     if (!stage) {
-      throw new NotFoundException("Etapa não encontrada");
+      throw new NotFoundException('Etapa não encontrada');
     }
 
     const previousStatus = lead.status;
@@ -2103,10 +2451,24 @@ export class CrmLeadsService {
         pipelineId: pipeline.id,
         stageId: stage.id,
         status: stage.statusBase,
-        statusChangedAt: previousStatus !== stage.statusBase ? new Date() : undefined,
-        wonAt: (stage.statusBase as CrmLeadStatus) === CrmLeadStatus.WON ? new Date() : (stage.statusBase as CrmLeadStatus) !== CrmLeadStatus.WON ? null : undefined,
-        lostAt: (stage.statusBase as CrmLeadStatus) === CrmLeadStatus.LOST ? new Date() : (stage.statusBase as CrmLeadStatus) !== CrmLeadStatus.LOST ? null : undefined,
-        lostReason: (stage.statusBase as CrmLeadStatus) !== CrmLeadStatus.LOST ? null : undefined,
+        statusChangedAt:
+          previousStatus !== stage.statusBase ? new Date() : undefined,
+        wonAt:
+          (stage.statusBase as CrmLeadStatus) === CrmLeadStatus.WON
+            ? new Date()
+            : (stage.statusBase as CrmLeadStatus) !== CrmLeadStatus.WON
+              ? null
+              : undefined,
+        lostAt:
+          (stage.statusBase as CrmLeadStatus) === CrmLeadStatus.LOST
+            ? new Date()
+            : (stage.statusBase as CrmLeadStatus) !== CrmLeadStatus.LOST
+              ? null
+              : undefined,
+        lostReason:
+          (stage.statusBase as CrmLeadStatus) !== CrmLeadStatus.LOST
+            ? null
+            : undefined,
       },
       include: this.leadInclude(),
     });
@@ -2115,7 +2477,7 @@ export class CrmLeadsService {
       companyId,
       leadId: lead.id,
       userId: actor.id,
-      type: "LEAD_STAGE_MOVED",
+      type: 'LEAD_STAGE_MOVED',
       description: `Lead movido para a etapa ${stage.name}`,
     });
 
@@ -2124,14 +2486,14 @@ export class CrmLeadsService {
         companyId,
         leadId: lead.id,
         userId: actor.id,
-        type: "LEAD_STATUS_CHANGED",
+        type: 'LEAD_STATUS_CHANGED',
         description: `Status alterado de ${previousStatus} para ${stage.statusBase}`,
       });
 
       await this.automationEngine.handleEvent({
         companyId,
-        module: "CRM",
-        triggerType: "LEAD_STATUS_CHANGED",
+        module: 'CRM',
+        triggerType: 'LEAD_STATUS_CHANGED',
         payload: {
           leadId: lead.id,
           leadName: lead.name,
@@ -2145,6 +2507,5 @@ export class CrmLeadsService {
     }
 
     return this.sanitizeLead(updatedLead, perms);
-  }}
-
-
+  }
+}
