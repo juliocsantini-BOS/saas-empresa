@@ -6168,7 +6168,7 @@ function ReportBarChartCard({
   title: string;
   subtitle: string;
   rows: Array<{ label: string; value: number; helper: string; valueLabel: string }>;
-  accent?: 'purple' | 'blue';
+  accent?: 'purple' | 'blue' | 'green';
 }) {
   const topRows = rows
     .filter((row) => Number.isFinite(row.value) && row.value >= 0)
@@ -6179,6 +6179,8 @@ function ReportBarChartCard({
   const barClass =
     accent === 'blue'
       ? 'bg-[linear-gradient(90deg,rgba(120,168,255,0.95),rgba(178,206,255,0.9))]'
+      : accent === 'green'
+        ? 'bg-[linear-gradient(90deg,rgba(34,197,94,0.95),rgba(134,239,172,0.9))]'
       : 'bg-[linear-gradient(90deg,rgba(139,92,246,0.95),rgba(221,214,254,0.92))]';
 
   return (
