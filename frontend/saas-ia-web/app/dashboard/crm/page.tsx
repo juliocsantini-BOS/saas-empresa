@@ -726,6 +726,7 @@ export default function CrmPage() {
   }, [pipelines, selectedPipelineId]);
 
   const selectedEnterpriseLead = selectedLead || filteredLeads[0] || null;
+  const analyticsUniverse = analyticsItems.length > 0 ? analyticsItems : filteredLeads;
   const primaryAccount = accounts[0] || null;
   const primarySequence = sequences[0] || null;
   const latestQuote = quotes[0] || null;
@@ -1054,7 +1055,7 @@ export default function CrmPage() {
   const selectedAccountSummary = useMemo(() => {
     if (!selectedLead?.companyName?.trim()) return null;
 
-    const accountLeads = leads.filter(
+    const accountLeads = analyticsUniverse.filter(
       (lead) =>
         normalizeUiText(lead.companyName || '').trim().toLowerCase() ===
         normalizeUiText(selectedLead.companyName || '').trim().toLowerCase(),
@@ -1079,14 +1080,14 @@ export default function CrmPage() {
         0,
       ),
     };
-  }, [leads, selectedLead]);
+  }, [analyticsUniverse, selectedLead]);
 
   const selectedLeadRoutingSuggestion = useMemo(() => {
     if (!selectedLead) return null;
 
     const candidates = ownerOptions
       .map((owner) => {
-        const ownerLeads = leads.filter((lead) => lead.ownerUser?.id === owner.id);
+        const ownerLeads = analyticsUniverse.filter((lead) => lead.ownerUser?.id === owner.id);
         const sameBranch = selectedLead.branchId
           ? ownerLeads.filter((lead) => lead.branchId === selectedLead.branchId).length
           : 0;
@@ -1119,7 +1120,7 @@ export default function CrmPage() {
       .sort((a, b) => b.fitScore - a.fitScore || a.openDeals - b.openDeals);
 
     return candidates[0] || null;
-  }, [leads, openTasksByOwnerReport, ownerOptions, selectedLead]);
+  }, [analyticsUniverse, openTasksByOwnerReport, ownerOptions, selectedLead]);
 
   function applyPlaybookPreset(preset: ReturnType<typeof getStagePlaybook>[number]) {
     if (!selectedLead) return;
