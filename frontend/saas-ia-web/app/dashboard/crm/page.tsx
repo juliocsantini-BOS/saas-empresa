@@ -222,8 +222,8 @@ export default function CrmPage() {
   const [routingRules, setRoutingRules] = useState<CrmRoutingRule[]>([]);
   const [conversationInsights, setConversationInsights] = useState<CrmConversationInsight[]>([]);
   const [forecastSnapshots, setForecastSnapshots] = useState<CrmForecastSnapshot[]>([]);
-  const [forecastAdjustments, setForecastAdjustments] = useState<Array<Record<string, unknown>>>([]);
-  const [forecastTotals, setForecastTotals] = useState<Record<string, number>>({});
+  const [, setForecastAdjustments] = useState<Array<Record<string, unknown>>>([]);
+  const [, setForecastTotals] = useState<Record<string, number>>({});
   const [isAccountWorkspaceOpen, setIsAccountWorkspaceOpen] = useState(false);
   const [isEngagementWorkspaceOpen, setIsEngagementWorkspaceOpen] = useState(false);
   const [isDocumentsWorkspaceOpen, setIsDocumentsWorkspaceOpen] = useState(false);
@@ -729,6 +729,70 @@ export default function CrmPage() {
   const primarySequence = sequences[0] || null;
   const latestQuote = quotes[0] || null;
   const latestForecastSnapshot = forecastSnapshots[0] || null;
+  const connectedMailboxes = useMemo(
+    () =>
+      mailboxes.filter((mailbox) =>
+        ['CONNECTED', 'ACTIVE', 'SYNCED'].includes(
+          String(mailbox.syncStatus || '')
+            .trim()
+            .toUpperCase(),
+        ),
+      ),
+    [mailboxes],
+  );
+  const mailboxErrors = useMemo(
+    () => mailboxes.filter((mailbox) => mailbox.errorMessage),
+    [mailboxes],
+  );
+  const connectedChannelIntegrations = useMemo(
+    () =>
+      channelIntegrations.filter((integration) =>
+        ['CONNECTED', 'READY'].includes(
+          String(integration.status || '')
+            .trim()
+            .toUpperCase(),
+        ),
+      ),
+    [channelIntegrations],
+  );
+  const pendingChannelIntegrations = useMemo(
+    () =>
+      channelIntegrations.filter((integration) =>
+        ['PENDING', 'REQUIRES_REAUTH', 'EXPIRED'].includes(
+          String(integration.status || '')
+            .trim()
+            .toUpperCase(),
+        ),
+      ),
+    [channelIntegrations],
+  );
+  const latestInboundChannel = useMemo(
+    () =>
+      [...channelIntegrations]
+        .filter((integration) => integration.lastInboundAt)
+        .sort(
+          (a, b) =>
+            new Date(b.lastInboundAt || 0).getTime() -
+            new Date(a.lastInboundAt || 0).getTime(),
+        )[0] || null,
+    [channelIntegrations],
+  );
+  const emailReadinessLabel = useMemo(() => {
+    if (connectedMailboxes.length > 0) return 'Operacional';
+    if (mailboxes.length > 0) return 'Parcial';
+    if (emailTemplates.length > 0 || sequences.length > 0) return 'Estruturando';
+    return 'Nao conectado';
+  }, [connectedMailboxes.length, emailTemplates.length, mailboxes.length, sequences.length]);
+  const omnichannelReadinessLabel = useMemo(() => {
+    if (connectedChannelIntegrations.length > 0) return 'Operacional';
+    if (pendingChannelIntegrations.length > 0) return 'Pendente';
+    if (channelIntegrations.length > 0) return 'Configurando';
+    return 'Nao conectado';
+  }, [
+    channelIntegrations.length,
+    connectedChannelIntegrations.length,
+    pendingChannelIntegrations.length,
+  ]);
 
   const managementForecastSummary = useMemo(() => {
     const openLeads = filteredLeads.filter((lead) => !['WON', 'LOST'].includes(lead.status));
@@ -1940,17 +2004,29 @@ export default function CrmPage() {
               metric={`${mailboxes.length} mailbox(es)`}
               helper={
                 mailboxes[0]
-                  ? `${normalizeUiText(mailboxes[0].label)} · ${normalizeUiText(mailboxes[0].syncStatus)}`
+                  ? `${emailReadinessLabel} · ${connectedMailboxes.length}/${mailboxes.length} conectada(s)`
                   : primarySequence
                     ? `${emailTemplates.length} template(s) · ${normalizeUiText(primarySequence.name)}`
                     : 'Conecte caixas, templates e sequences reais.'
               }
               loading={loadingEnterpriseHub}
-              rows={inboxMessages.slice(0, 3).map((message) => ({
-                label: normalizeUiText(message.subject),
-                helper: normalizeUiText(message.fromEmail || message.toEmail || 'Sem remetente'),
-                value: normalizeUiText(message.direction),
-              }))}
+              rows={
+                inboxMessages.length > 0
+                  ? inboxMessages.slice(0, 3).map((message) => ({
+                      label: normalizeUiText(message.subject),
+                      helper: normalizeUiText(message.fromEmail || message.toEmail || 'Sem remetente'),
+                      value: normalizeUiText(message.direction),
+                    }))
+                  : [
+                      {
+                        label: `${connectedMailboxes.length} mailbox(es) conectada(s)`,
+                        helper: mailboxErrors[0]
+                          ? normalizeUiText(mailboxErrors[0].errorMessage || 'Erro de sincronizacao')
+                          : 'Pronto para sincronizar entrada e saida comercial',
+                        value: emailReadinessLabel,
+                      },
+                    ]
+              }
               actionLabel="Operar"
               onAction={() => setIsEngagementWorkspaceOpen(true)}
             />
@@ -1997,30 +2073,36 @@ export default function CrmPage() {
             />
 
             <EnterpriseHubCard
-              title="Forecast gerencial"
-              eyebrow="Governance"
-              metric={canSeeValues ? formatMoney(forecastTotals.commit || 0) : 'Sem acesso'}
-              helper="Commit consolidado com snapshots, ajustes e governança."
+              title="Canais e execução"
+              eyebrow="Omnichannel"
+              metric={`${connectedChannelIntegrations.length} ativo(s)`}
+              helper={
+                latestInboundChannel?.lastInboundAt
+                  ? `${omnichannelReadinessLabel} · ultimo inbound ${formatRelativeTime(latestInboundChannel.lastInboundAt)}`
+                  : `${omnichannelReadinessLabel} · conecte WhatsApp, Instagram e Facebook`
+              }
               loading={loadingEnterpriseHub}
-              rows={[
-                {
-                  label: 'Pipeline',
-                  helper: 'Receita em construção',
-                  value: canSeeValues ? formatMoney(forecastTotals.pipeline || 0) : 'Sem acesso',
-                },
-                {
-                  label: 'Best case',
-                  helper: 'Cenário provável',
-                  value: canSeeValues ? formatMoney(forecastTotals.bestCase || 0) : 'Sem acesso',
-                },
-                {
-                  label: 'Ajustes',
-                  helper: `${forecastSnapshots.length} snapshot(s)`,
-                  value: `${forecastAdjustments.length}`,
-                },
-              ]}
-              actionLabel="Ajustar"
-              onAction={() => setIsForecastWorkspaceOpen(true)}
+              rows={
+                channelIntegrations.length > 0
+                  ? channelIntegrations.slice(0, 3).map((integration) => ({
+                      label: normalizeUiText(integration.label),
+                      helper: integration.lastInboundAt
+                        ? `Inbound ${formatRelativeTime(integration.lastInboundAt)}`
+                        : normalizeUiText(
+                            integration.channelIdentifier || integration.provider,
+                          ),
+                      value: normalizeUiText(integration.status),
+                    }))
+                  : [
+                      {
+                        label: 'WhatsApp e social',
+                        helper: 'Receba mensagens e atualize o lead em tempo real',
+                        value: omnichannelReadinessLabel,
+                      },
+                    ]
+              }
+              actionLabel="Conectar"
+              onAction={() => setIsEngagementWorkspaceOpen(true)}
             />
           </div>
         </CrmPanel>
@@ -4239,6 +4321,24 @@ export default function CrmPage() {
           </div>
 
           <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4 xl:col-span-2">
+              <div className="grid gap-3 md:grid-cols-4">
+                <MiniStat label="Email readiness" value={emailReadinessLabel} />
+                <MiniStat
+                  label="Mailboxes conectadas"
+                  value={`${connectedMailboxes.length}/${mailboxes.length || 0}`}
+                />
+                <MiniStat
+                  label="Omnichannel readiness"
+                  value={omnichannelReadinessLabel}
+                />
+                <MiniStat
+                  label="Canais pendentes"
+                  value={String(pendingChannelIntegrations.length)}
+                />
+              </div>
+            </div>
+
             <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4">
               <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                 Conexões ativas
@@ -4278,6 +4378,11 @@ export default function CrmPage() {
                       <div className="mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                         <span>{normalizeUiText(integration.provider)}</span>
                         <span>{normalizeUiText(integration.status)}</span>
+                        {integration.errorMessage ? (
+                          <span className="text-amber-300">
+                            {normalizeUiText(integration.errorMessage)}
+                          </span>
+                        ) : null}
                         {integration.lastInboundAt ? (
                           <span>Última entrada {formatRelativeTime(integration.lastInboundAt)}</span>
                         ) : null}
@@ -4312,6 +4417,12 @@ export default function CrmPage() {
                     <div className="mb-1 uppercase tracking-[0.18em] text-zinc-500">Webhook</div>
                     <div className="break-all">{integrationConnectPreview.webhookUrl || 'Este provider não usa webhook'}</div>
                   </div>
+                  {integrationConnectPreview.requiredEnv?.length ? (
+                    <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-4 py-3 text-xs text-zinc-400">
+                      <div className="mb-1 uppercase tracking-[0.18em] text-zinc-500">Variáveis exigidas</div>
+                      <div>{integrationConnectPreview.requiredEnv.join(', ')}</div>
+                    </div>
+                  ) : null}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-dashed border-white/10 px-4 py-5 text-sm text-zinc-500">

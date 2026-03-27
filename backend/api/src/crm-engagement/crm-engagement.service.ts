@@ -3,9 +3,9 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from "@nestjs/common";
-import { Role } from "@prisma/client";
-import { PrismaService } from "../prisma/prisma.service";
+} from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 type Actor = {
   id: string;
@@ -18,15 +18,15 @@ export class CrmEngagementService {
   constructor(private readonly prisma: PrismaService) {}
 
   private ensureCompanyId(actor: Actor) {
-    const companyId = String(actor.companyId ?? "").trim();
+    const companyId = String(actor.companyId ?? '').trim();
     if (!companyId) {
-      throw new ForbiddenException("Company obrigatória.");
+      throw new ForbiddenException('Company obrigatória.');
     }
     return companyId;
   }
 
   private trim(value: unknown) {
-    const normalized = String(value ?? "").trim();
+    const normalized = String(value ?? '').trim();
     return normalized || null;
   }
 
@@ -35,16 +35,51 @@ export class CrmEngagementService {
     if (!raw) return null;
     const parsed = new Date(raw);
     if (Number.isNaN(parsed.getTime())) {
-      throw new BadRequestException("Data inválida.");
+      throw new BadRequestException('Data inválida.');
     }
     return parsed;
+  }
+
+  private async registerLeadCommunication(input: {
+    companyId: string;
+    leadId?: string | null;
+    userId?: string | null;
+    type: string;
+    description: string;
+  }) {
+    const leadId = this.trim(input.leadId);
+    if (!leadId) return;
+
+    const now = new Date();
+
+    await this.prisma.$transaction([
+      (this.prisma as any).crmLead.updateMany({
+        where: {
+          id: leadId,
+          companyId: input.companyId,
+        },
+        data: {
+          lastActivityAt: now,
+          lastContactAt: now,
+        },
+      }),
+      (this.prisma as any).crmLeadActivity.create({
+        data: {
+          companyId: input.companyId,
+          leadId,
+          userId: this.trim(input.userId),
+          type: input.type,
+          description: input.description,
+        },
+      }),
+    ]);
   }
 
   async listMailboxes(actor: Actor) {
     const companyId = this.ensureCompanyId(actor);
     return (this.prisma as any).crmMailbox.findMany({
       where: { companyId },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
   }
 
@@ -55,7 +90,9 @@ export class CrmEngagementService {
     const label = this.trim(body?.label) || emailAddress;
 
     if (!emailAddress || !provider) {
-      throw new BadRequestException("provider e emailAddress são obrigatórios.");
+      throw new BadRequestException(
+        'provider e emailAddress são obrigatórios.',
+      );
     }
 
     return (this.prisma as any).crmMailbox.create({
@@ -66,7 +103,7 @@ export class CrmEngagementService {
         label,
         emailAddress,
         isActive: body?.isActive !== false,
-        syncStatus: this.trim(body?.syncStatus) || "CONNECTED",
+        syncStatus: this.trim(body?.syncStatus) || 'CONNECTED',
         configJson: body?.configJson ?? null,
       },
     });
@@ -76,7 +113,7 @@ export class CrmEngagementService {
     const companyId = this.ensureCompanyId(actor);
     return (this.prisma as any).crmEmailTemplate.findMany({
       where: { companyId },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
   }
 
@@ -87,7 +124,7 @@ export class CrmEngagementService {
     const bodyText = this.trim(body?.body);
 
     if (!name || !subject || !bodyText) {
-      throw new BadRequestException("name, subject e body são obrigatórios.");
+      throw new BadRequestException('name, subject e body são obrigatórios.');
     }
 
     return (this.prisma as any).crmEmailTemplate.create({
@@ -108,13 +145,13 @@ export class CrmEngagementService {
     return (this.prisma as any).crmSequence.findMany({
       where: { companyId },
       include: {
-        steps: { orderBy: [{ order: "asc" }] },
+        steps: { orderBy: [{ order: 'asc' }] },
         enrollments: {
-          orderBy: [{ createdAt: "desc" }],
+          orderBy: [{ createdAt: 'desc' }],
           take: 10,
         },
       },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
   }
 
@@ -122,7 +159,7 @@ export class CrmEngagementService {
     const companyId = this.ensureCompanyId(actor);
     const name = this.trim(body?.name);
     if (!name) {
-      throw new BadRequestException("name é obrigatório.");
+      throw new BadRequestException('name é obrigatório.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -144,11 +181,13 @@ export class CrmEngagementService {
             companyId,
             sequenceId: sequence.id,
             order: index,
-            type: this.trim(step?.type) || "EMAIL",
+            type: this.trim(step?.type) || 'EMAIL',
             subject: this.trim(step?.subject),
             body: this.trim(step?.body),
             taskTitle: this.trim(step?.taskTitle),
-            dueInDays: Number.isFinite(Number(step?.dueInDays)) ? Number(step.dueInDays) : 0,
+            dueInDays: Number.isFinite(Number(step?.dueInDays))
+              ? Number(step.dueInDays)
+              : 0,
             configJson: step?.configJson ?? null,
           },
         });
@@ -156,7 +195,7 @@ export class CrmEngagementService {
 
       return (tx as any).crmSequence.findUnique({
         where: { id: sequence.id },
-        include: { steps: { orderBy: [{ order: "asc" }] } },
+        include: { steps: { orderBy: [{ order: 'asc' }] } },
       });
     });
   }
@@ -166,7 +205,7 @@ export class CrmEngagementService {
     const sequenceId = this.trim(body?.sequenceId);
     const leadId = this.trim(body?.leadId);
     if (!sequenceId || !leadId) {
-      throw new BadRequestException("sequenceId e leadId são obrigatórios.");
+      throw new BadRequestException('sequenceId e leadId são obrigatórios.');
     }
 
     return (this.prisma as any).crmSequenceEnrollment.create({
@@ -175,7 +214,7 @@ export class CrmEngagementService {
         sequenceId,
         leadId,
         contactId: this.trim(body?.contactId),
-        status: this.trim(body?.status) || "ACTIVE",
+        status: this.trim(body?.status) || 'ACTIVE',
         currentStepOrder: Number.isFinite(Number(body?.currentStepOrder))
           ? Number(body.currentStepOrder)
           : 0,
@@ -195,7 +234,7 @@ export class CrmEngagementService {
         account: { select: { id: true, name: true } },
         contact: { select: { id: true, fullName: true, email: true } },
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
       take: 100,
     });
   }
@@ -205,10 +244,10 @@ export class CrmEngagementService {
     const subject = this.trim(body?.subject);
     const bodyText = this.trim(body?.body);
     if (!subject || !bodyText) {
-      throw new BadRequestException("subject e body são obrigatórios.");
+      throw new BadRequestException('subject e body são obrigatórios.');
     }
 
-    return (this.prisma as any).crmEmailMessage.create({
+    const message = await (this.prisma as any).crmEmailMessage.create({
       data: {
         companyId,
         mailboxId: this.trim(body?.mailboxId),
@@ -216,8 +255,8 @@ export class CrmEngagementService {
         accountId: this.trim(body?.accountId),
         contactId: this.trim(body?.contactId),
         sequenceEnrollmentId: this.trim(body?.sequenceEnrollmentId),
-        direction: this.trim(body?.direction) || "OUTBOUND",
-        syncSource: this.trim(body?.syncSource) || "MANUAL",
+        direction: this.trim(body?.direction) || 'OUTBOUND',
+        syncSource: this.trim(body?.syncSource) || 'MANUAL',
         providerMessageId: this.trim(body?.providerMessageId),
         threadId: this.trim(body?.threadId),
         subject,
@@ -232,6 +271,19 @@ export class CrmEngagementService {
         metadataJson: body?.metadataJson ?? null,
       },
     });
+
+    await this.registerLeadCommunication({
+      companyId,
+      leadId: this.trim(body?.leadId),
+      userId: actor.id,
+      type:
+        (this.trim(body?.direction)?.toUpperCase() || 'OUTBOUND') === 'INBOUND'
+          ? 'EMAIL_RECEIVED'
+          : 'EMAIL_SENT',
+      description: `Email ${(this.trim(body?.direction)?.toUpperCase() || 'OUTBOUND') === 'INBOUND' ? 'recebido' : 'enviado'}: ${subject}`,
+    });
+
+    return message;
   }
 
   async listConversationInsights(actor: Actor, leadId?: string) {
@@ -241,7 +293,7 @@ export class CrmEngagementService {
         companyId,
         ...(leadId ? { leadId } : {}),
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
       take: 50,
     });
   }
@@ -250,7 +302,7 @@ export class CrmEngagementService {
     const companyId = this.ensureCompanyId(actor);
     const leadId = this.trim(body?.leadId);
     if (!leadId) {
-      throw new BadRequestException("leadId é obrigatório.");
+      throw new BadRequestException('leadId é obrigatório.');
     }
 
     return (this.prisma as any).crmConversationInsight.create({
@@ -258,7 +310,7 @@ export class CrmEngagementService {
         companyId,
         leadId,
         userId: actor.id,
-        sourceType: this.trim(body?.sourceType) || "CALL",
+        sourceType: this.trim(body?.sourceType) || 'CALL',
         transcriptText: this.trim(body?.transcriptText),
         summaryText: this.trim(body?.summaryText),
         objectionsJson: body?.objectionsJson ?? null,

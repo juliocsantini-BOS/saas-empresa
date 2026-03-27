@@ -3,13 +3,11 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from "@nestjs/common";
-import {
-  Role,
-} from "@prisma/client";
-import { randomUUID } from "crypto";
-import { RequestContext } from "../common/request-context/request-context";
-import { PrismaService } from "../prisma/prisma.service";
+} from '@nestjs/common';
+import { Role } from '@prisma/client';
+import { randomUUID } from 'crypto';
+import { RequestContext } from '../common/request-context/request-context';
+import { PrismaService } from '../prisma/prisma.service';
 
 type Actor = {
   id?: string | null;
@@ -18,26 +16,37 @@ type Actor = {
 };
 
 type CrmIntegrationProviderValue =
-  | "GOOGLE"
-  | "GMAIL"
-  | "MICROSOFT"
-  | "YAHOO"
-  | "WHATSAPP"
-  | "FACEBOOK"
-  | "INSTAGRAM"
-  | "OTHER";
+  | 'GOOGLE'
+  | 'GMAIL'
+  | 'MICROSOFT'
+  | 'YAHOO'
+  | 'WHATSAPP'
+  | 'FACEBOOK'
+  | 'INSTAGRAM'
+  | 'OTHER';
 
-type CrmIntegrationCategoryValue = "EMAIL" | "MESSAGING" | "SOCIAL";
-type CrmIntegrationConnectionModeValue = "OAUTH" | "API_KEY" | "MANUAL" | "WEBHOOK" | "IMAP_SMTP";
+type CrmIntegrationCategoryValue = 'EMAIL' | 'MESSAGING' | 'SOCIAL';
+type CrmIntegrationConnectionModeValue =
+  | 'OAUTH'
+  | 'API_KEY'
+  | 'MANUAL'
+  | 'WEBHOOK'
+  | 'IMAP_SMTP';
 type CrmIntegrationStatusValue =
-  | "DISCONNECTED"
-  | "PENDING"
-  | "CONNECTED"
-  | "ERROR"
-  | "EXPIRED"
-  | "REQUIRES_REAUTH";
-type CrmOmnichannelDirectionValue = "INBOUND" | "OUTBOUND" | "SYSTEM";
-type CrmOmnichannelMessageStatusValue = "QUEUED" | "SENT" | "DELIVERED" | "READ" | "FAILED" | "RECEIVED";
+  | 'DISCONNECTED'
+  | 'PENDING'
+  | 'CONNECTED'
+  | 'ERROR'
+  | 'EXPIRED'
+  | 'REQUIRES_REAUTH';
+type CrmOmnichannelDirectionValue = 'INBOUND' | 'OUTBOUND' | 'SYSTEM';
+type CrmOmnichannelMessageStatusValue =
+  | 'QUEUED'
+  | 'SENT'
+  | 'DELIVERED'
+  | 'READ'
+  | 'FAILED'
+  | 'RECEIVED';
 
 type ProviderPreset = {
   provider: CrmIntegrationProviderValue;
@@ -53,100 +62,108 @@ type ProviderPreset = {
 
 const PROVIDER_PRESETS: Record<CrmIntegrationProviderValue, ProviderPreset> = {
   GOOGLE: {
-    provider: "GOOGLE",
-    label: "Google Workspace",
-    category: "EMAIL",
-    connectionMode: "OAUTH",
-    channelType: "EMAIL",
+    provider: 'GOOGLE',
+    label: 'Google Workspace',
+    category: 'EMAIL',
+    connectionMode: 'OAUTH',
+    channelType: 'EMAIL',
     scopes: [
-      "openid",
-      "email",
-      "profile",
-      "https://www.googleapis.com/auth/gmail.readonly",
-      "https://www.googleapis.com/auth/gmail.send",
-      "https://www.googleapis.com/auth/gmail.modify",
+      'openid',
+      'email',
+      'profile',
+      'https://www.googleapis.com/auth/gmail.readonly',
+      'https://www.googleapis.com/auth/gmail.send',
+      'https://www.googleapis.com/auth/gmail.modify',
     ],
-    authBaseUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-    defaultIdentifierPlaceholder: "workspace@empresa.com",
+    authBaseUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+    defaultIdentifierPlaceholder: 'workspace@empresa.com',
   },
   GMAIL: {
-    provider: "GMAIL",
-    label: "Gmail",
-    category: "EMAIL",
-    connectionMode: "OAUTH",
-    channelType: "EMAIL",
+    provider: 'GMAIL',
+    label: 'Gmail',
+    category: 'EMAIL',
+    connectionMode: 'OAUTH',
+    channelType: 'EMAIL',
     scopes: [
-      "openid",
-      "email",
-      "profile",
-      "https://www.googleapis.com/auth/gmail.readonly",
-      "https://www.googleapis.com/auth/gmail.send",
-      "https://www.googleapis.com/auth/gmail.modify",
+      'openid',
+      'email',
+      'profile',
+      'https://www.googleapis.com/auth/gmail.readonly',
+      'https://www.googleapis.com/auth/gmail.send',
+      'https://www.googleapis.com/auth/gmail.modify',
     ],
-    authBaseUrl: "https://accounts.google.com/o/oauth2/v2/auth",
-    defaultIdentifierPlaceholder: "vendas@gmail.com",
+    authBaseUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+    defaultIdentifierPlaceholder: 'vendas@gmail.com',
   },
   MICROSOFT: {
-    provider: "MICROSOFT",
-    label: "Microsoft 365",
-    category: "EMAIL",
-    connectionMode: "OAUTH",
-    channelType: "EMAIL",
-    scopes: ["openid", "email", "profile", "offline_access", "Mail.Read", "Mail.Send"],
-    authBaseUrl: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-    defaultIdentifierPlaceholder: "seller@empresa.com",
+    provider: 'MICROSOFT',
+    label: 'Microsoft 365',
+    category: 'EMAIL',
+    connectionMode: 'OAUTH',
+    channelType: 'EMAIL',
+    scopes: [
+      'openid',
+      'email',
+      'profile',
+      'offline_access',
+      'Mail.Read',
+      'Mail.Send',
+    ],
+    authBaseUrl:
+      'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+    defaultIdentifierPlaceholder: 'seller@empresa.com',
   },
   YAHOO: {
-    provider: "YAHOO",
-    label: "Yahoo Mail",
-    category: "EMAIL",
-    connectionMode: "OAUTH",
-    channelType: "EMAIL",
-    scopes: ["openid", "openid2", "mail-r", "mail-w"],
-    authBaseUrl: "https://api.login.yahoo.com/oauth2/request_auth",
-    defaultIdentifierPlaceholder: "seller@yahoo.com",
+    provider: 'YAHOO',
+    label: 'Yahoo Mail',
+    category: 'EMAIL',
+    connectionMode: 'OAUTH',
+    channelType: 'EMAIL',
+    scopes: ['openid', 'openid2', 'mail-r', 'mail-w'],
+    authBaseUrl: 'https://api.login.yahoo.com/oauth2/request_auth',
+    defaultIdentifierPlaceholder: 'seller@yahoo.com',
   },
   WHATSAPP: {
-    provider: "WHATSAPP",
-    label: "WhatsApp Business",
-    category: "MESSAGING",
-    connectionMode: "WEBHOOK",
-    channelType: "WHATSAPP",
-    scopes: ["whatsapp_business_management", "whatsapp_business_messaging"],
-    authBaseUrl: "https://www.facebook.com/dialog/oauth",
-    defaultIdentifierPlaceholder: "+55 11 99999-9999",
+    provider: 'WHATSAPP',
+    label: 'WhatsApp Business',
+    category: 'MESSAGING',
+    connectionMode: 'WEBHOOK',
+    channelType: 'WHATSAPP',
+    scopes: ['whatsapp_business_management', 'whatsapp_business_messaging'],
+    authBaseUrl: 'https://www.facebook.com/dialog/oauth',
+    defaultIdentifierPlaceholder: '+55 11 99999-9999',
     webhookSupported: true,
   },
   FACEBOOK: {
-    provider: "FACEBOOK",
-    label: "Facebook Messenger",
-    category: "SOCIAL",
-    connectionMode: "WEBHOOK",
-    channelType: "FACEBOOK_MESSENGER",
-    scopes: ["pages_show_list", "pages_messaging", "business_management"],
-    authBaseUrl: "https://www.facebook.com/dialog/oauth",
-    defaultIdentifierPlaceholder: "facebook.com/sua-pagina",
+    provider: 'FACEBOOK',
+    label: 'Facebook Messenger',
+    category: 'SOCIAL',
+    connectionMode: 'WEBHOOK',
+    channelType: 'FACEBOOK_MESSENGER',
+    scopes: ['pages_show_list', 'pages_messaging', 'business_management'],
+    authBaseUrl: 'https://www.facebook.com/dialog/oauth',
+    defaultIdentifierPlaceholder: 'facebook.com/sua-pagina',
     webhookSupported: true,
   },
   INSTAGRAM: {
-    provider: "INSTAGRAM",
-    label: "Instagram Direct",
-    category: "SOCIAL",
-    connectionMode: "WEBHOOK",
-    channelType: "INSTAGRAM_DM",
-    scopes: ["instagram_basic", "instagram_manage_messages", "pages_show_list"],
-    authBaseUrl: "https://www.facebook.com/dialog/oauth",
-    defaultIdentifierPlaceholder: "@suaempresa",
+    provider: 'INSTAGRAM',
+    label: 'Instagram Direct',
+    category: 'SOCIAL',
+    connectionMode: 'WEBHOOK',
+    channelType: 'INSTAGRAM_DM',
+    scopes: ['instagram_basic', 'instagram_manage_messages', 'pages_show_list'],
+    authBaseUrl: 'https://www.facebook.com/dialog/oauth',
+    defaultIdentifierPlaceholder: '@suaempresa',
     webhookSupported: true,
   },
   OTHER: {
-    provider: "OTHER",
-    label: "Outro provider",
-    category: "SOCIAL",
-    connectionMode: "MANUAL",
-    channelType: "CUSTOM",
+    provider: 'OTHER',
+    label: 'Outro provider',
+    category: 'SOCIAL',
+    connectionMode: 'MANUAL',
+    channelType: 'CUSTOM',
     scopes: [],
-    defaultIdentifierPlaceholder: "Identificador do canal",
+    defaultIdentifierPlaceholder: 'Identificador do canal',
   },
 };
 
@@ -155,15 +172,15 @@ export class CrmIntegrationsService {
   constructor(private readonly prisma: PrismaService) {}
 
   private ensureCompanyId(actor: Actor) {
-    const companyId = String(actor.companyId ?? "").trim();
+    const companyId = String(actor.companyId ?? '').trim();
     if (!companyId) {
-      throw new ForbiddenException("Company obrigatória.");
+      throw new ForbiddenException('Company obrigatória.');
     }
     return companyId;
   }
 
   private trim(value: unknown) {
-    const normalized = String(value ?? "").trim();
+    const normalized = String(value ?? '').trim();
     return normalized || null;
   }
 
@@ -172,16 +189,87 @@ export class CrmIntegrationsService {
     if (!raw) return null;
     const parsed = new Date(raw);
     if (Number.isNaN(parsed.getTime())) {
-      throw new BadRequestException("Data inválida.");
+      throw new BadRequestException('Data inválida.');
     }
     return parsed;
   }
 
+  private async registerLeadCommunication(input: {
+    companyId: string;
+    leadId?: string | null;
+    userId?: string | null;
+    type: string;
+    description: string;
+  }) {
+    const leadId = this.trim(input.leadId);
+    if (!leadId) return;
+
+    const now = new Date();
+
+    await this.prisma.$transaction([
+      (this.prisma as any).crmLead.updateMany({
+        where: {
+          id: leadId,
+          companyId: input.companyId,
+        },
+        data: {
+          lastActivityAt: now,
+          lastContactAt: now,
+        },
+      }),
+      (this.prisma as any).crmLeadActivity.create({
+        data: {
+          companyId: input.companyId,
+          leadId,
+          userId: this.trim(input.userId),
+          type: input.type,
+          description: input.description,
+        },
+      }),
+    ]);
+  }
+
+  private async resolveLeadFromInboundHandle(
+    companyId: string,
+    handle?: string | null,
+  ) {
+    const normalizedHandle = this.trim(handle);
+    if (!normalizedHandle) return null;
+
+    return (this.prisma as any).crmLead.findFirst({
+      where: {
+        companyId,
+        OR: [
+          { whatsapp: normalizedHandle },
+          { phone: normalizedHandle },
+          {
+            contact: {
+              is: {
+                OR: [
+                  { whatsapp: normalizedHandle },
+                  { phone: normalizedHandle },
+                ],
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        accountId: true,
+        contactId: true,
+      },
+      orderBy: [{ updatedAt: 'desc' }],
+    });
+  }
+
   private getPreset(rawProvider: unknown) {
-    const provider = String(rawProvider ?? "").trim().toUpperCase() as CrmIntegrationProviderValue;
+    const provider = String(rawProvider ?? '')
+      .trim()
+      .toUpperCase() as CrmIntegrationProviderValue;
     const preset = PROVIDER_PRESETS[provider];
     if (!preset) {
-      throw new BadRequestException("Provider de integração inválido.");
+      throw new BadRequestException('Provider de integração inválido.');
     }
     return preset;
   }
@@ -190,26 +278,26 @@ export class CrmIntegrationsService {
     return (
       this.trim(process.env.APP_URL) ||
       this.trim(process.env.FRONTEND_URL) ||
-      "http://localhost:3001"
+      'http://localhost:3001'
     );
   }
 
   private getApiBaseUrl() {
-    return this.trim(process.env.API_URL) || "http://localhost:3000";
+    return this.trim(process.env.API_URL) || 'http://localhost:3000';
   }
 
   private getOauthClientId(provider: CrmIntegrationProviderValue) {
     switch (provider) {
-      case "GOOGLE":
-      case "GMAIL":
+      case 'GOOGLE':
+      case 'GMAIL':
         return this.trim(process.env.GOOGLE_CLIENT_ID);
-      case "MICROSOFT":
+      case 'MICROSOFT':
         return this.trim(process.env.MICROSOFT_CLIENT_ID);
-      case "YAHOO":
+      case 'YAHOO':
         return this.trim(process.env.YAHOO_CLIENT_ID);
-      case "WHATSAPP":
-      case "FACEBOOK":
-      case "INSTAGRAM":
+      case 'WHATSAPP':
+      case 'FACEBOOK':
+      case 'INSTAGRAM':
         return this.trim(process.env.META_APP_ID);
       default:
         return null;
@@ -234,27 +322,27 @@ export class CrmIntegrationsService {
     }
 
     const params = new URLSearchParams();
-    params.set("client_id", clientId);
-    params.set("redirect_uri", callbackUrl);
-    params.set("response_type", "code");
-    params.set("state", stateToken);
+    params.set('client_id', clientId);
+    params.set('redirect_uri', callbackUrl);
+    params.set('response_type', 'code');
+    params.set('state', stateToken);
 
-    if (preset.provider === "GOOGLE" || preset.provider === "GMAIL") {
-      params.set("access_type", "offline");
-      params.set("prompt", "consent");
-      params.set("scope", scopes.join(" "));
-    } else if (preset.provider === "MICROSOFT") {
-      params.set("scope", scopes.join(" "));
+    if (preset.provider === 'GOOGLE' || preset.provider === 'GMAIL') {
+      params.set('access_type', 'offline');
+      params.set('prompt', 'consent');
+      params.set('scope', scopes.join(' '));
+    } else if (preset.provider === 'MICROSOFT') {
+      params.set('scope', scopes.join(' '));
     } else if (
-      preset.provider === "YAHOO" ||
-      preset.provider === "WHATSAPP" ||
-      preset.provider === "FACEBOOK" ||
-      preset.provider === "INSTAGRAM"
+      preset.provider === 'YAHOO' ||
+      preset.provider === 'WHATSAPP' ||
+      preset.provider === 'FACEBOOK' ||
+      preset.provider === 'INSTAGRAM'
     ) {
-      params.set("scope", scopes.join(" "));
+      params.set('scope', scopes.join(' '));
     }
 
-    params.set("login_hint", integrationId);
+    params.set('login_hint', integrationId);
 
     return `${preset.authBaseUrl}?${params.toString()}`;
   }
@@ -263,7 +351,7 @@ export class CrmIntegrationsService {
     const companyId = this.ensureCompanyId(actor);
     return (this.prisma as any).crmChannelIntegration.findMany({
       where: { companyId },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
   }
 
@@ -284,11 +372,14 @@ export class CrmIntegrationsService {
         provider: preset.provider,
         category: preset.category,
         connectionMode:
-          (this.trim(body?.connectionMode)?.toUpperCase() as CrmIntegrationConnectionModeValue) ||
+          (this.trim(
+            body?.connectionMode,
+          )?.toUpperCase() as CrmIntegrationConnectionModeValue) ||
           preset.connectionMode,
         status:
-          (this.trim(body?.status)?.toUpperCase() as CrmIntegrationStatusValue) ||
-          "PENDING",
+          (this.trim(
+            body?.status,
+          )?.toUpperCase() as CrmIntegrationStatusValue) || 'PENDING',
         label,
         channelIdentifier,
         externalAccountId: this.trim(body?.externalAccountId),
@@ -308,7 +399,9 @@ export class CrmIntegrationsService {
         webhookVerifyToken:
           this.trim(body?.webhookVerifyToken) ||
           this.trim(process.env.META_WEBHOOK_VERIFY_TOKEN),
-        webhookSecret: this.trim(body?.webhookSecret) || this.trim(process.env.META_APP_SECRET),
+        webhookSecret:
+          this.trim(body?.webhookSecret) ||
+          this.trim(process.env.META_APP_SECRET),
         configJson: body?.configJson ?? null,
       },
     });
@@ -324,34 +417,41 @@ export class CrmIntegrationsService {
         : preset.scopes;
 
     const stateToken = randomUUID();
-    const integration = await (this.prisma as any).crmChannelIntegration.create({
-      data: {
-        companyId,
-        userId: this.trim(actor.id),
-        provider: preset.provider,
-        category: preset.category,
-        connectionMode: preset.connectionMode,
-        status: "PENDING",
-        label,
-        channelIdentifier: this.trim(body?.channelIdentifier),
-        scopes,
-        callbackUrl: `${this.getApiBaseUrl()}/v1/crm/integrations/callback/${preset.provider.toLowerCase()}`,
-        webhookUrl: preset.webhookSupported
-          ? `${this.getApiBaseUrl()}/v1/crm/integrations/webhooks/meta`
-          : null,
-        webhookVerifyToken: preset.webhookSupported
-          ? this.trim(process.env.META_WEBHOOK_VERIFY_TOKEN)
-          : null,
-        configJson: {
-          stateToken,
-          appUrl: this.getBaseAppUrl(),
-          providerLabel: preset.label,
-          defaultIdentifierPlaceholder: preset.defaultIdentifierPlaceholder,
+    const integration = await (this.prisma as any).crmChannelIntegration.create(
+      {
+        data: {
+          companyId,
+          userId: this.trim(actor.id),
+          provider: preset.provider,
+          category: preset.category,
+          connectionMode: preset.connectionMode,
+          status: 'PENDING',
+          label,
+          channelIdentifier: this.trim(body?.channelIdentifier),
+          scopes,
+          callbackUrl: `${this.getApiBaseUrl()}/v1/crm/integrations/callback/${preset.provider.toLowerCase()}`,
+          webhookUrl: preset.webhookSupported
+            ? `${this.getApiBaseUrl()}/v1/crm/integrations/webhooks/meta`
+            : null,
+          webhookVerifyToken: preset.webhookSupported
+            ? this.trim(process.env.META_WEBHOOK_VERIFY_TOKEN)
+            : null,
+          configJson: {
+            stateToken,
+            appUrl: this.getBaseAppUrl(),
+            providerLabel: preset.label,
+            defaultIdentifierPlaceholder: preset.defaultIdentifierPlaceholder,
+          },
         },
       },
-    });
+    );
 
-    const authUrl = this.buildConnectUrl(preset, integration.id, stateToken, scopes);
+    const authUrl = this.buildConnectUrl(
+      preset,
+      integration.id,
+      stateToken,
+      scopes,
+    );
     const updated = await (this.prisma as any).crmChannelIntegration.update({
       where: { id: integration.id },
       data: {
@@ -366,28 +466,27 @@ export class CrmIntegrationsService {
       webhookUrl: updated.webhookUrl,
       provider: preset.provider,
       providerLabel: preset.label,
-      status: authUrl ? "READY" : "MISSING_CREDENTIALS",
+      status: authUrl ? 'READY' : 'MISSING_CREDENTIALS',
       requiredEnv: this.getRequiredEnv(preset.provider),
     };
   }
 
   async sync(actor: Actor, integrationId: string) {
     const companyId = this.ensureCompanyId(actor);
-    const integration = await (this.prisma as any).crmChannelIntegration.findFirst({
+    const integration = await (
+      this.prisma as any
+    ).crmChannelIntegration.findFirst({
       where: { id: integrationId, companyId },
     });
 
     if (!integration) {
-      throw new NotFoundException("Integração não encontrada.");
+      throw new NotFoundException('Integração não encontrada.');
     }
 
     return (this.prisma as any).crmChannelIntegration.update({
       where: { id: integration.id },
       data: {
-        status:
-          integration.status === "CONNECTED"
-            ? "CONNECTED"
-            : "PENDING",
+        status: integration.status === 'CONNECTED' ? 'CONNECTED' : 'PENDING',
         lastSyncAt: new Date(),
         errorMessage: null,
       },
@@ -404,34 +503,39 @@ export class CrmIntegrationsService {
         account: { select: { id: true, name: true } },
         contact: { select: { id: true, fullName: true, email: true } },
       },
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: 'desc' }],
       take: 100,
     });
   }
 
   async createMessage(actor: Actor, body: any) {
     const companyId = this.ensureCompanyId(actor);
-    const channelType = this.trim(body?.channelType) || "WHATSAPP";
+    const channelType = this.trim(body?.channelType) || 'WHATSAPP';
     const content = this.trim(body?.body);
 
     if (!content) {
-      throw new BadRequestException("body é obrigatório.");
+      throw new BadRequestException('body é obrigatório.');
     }
 
-    return (this.prisma as any).crmOmnichannelMessage.create({
+    const leadId = this.trim(body?.leadId);
+    const direction =
+      (this.trim(
+        body?.direction,
+      )?.toUpperCase() as CrmOmnichannelDirectionValue) || 'OUTBOUND';
+
+    const message = await (this.prisma as any).crmOmnichannelMessage.create({
       data: {
         companyId,
         integrationId: this.trim(body?.integrationId),
-        leadId: this.trim(body?.leadId),
+        leadId,
         accountId: this.trim(body?.accountId),
         contactId: this.trim(body?.contactId),
-        direction:
-          (this.trim(body?.direction)?.toUpperCase() as CrmOmnichannelDirectionValue) ||
-          "OUTBOUND",
+        direction,
         channelType,
         status:
-          (this.trim(body?.status)?.toUpperCase() as CrmOmnichannelMessageStatusValue) ||
-          "SENT",
+          (this.trim(
+            body?.status,
+          )?.toUpperCase() as CrmOmnichannelMessageStatusValue) || 'SENT',
         providerMessageId: this.trim(body?.providerMessageId),
         threadId: this.trim(body?.threadId),
         senderName: this.trim(body?.senderName),
@@ -446,32 +550,49 @@ export class CrmIntegrationsService {
         metadataJson: body?.metadataJson ?? null,
       },
     });
+
+    await this.registerLeadCommunication({
+      companyId,
+      leadId,
+      userId: this.trim(actor.id),
+      type:
+        direction === 'INBOUND'
+          ? 'CHANNEL_MESSAGE_RECEIVED'
+          : 'CHANNEL_MESSAGE_SENT',
+      description: `${channelType} ${direction === 'INBOUND' ? 'recebido' : 'enviado'}: ${content.slice(0, 120)}`,
+    });
+
+    return message;
   }
 
   async handleCallback(providerParam: string, query: Record<string, unknown>) {
-    const provider = providerParam.trim().toUpperCase() as CrmIntegrationProviderValue;
+    const provider = providerParam
+      .trim()
+      .toUpperCase() as CrmIntegrationProviderValue;
     const preset = PROVIDER_PRESETS[provider];
     if (!preset) {
-      throw new NotFoundException("Provider não suportado.");
+      throw new NotFoundException('Provider não suportado.');
     }
 
     const stateToken = this.trim(query?.state);
     if (!stateToken) {
-      throw new BadRequestException("state é obrigatório.");
+      throw new BadRequestException('state é obrigatório.');
     }
 
-    const integration = await (this.prisma as any).crmChannelIntegration.findFirst({
+    const integration = await (
+      this.prisma as any
+    ).crmChannelIntegration.findFirst({
       where: {
         provider,
         configJson: {
-          path: ["stateToken"],
+          path: ['stateToken'],
           equals: stateToken,
         },
       },
     });
 
     if (!integration) {
-      throw new NotFoundException("Integração não encontrada para o callback.");
+      throw new NotFoundException('Integração não encontrada para o callback.');
     }
 
     const current = (RequestContext as any).get?.() ?? {};
@@ -479,7 +600,7 @@ export class CrmIntegrationsService {
       ...current,
       companyId: integration.companyId,
       isSystem: true,
-      systemSource: "crm-integrations-callback",
+      systemSource: 'crm-integrations-callback',
     });
 
     const code = this.trim(query?.code);
@@ -489,8 +610,10 @@ export class CrmIntegrationsService {
     const updated = await (this.prisma as any).crmChannelIntegration.update({
       where: { id: integration.id },
       data: {
-        status: error ? "ERROR" : "CONNECTED",
-        errorMessage: error ? [error, errorDescription].filter(Boolean).join(": ") : null,
+        status: error ? 'ERROR' : 'CONNECTED',
+        errorMessage: error
+          ? [error, errorDescription].filter(Boolean).join(': ')
+          : null,
         lastSyncAt: error ? integration.lastSyncAt : new Date(),
         configJson: {
           ...(integration.configJson ?? {}),
@@ -508,19 +631,19 @@ export class CrmIntegrationsService {
       status: updated.status,
       appRedirectUrl: `${this.getBaseAppUrl()}/dashboard/crm?integration=${updated.id}`,
       message: error
-        ? "A conexão retornou erro no provider."
-        : "Conexão recebida. Próximo passo: trocar o authorization code por tokens do provider.",
+        ? 'A conexão retornou erro no provider.'
+        : 'Conexão recebida. Próximo passo: trocar o authorization code por tokens do provider.',
     };
   }
 
   async verifyMetaWebhook(query: Record<string, unknown>) {
-    const mode = this.trim(query["hub.mode"]);
-    const token = this.trim(query["hub.verify_token"]);
-    const challenge = this.trim(query["hub.challenge"]);
+    const mode = this.trim(query['hub.mode']);
+    const token = this.trim(query['hub.verify_token']);
+    const challenge = this.trim(query['hub.challenge']);
     const expected = this.trim(process.env.META_WEBHOOK_VERIFY_TOKEN);
 
-    if (mode !== "subscribe" || !challenge || !expected || token !== expected) {
-      throw new ForbiddenException("Webhook Meta não verificado.");
+    if (mode !== 'subscribe' || !challenge || !expected || token !== expected) {
+      throw new ForbiddenException('Webhook Meta não verificado.');
     }
 
     return challenge;
@@ -555,7 +678,9 @@ export class CrmIntegrationsService {
       return;
     }
 
-    const integration = await (this.prisma as any).crmChannelIntegration.findFirst({
+    const integration = await (
+      this.prisma as any
+    ).crmChannelIntegration.findFirst({
       where: {
         OR: [
           { externalBusinessId: businessId },
@@ -563,7 +688,7 @@ export class CrmIntegrationsService {
           { channelIdentifier: businessId },
         ],
       },
-      orderBy: [{ updatedAt: "desc" }],
+      orderBy: [{ updatedAt: 'desc' }],
     });
 
     if (!integration) {
@@ -575,47 +700,66 @@ export class CrmIntegrationsService {
       ...current,
       companyId: integration.companyId,
       isSystem: true,
-      systemSource: "crm-integrations-webhook",
+      systemSource: 'crm-integrations-webhook',
     });
 
     const messageBody =
       this.trim(payload?.text?.body) ||
       this.trim(payload?.message?.text) ||
       this.trim(payload?.message?.mid) ||
-      "Evento recebido do provider";
+      'Evento recebido do provider';
 
     await (this.prisma as any).crmChannelIntegration.update({
       where: { id: integration.id },
       data: {
-        status: "CONNECTED",
+        status: 'CONNECTED',
         lastInboundAt: new Date(),
       },
     });
+
+    const senderHandle =
+      this.trim(payload?.contacts?.[0]?.wa_id) ||
+      this.trim(payload?.sender?.id) ||
+      this.trim(payload?.from?.id);
+    const recipientHandle =
+      this.trim(payload?.metadata?.display_phone_number) ||
+      this.trim(payload?.recipient?.id);
+    const linkedLead = await this.resolveLeadFromInboundHandle(
+      integration.companyId,
+      senderHandle || recipientHandle,
+    );
 
     await (this.prisma as any).crmOmnichannelMessage.create({
       data: {
         companyId: integration.companyId,
         integrationId: integration.id,
-        direction: "INBOUND",
+        leadId: linkedLead?.id ?? null,
+        accountId: linkedLead?.accountId ?? null,
+        contactId: linkedLead?.contactId ?? null,
+        direction: 'INBOUND',
         channelType: String(integration.provider),
-        status: "RECEIVED",
+        status: 'RECEIVED',
         providerMessageId:
           this.trim(payload?.messages?.[0]?.id) ||
           this.trim(payload?.message?.mid) ||
           this.trim(payload?.mid),
         threadId: this.trim(payload?.conversation?.id),
-        senderName: this.trim(payload?.contacts?.[0]?.profile?.name) || this.trim(payload?.sender?.name),
-        senderHandle:
-          this.trim(payload?.contacts?.[0]?.wa_id) ||
-          this.trim(payload?.sender?.id) ||
-          this.trim(payload?.from?.id),
-        recipientHandle:
-          this.trim(payload?.metadata?.display_phone_number) ||
-          this.trim(payload?.recipient?.id),
+        senderName:
+          this.trim(payload?.contacts?.[0]?.profile?.name) ||
+          this.trim(payload?.sender?.name),
+        senderHandle,
+        recipientHandle,
         body: messageBody,
         receivedAt: new Date(),
         metadataJson: payload,
       },
+    });
+
+    await this.registerLeadCommunication({
+      companyId: integration.companyId,
+      leadId: linkedLead?.id ?? null,
+      type: 'WHATSAPP_RECEIVED',
+      description: `Mensagem recebida em ${String(integration.provider)}: ${messageBody.slice(0, 120)}`,
     });
   }
 
@@ -635,19 +779,24 @@ export class CrmIntegrationsService {
 
   private getRequiredEnv(provider: CrmIntegrationProviderValue) {
     switch (provider) {
-      case "GOOGLE":
-      case "GMAIL":
-        return ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "API_URL"];
-      case "MICROSOFT":
-        return ["MICROSOFT_CLIENT_ID", "MICROSOFT_CLIENT_SECRET", "API_URL"];
-      case "YAHOO":
-        return ["YAHOO_CLIENT_ID", "YAHOO_CLIENT_SECRET", "API_URL"];
-      case "WHATSAPP":
-      case "FACEBOOK":
-      case "INSTAGRAM":
-        return ["META_APP_ID", "META_APP_SECRET", "META_WEBHOOK_VERIFY_TOKEN", "API_URL"];
+      case 'GOOGLE':
+      case 'GMAIL':
+        return ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'API_URL'];
+      case 'MICROSOFT':
+        return ['MICROSOFT_CLIENT_ID', 'MICROSOFT_CLIENT_SECRET', 'API_URL'];
+      case 'YAHOO':
+        return ['YAHOO_CLIENT_ID', 'YAHOO_CLIENT_SECRET', 'API_URL'];
+      case 'WHATSAPP':
+      case 'FACEBOOK':
+      case 'INSTAGRAM':
+        return [
+          'META_APP_ID',
+          'META_APP_SECRET',
+          'META_WEBHOOK_VERIFY_TOKEN',
+          'API_URL',
+        ];
       default:
-        return ["API_URL"];
+        return ['API_URL'];
     }
   }
 }
