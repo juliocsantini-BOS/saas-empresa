@@ -242,6 +242,7 @@ export function CrmExecutiveHero({
   stats,
   topOwner,
   dominantStatus,
+  quickCharts,
   onAddLead,
   onViewPipeline,
   onManagePipeline,
@@ -249,10 +250,21 @@ export function CrmExecutiveHero({
   stats: CrmStats;
   topOwner: [string, number] | null;
   dominantStatus: LeadStatus;
+  quickCharts?: Array<{
+    label: string;
+    helper: string;
+    value: number;
+    valueLabel: string;
+  }>;
   onAddLead: () => void;
   onViewPipeline: () => void;
   onManagePipeline?: () => void;
 }) {
+  const safeCharts = (quickCharts || [])
+    .filter((item) => Number.isFinite(item.value) && item.value >= 0)
+    .slice(0, 3);
+  const maxChartValue = safeCharts.reduce((max, item) => Math.max(max, item.value), 0);
+
   return (
     <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,0.82fr)]">
         <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.18),transparent_34%),radial-gradient(circle_at_top_right,rgba(93,156,255,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02))] p-4">
@@ -354,6 +366,44 @@ export function CrmExecutiveHero({
                 }
                 helper="Recomendação automática de operação"
               />
+            </div>
+          </div>
+
+          <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+            <div className="text-sm font-medium text-white">Gráficos rápidos</div>
+            <div className="mt-1.5 text-[13px] leading-5 text-zinc-500">
+              Snapshot visual para decisão imediata.
+            </div>
+            <div className="mt-3 space-y-2.5">
+              {safeCharts.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-3 py-4 text-sm text-zinc-500">
+                  Sem dados no recorte atual.
+                </div>
+              ) : (
+                safeCharts.map((item) => {
+                  const width = maxChartValue > 0 ? Math.max((item.value / maxChartValue) * 100, 18) : 18;
+
+                  return (
+                    <div key={item.label} className="space-y-1.5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-xs uppercase tracking-[0.18em] text-zinc-500">
+                            {item.label}
+                          </div>
+                          <div className="mt-0.5 text-[11px] text-zinc-400">{item.helper}</div>
+                        </div>
+                        <div className="shrink-0 text-sm font-medium text-white">{item.valueLabel}</div>
+                      </div>
+                      <div className="h-2 rounded-full bg-white/[0.05]">
+                        <div
+                          className="h-2 rounded-full bg-[linear-gradient(90deg,rgba(139,92,246,0.95),rgba(221,214,254,0.92))]"
+                          style={{ width: `${width}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

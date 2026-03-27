@@ -1605,6 +1605,37 @@ export default function CrmPage() {
     }
   }
 
+  const heroQuickCharts = useMemo(() => {
+    const bestStage = [...stageConversionReport].sort((a, b) => (b.rate || 0) - (a.rate || 0))[0];
+    const bestSource = [...sourceConversionReport].sort((a, b) => (b.value || 0) - (a.value || 0))[0];
+    const topOwnerPipeline = [...pipelineValueByOwnerReport].sort(
+      (a, b) => (b.value || 0) - (a.value || 0),
+    )[0];
+
+    return [
+      {
+        label: 'Conversão',
+        helper: bestStage
+          ? `${STATUS_LABELS[bestStage.label as LeadStatus] || bestStage.label}`
+          : 'Sem etapa líder',
+        value: bestStage?.rate || 0,
+        valueLabel: `${bestStage?.rate || 0}%`,
+      },
+      {
+        label: 'Origem',
+        helper: bestSource ? bestSource.label : 'Sem origem líder',
+        value: bestSource?.value || 0,
+        valueLabel: canSeeValues ? formatMoney(bestSource?.value || 0) : 'Sem acesso',
+      },
+      {
+        label: 'Owner',
+        helper: topOwnerPipeline ? topOwnerPipeline.label : 'Sem owner líder',
+        value: topOwnerPipeline?.value || 0,
+        valueLabel: canSeeValues ? formatMoney(topOwnerPipeline?.value || 0) : 'Sem acesso',
+      },
+    ];
+  }, [canSeeValues, pipelineValueByOwnerReport, sourceConversionReport, stageConversionReport]);
+
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
       <CrmStyles />
@@ -1614,6 +1645,7 @@ export default function CrmPage() {
           stats={stats}
           dominantStatus={dominantStatus}
           topOwner={topOwner}
+          quickCharts={heroQuickCharts}
           onAddLead={() => setIsCreateOpen(true)}
           onManagePipeline={() => setIsPipelineManagerOpen(true)}
           onViewPipeline={() =>
