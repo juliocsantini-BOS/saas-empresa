@@ -1962,7 +1962,7 @@ export default function CrmPage() {
         stalled: `${stalled} parado(s)`,
         coverage:
           currentSalesTarget && canSeeValues && parseMoney(currentSalesTarget.targetValue) > 0
-            ? `${Math.round((owner.value / parseMoney(currentSalesTarget.targetValue)) * 100)}% da meta`
+            ? `${Math.round((((owner.value || 0) / parseMoney(currentSalesTarget.targetValue)) * 100))}% da meta`
             : 'Cobertura em leitura',
         executionLoad,
       };
