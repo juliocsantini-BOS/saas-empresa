@@ -2027,6 +2027,138 @@ export default function CrmPage() {
 
         {showExecutiveWorkspace ? (
           <>
+            <CrmPanel className="p-4 md:p-5">
+              <CrmSectionHeader
+                eyebrow="Executive filters"
+                title="Filtros rápidos de decisão"
+                description="Ajuste o recorte executivo sem abrir a camada completa de operação."
+              />
+
+              <div className="grid gap-3 xl:grid-cols-6">
+                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Status</div>
+                  <select
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value as 'ALL' | LeadStatus)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                  >
+                    <option value="ALL">Todos</option>
+                    {STATUS_ORDER.map((status) => (
+                      <option key={status} value={status}>
+                        {STATUS_LABELS[status]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Responsável</div>
+                  <select
+                    value={ownerFilter}
+                    onChange={(event) => setOwnerFilter(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                  >
+                    <option value="ALL">Todos</option>
+                    {ownerOptions.map((owner) => (
+                      <option key={owner.id} value={owner.id}>
+                        {owner.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Origem</div>
+                  <select
+                    value={sourceFilter}
+                    onChange={(event) => setSourceFilter(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                  >
+                    <option value="ALL">Todas</option>
+                    {sourceOptions.map((source) => (
+                      <option key={source.id} value={source.id}>
+                        {source.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Fechamento até</div>
+                  <input
+                    type="date"
+                    value={expectedCloseDateTo}
+                    onChange={(event) => setExpectedCloseDateTo(event.target.value)}
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                  />
+                </div>
+
+                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Valor mínimo</div>
+                  <input
+                    value={dealValueMin}
+                    onChange={(event) => setDealValueMin(event.target.value)}
+                    placeholder="Ex.: 10000"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-zinc-500 transition focus:border-[#2C8BFF]/25"
+                  />
+                </div>
+
+                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Probabilidade mínima</div>
+                  <input
+                    value={probabilityMin}
+                    onChange={(event) => setProbabilityMin(event.target.value)}
+                    placeholder="Ex.: 60"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-zinc-500 transition focus:border-[#2C8BFF]/25"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOverdueNextStepOnly('YES');
+                    setStalledOnly('ALL');
+                  }}
+                  className="rounded-full border border-amber-500/20 bg-amber-500/10 px-3.5 py-2 text-xs font-medium text-amber-200 transition hover:bg-amber-500/15"
+                >
+                  Follow-up vencido
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStalledOnly('YES');
+                    setOverdueNextStepOnly('ALL');
+                  }}
+                  className="rounded-full border border-red-500/20 bg-red-500/10 px-3.5 py-2 text-xs font-medium text-red-200 transition hover:bg-red-500/15"
+                >
+                  Leads parados
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPriorityFilter('HIGH')}
+                  className="rounded-full border border-sky-500/20 bg-sky-500/10 px-3.5 py-2 text-xs font-medium text-sky-200 transition hover:bg-sky-500/15"
+                >
+                  Alta prioridade
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPriorityFilter('URGENT')}
+                  className="rounded-full border border-[#2C8BFF]/20 bg-[#2C8BFF]/10 px-3.5 py-2 text-xs font-medium text-[#9CCBFF] transition hover:bg-[#2C8BFF]/15"
+                >
+                  Urgente
+                </button>
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
+                >
+                  Limpar recorte
+                </button>
+              </div>
+            </CrmPanel>
+
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
               {executiveMetrics.map((item) => (
                 <ExecutiveOverviewCard
