@@ -3301,7 +3301,9 @@ export default function CrmPage() {
                   value={String(inboxMessages.length)}
                   helper={
                     latestInboundChannel
-                      ? `Ultimo inbound via ${normalizeUiText(latestInboundChannel)}`
+                      ? `Ultimo inbound via ${normalizeUiText(
+                          latestInboundChannel.label || latestInboundChannel.provider || 'canal',
+                        )}`
                       : 'Sem inbound recente'
                   }
                 />
