@@ -117,6 +117,7 @@ import type {
   CrmSalesTarget,
   CrmSequence,
   CreateCrmSalesTargetInput,
+  DepartmentOption,
   LeadStatus,
   SalesTargetPeriod,
   TemperatureFilter,
@@ -253,9 +254,9 @@ const DEMO_BRANCH_OPTIONS = [
   { id: 'demo-branch-rj', name: 'Rio de Janeiro' },
 ];
 
-const DEMO_DEPARTMENT_OPTIONS = [
-  { id: 'demo-dept-smb', name: 'SMB Sales' },
-  { id: 'demo-dept-ent', name: 'Enterprise Sales' },
+const DEMO_DEPARTMENT_OPTIONS: DepartmentOption[] = [
+  { id: 'demo-dept-smb', name: 'SMB Sales', branchId: 'demo-branch-sp' },
+  { id: 'demo-dept-ent', name: 'Enterprise Sales', branchId: 'demo-branch-rj' },
 ];
 
 const DEMO_PIPELINE_TOTALS = [
@@ -1296,7 +1297,9 @@ export default function CrmPage() {
   const visualConnectedMailboxes = useMemo(
     () =>
       visualMailboxes.filter((mailbox) =>
-        ['CONNECTED', 'ACTIVE'].includes(normalizeUiText(mailbox.status).toUpperCase()),
+        ['CONNECTED', 'ACTIVE', 'SYNCED'].includes(
+          normalizeUiText(mailbox.syncStatus || '').toUpperCase(),
+        ),
       ),
     [visualMailboxes],
   );
