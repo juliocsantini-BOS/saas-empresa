@@ -446,6 +446,51 @@ const DEMO_DOCUMENTS: CrmDocument[] = [
   },
 ];
 
+const DEMO_PRIORITY_ROWS = [
+  {
+    id: 'demo-priority-1',
+    title: 'Follow-up TechCorp',
+    subtitle: 'Proposta enviada · Ana Silva',
+    meta: 'Hoje · alinhar aprovacao juridica',
+    accent: 'critical',
+  },
+  {
+    id: 'demo-priority-2',
+    title: 'Contrato Banco Digital',
+    subtitle: 'Negociacao final · Carlos Mendes',
+    meta: 'Amanha · validar condicoes finais',
+    accent: 'high',
+  },
+  {
+    id: 'demo-priority-3',
+    title: 'Discovery HealthTech',
+    subtitle: 'Qualificacao · Juliana Martins',
+    meta: 'Qua 14:00 · mapear decisor e timing',
+    accent: 'medium',
+  },
+];
+
+const DEMO_COACH_ROWS = [
+  {
+    id: 'demo-insight-1',
+    title: 'Taxa de conversao em queda',
+    body: 'As propostas enviadas na ultima semana perderam ritmo. Revisar objecoes e reforcar prova de valor.',
+    tone: 'danger',
+  },
+  {
+    id: 'demo-insight-2',
+    title: 'Pipeline concentrado',
+    body: 'Tres contas representam a maior parte do forecast. Vale diversificar prospeccao para reduzir risco.',
+    tone: 'info',
+  },
+  {
+    id: 'demo-insight-3',
+    title: 'Ciclo reduzido em SMB',
+    body: 'Deals SMB estao fechando mais rapido. Repetir abordagem nas novas oportunidades parecidas.',
+    tone: 'positive',
+  },
+];
+
 export default function CrmPage() {
   const pipelineRef = useRef<HTMLDivElement | null>(null);
 
@@ -1296,6 +1341,40 @@ export default function CrmPage() {
   const visualInboxMessages = inboxMessages.length > 0 ? inboxMessages : DEMO_INBOX_MESSAGES;
   const visualQuotes = quotes.length > 0 ? quotes : DEMO_QUOTES;
   const visualDocuments = documents.length > 0 ? documents : DEMO_DOCUMENTS;
+  const visualPrimaryAccount =
+    primaryAccount ||
+    (demoPreviewActive
+      ? {
+          id: 'demo-account-1',
+          name: 'TechCorp',
+          contacts: [
+            {
+              id: 'demo-contact-1',
+              firstName: 'Marina',
+              lastName: 'Costa',
+              fullName: 'Marina Costa',
+              email: 'marina.costa@techcorp.com',
+              jobTitle: 'Diretora Comercial',
+              isPrimary: true,
+            },
+            {
+              id: 'demo-contact-2',
+              firstName: 'Felipe',
+              lastName: 'Rocha',
+              fullName: 'Felipe Rocha',
+              email: 'felipe.rocha@techcorp.com',
+              jobTitle: 'Head de Operacoes',
+            },
+          ],
+        }
+      : null);
+  const visualPrimarySequence =
+    primarySequence || (demoPreviewActive ? { id: 'demo-seq-1', name: 'Cadencia Enterprise Q1' } : null);
+  const visualLatestQuote = latestQuote || visualQuotes[0] || null;
+  const visualExecutivePriorityRows =
+    executivePriorityRows.length > 0 ? executivePriorityRows : DEMO_PRIORITY_ROWS;
+  const visualExecutiveCoachRows =
+    executiveCoachRows.length > 0 ? executiveCoachRows : DEMO_COACH_ROWS;
 
   const pipelineGovernanceSummary = useMemo(() => {
     const openLeads = filteredLeads.filter((lead) => !['WON', 'LOST'].includes(lead.status));
@@ -2915,28 +2994,31 @@ export default function CrmPage() {
             </div>
 
             <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.08fr)]">
-              <ExecutivePriorityListCard
-                title="Tarefas críticas"
-                subtitle={`${guidedSellingQueue.length} prioridade(s) imediata(s)`}
-                rows={executivePriorityRows}
-                onSelect={(leadId) => {
-                  const nextLead = filteredLeads.find((lead) => lead.id === leadId);
-                  if (nextLead) void openLeadDetails(nextLead);
-                }}
-              />
+                <ExecutivePriorityListCard
+                  title="Tarefas críticas"
+                  subtitle={`${visualExecutivePriorityRows.length} prioridade(s) imediata(s)`}
+                  rows={visualExecutivePriorityRows}
+                  onSelect={(leadId) => {
+                    const nextLead = filteredLeads.find((lead) => lead.id === leadId);
+                    if (nextLead) void openLeadDetails(nextLead);
+                  }}
+                />
               <ExecutiveAccountFocusCard
                 title="Contas prioritárias"
                 subtitle="Deals que precisam de decisão"
                 rows={executiveAccountRows}
               />
-              <ExecutiveInsightFeedCard
-                title="AI Coaching Insights"
-                subtitle="Recomendações baseadas em dados"
-                rows={executiveCoachRows}
-                footer={conversationCoachingSummary.alert}
-              />
-            </div>
-          </>
+                <ExecutiveInsightFeedCard
+                  title="AI Coaching Insights"
+                  subtitle="Recomendações baseadas em dados"
+                  rows={visualExecutiveCoachRows}
+                  footer={
+                    conversationCoachingSummary.alert ||
+                    'Existem sinais suficientes para agir em pipeline concentrado, objecoes e velocidade de fechamento.'
+                  }
+                />
+              </div>
+            </>
         ) : null}
 
         {showEnterpriseLauncher ? (
@@ -3015,12 +3097,12 @@ export default function CrmPage() {
               eyebrow="Account intelligence"
               metric={`${accounts.length} conta(s)`}
               helper={
-                primaryAccount
-                  ? `${normalizeUiText(primaryAccount.name)} com ${(primaryAccount.contacts || accountContacts).length} stakeholder(s)`
+                visualPrimaryAccount
+                  ? `${normalizeUiText(visualPrimaryAccount.name)} com ${(visualPrimaryAccount.contacts || accountContacts).length} stakeholder(s)`
                   : 'Estruture contas e múltiplos stakeholders por empresa.'
               }
               loading={loadingEnterpriseHub}
-              rows={(primaryAccount?.contacts || accountContacts).slice(0, 3).map((contact) => ({
+              rows={(visualPrimaryAccount?.contacts || accountContacts).slice(0, 3).map((contact) => ({
                 label: normalizeUiText(contact.fullName),
                 helper: normalizeUiText(contact.jobTitle || contact.email || 'Contato mapeado'),
                 value: contact.isPrimary ? 'Primary' : 'Contato',
@@ -3036,23 +3118,23 @@ export default function CrmPage() {
               eyebrow="Email sync"
               metric={`${mailboxes.length} mailbox(es)`}
               helper={
-                mailboxes[0]
-                  ? `${emailReadinessLabel} · ${connectedMailboxes.length}/${mailboxes.length} conectada(s)`
-                  : primarySequence
-                    ? `${emailTemplates.length} template(s) · ${normalizeUiText(primarySequence.name)}`
+                visualMailboxes[0]
+                  ? `${emailReadinessLabel} · ${connectedMailboxes.length || visualMailboxes.length}/${mailboxes.length || visualMailboxes.length} conectada(s)`
+                  : visualPrimarySequence
+                    ? `${emailTemplates.length || 6} template(s) · ${normalizeUiText(visualPrimarySequence.name)}`
                     : 'Conecte caixas, templates e sequences reais.'
               }
               loading={loadingEnterpriseHub}
               rows={
-                inboxMessages.length > 0
-                  ? inboxMessages.slice(0, 3).map((message) => ({
+                visualInboxMessages.length > 0
+                  ? visualInboxMessages.slice(0, 3).map((message) => ({
                       label: normalizeUiText(message.subject),
                       helper: normalizeUiText(message.fromEmail || message.toEmail || 'Sem remetente'),
                       value: normalizeUiText(message.direction),
                     }))
                   : [
                       {
-                        label: `${connectedMailboxes.length} mailbox(es) conectada(s)`,
+                        label: `${connectedMailboxes.length || visualMailboxes.length} mailbox(es) conectada(s)`,
                         helper: mailboxErrors[0]
                           ? normalizeUiText(mailboxErrors[0].errorMessage || 'Erro de sincronizacao')
                           : 'Pronto para sincronizar entrada e saida comercial',
@@ -3069,14 +3151,14 @@ export default function CrmPage() {
             <EnterpriseHubCard
               title="Quotes e documentos"
               eyebrow="Proposal desk"
-              metric={`${quotes.length} quote(s)`}
+              metric={`${visualQuotes.length} quote(s)`}
               helper={
-                latestQuote
-                  ? `${normalizeUiText(latestQuote.title)} · ${normalizeUiText(latestQuote.status)}`
+                visualLatestQuote
+                  ? `${normalizeUiText(visualLatestQuote.title)} · ${normalizeUiText(visualLatestQuote.status)}`
                   : 'Gere quote, proposta, contrato e assinatura.'
               }
               loading={loadingEnterpriseHub}
-              rows={documents.slice(0, 3).map((document) => ({
+              rows={visualDocuments.slice(0, 3).map((document) => ({
                 label: normalizeUiText(document.title),
                 helper: normalizeUiText(document.type),
                 value: normalizeUiText(document.signatureStatus),
@@ -3121,8 +3203,8 @@ export default function CrmPage() {
               }
               loading={loadingEnterpriseHub}
               rows={
-                channelIntegrations.length > 0
-                  ? channelIntegrations.slice(0, 3).map((integration) => ({
+                visualChannelIntegrations.length > 0
+                  ? visualChannelIntegrations.slice(0, 3).map((integration) => ({
                       label: normalizeUiText(integration.label),
                       helper: integration.lastInboundAt
                         ? `Inbound ${formatRelativeTime(integration.lastInboundAt)}`
@@ -3155,8 +3237,8 @@ export default function CrmPage() {
                 }
                 loading={loadingEnterpriseHub}
                 rows={
-                  channelIntegrations.length > 0
-                    ? channelIntegrations.slice(0, 3).map((integration) => ({
+                  visualChannelIntegrations.length > 0
+                    ? visualChannelIntegrations.slice(0, 3).map((integration) => ({
                         label: normalizeUiText(integration.label),
                         helper: integration.lastInboundAt
                           ? `Inbound ${formatRelativeTime(integration.lastInboundAt)}`
