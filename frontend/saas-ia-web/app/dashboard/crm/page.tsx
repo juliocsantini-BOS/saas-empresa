@@ -2032,10 +2032,9 @@ export default function CrmPage() {
                 }))}
                 badge={`${stats.open} deals`}
               />
-              <ReportBarChartCard
+              <ExecutiveOwnerBarsCard
                 title="Revenue por owner"
                 subtitle="Performance individual de vendas"
-                accent="blue"
                 rows={pipelineValueByOwnerReport.slice(0, 5).map((item) => ({
                   label: item.label,
                   value: item.value || 0,
@@ -6954,9 +6953,9 @@ function ExecutiveOverviewCard({
           : 'bg-white/[0.06] text-zinc-300';
 
   return (
-    <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[22px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-4 shadow-[0_22px_60px_rgba(0,0,0,0.24)]">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[#2C8BFF]/20 bg-[#10233B] text-lg text-[#2C8BFF]">
+        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[#1F3E67] bg-[#0F2743] text-lg text-[#2C8BFF] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
           ●
         </div>
         <div className={`rounded-full px-2.5 py-1 text-xs font-medium ${trendClass}`}>{trend}</div>
@@ -6984,22 +6983,37 @@ function ExecutiveGaugeCard({
   const safe = Math.max(0, Math.min(value, 100));
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
       <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
       <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
 
       <div className="mt-6 flex items-center justify-center">
-        <div
-          className="relative h-[190px] w-[190px] rounded-full"
-          style={{
-            background: `conic-gradient(from 180deg, rgba(52,211,153,0.95) 0deg ${Math.max(
-              safe * 1.8,
-              12,
-            )}deg, rgba(255,255,255,0.08) ${Math.max(safe * 1.8, 12)}deg 180deg, transparent 180deg 360deg)`,
-          }}
-        >
-          <div className="absolute inset-[22px] rounded-full bg-[#11161E]" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <div className="relative h-[160px] w-[220px]">
+          <svg viewBox="0 0 220 140" className="h-full w-full">
+            <path
+              d="M 30 110 A 80 80 0 0 1 190 110"
+              fill="none"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="18"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 30 110 A 80 80 0 0 1 190 110"
+              fill="none"
+              stroke="url(#forecastGaugeGradient)"
+              strokeWidth="18"
+              strokeLinecap="round"
+              pathLength="100"
+              strokeDasharray={`${safe} 100`}
+            />
+            <defs>
+              <linearGradient id="forecastGaugeGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+                <stop offset="0%" stopColor="#34D399" />
+                <stop offset="100%" stopColor="#22C55E" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div className="absolute inset-x-0 bottom-1 flex flex-col items-center justify-center text-center">
             <div className="text-[40px] font-semibold tracking-[-0.05em] text-white">{safe}%</div>
             <div className="mt-1 text-xs uppercase tracking-[0.18em] text-zinc-500">da meta</div>
           </div>
@@ -7030,7 +7044,7 @@ function ExecutiveStageBarsCard({
   const max = Math.max(...topRows.map((row) => row.value), 1);
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -7041,7 +7055,11 @@ function ExecutiveStageBarsCard({
         </div>
       </div>
 
-      <div className="mt-6 flex h-[220px] items-end gap-5">
+      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] px-4 pb-4 pt-6">
+        <div className="pointer-events-none mb-4 grid h-[1px] grid-cols-1">
+          <div className="h-px bg-transparent" />
+        </div>
+        <div className="flex h-[220px] items-end gap-5">
         {topRows.map((row, index) => {
           const height = Math.max((row.value / max) * 100, 12);
           return (
@@ -7060,6 +7078,63 @@ function ExecutiveStageBarsCard({
             </div>
           );
         })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveOwnerBarsCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: number; helper: string; valueLabel: string }>;
+}) {
+  const items = rows.filter((row) => row.value >= 0).slice(0, 5);
+  const max = Math.max(...items.map((row) => row.value), 1);
+
+  return (
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] p-4">
+        <div className="space-y-4">
+          {items.length === 0 ? (
+            <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+              Sem dados para este recorte.
+            </div>
+          ) : (
+            items.map((item) => {
+              const width = max > 0 ? Math.max((item.value / max) * 100, 8) : 8;
+
+              return (
+                <div key={item.label} className="grid grid-cols-[72px_minmax(0,1fr)] items-center gap-4">
+                  <div className="text-right text-sm text-zinc-400">{normalizeUiText(item.label)}</div>
+                  <div className="min-w-0">
+                    <div className="h-5 rounded-full bg-[#182231]">
+                      <div
+                        className="h-5 rounded-full bg-[linear-gradient(90deg,#2C8BFF,#4D9CFF)] shadow-[0_0_18px_rgba(44,139,255,0.18)]"
+                        style={{ width: `${width}%` }}
+                      />
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-3 text-xs text-zinc-500">
+                      <span>{item.helper}</span>
+                      <span>{item.valueLabel}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );
@@ -7086,7 +7161,7 @@ function ExecutivePriorityListCard({
           : 'border-l-emerald-400';
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -7105,7 +7180,7 @@ function ExecutivePriorityListCard({
               key={row.id}
               type="button"
               onClick={() => onSelect(row.id)}
-              className={`w-full rounded-[20px] border border-white/10 border-l-2 ${accentClass(row.accent)} bg-white/[0.03] px-4 py-3 text-left transition hover:bg-white/[0.05]`}
+              className={`w-full rounded-[20px] border border-white/8 border-l-2 ${accentClass(row.accent)} bg-[#171D27] px-4 py-3 text-left transition hover:bg-[#1A2230]`}
             >
               <div className="truncate text-base text-white">{row.title}</div>
               <div className="mt-1 text-sm text-zinc-400">{row.subtitle}</div>
@@ -7135,7 +7210,7 @@ function ExecutiveAccountFocusCard({
         : 'bg-red-500/10 text-red-300';
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -7152,7 +7227,7 @@ function ExecutiveAccountFocusCard({
           rows.map((row) => (
             <div
               key={`${row.title}-${row.meta}`}
-              className="rounded-[20px] border border-white/10 bg-white/[0.03] px-4 py-3"
+              className="rounded-[20px] border border-white/8 bg-[#171D27] px-4 py-3"
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
@@ -7191,7 +7266,7 @@ function ExecutiveInsightFeedCard({
         : 'bg-sky-500/10 text-sky-300';
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div>
         <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
         <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
@@ -7204,7 +7279,7 @@ function ExecutiveInsightFeedCard({
           </div>
         ) : (
           rows.map((row) => (
-            <div key={row.id} className="rounded-[20px] border border-white/10 bg-white/[0.03] px-4 py-3">
+            <div key={row.id} className="rounded-[20px] border border-white/8 bg-[#171D27] px-4 py-3">
               <div className="flex items-start gap-3">
                 <div className={`mt-0.5 rounded-full px-2.5 py-1 text-xs font-medium ${toneClass(row.tone)}`}>
                   AI
