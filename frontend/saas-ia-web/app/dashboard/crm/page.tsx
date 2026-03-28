@@ -2881,9 +2881,9 @@ export default function CrmPage() {
 
               <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
                 <div className="overflow-hidden rounded-[24px] border border-[#2C8BFF]/15 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.12),transparent_52%),linear-gradient(180deg,rgba(19,26,39,0.98),rgba(12,17,27,0.94))] p-3.5 shadow-[0_18px_42px_rgba(0,0,0,0.2)]">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="mb-3 min-h-[52px]">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Status</div>
-                    <div className="max-w-full rounded-full border border-[#2C8BFF]/15 bg-[#2C8BFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#9CCBFF]">
+                    <div className="mt-2 inline-flex max-w-full rounded-full border border-[#2C8BFF]/15 bg-[#2C8BFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#9CCBFF]">
                       {normalizeUiText(executiveStatusLabel)}
                     </div>
                   </div>
@@ -2902,9 +2902,9 @@ export default function CrmPage() {
                 </div>
 
                 <div className="overflow-hidden rounded-[24px] border border-emerald-400/12 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.1),transparent_50%),linear-gradient(180deg,rgba(19,26,39,0.98),rgba(12,17,27,0.94))] p-3.5 shadow-[0_18px_42px_rgba(0,0,0,0.2)]">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="mb-3 min-h-[52px]">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Responsável</div>
-                    <div className="max-w-full rounded-full border border-emerald-400/12 bg-emerald-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-emerald-200">
+                    <div className="mt-2 inline-flex max-w-full rounded-full border border-emerald-400/12 bg-emerald-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-emerald-200">
                       {normalizeUiText(executiveOwnerLabel)}
                     </div>
                   </div>
@@ -2923,9 +2923,9 @@ export default function CrmPage() {
                 </div>
 
                 <div className="overflow-hidden rounded-[24px] border border-violet-400/12 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.12),transparent_50%),linear-gradient(180deg,rgba(19,26,39,0.98),rgba(12,17,27,0.94))] p-3.5 shadow-[0_18px_42px_rgba(0,0,0,0.2)]">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="mb-3 min-h-[52px]">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Origem</div>
-                    <div className="max-w-full rounded-full border border-violet-400/12 bg-violet-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-violet-200">
+                    <div className="mt-2 inline-flex max-w-full rounded-full border border-violet-400/12 bg-violet-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-violet-200">
                       {normalizeUiText(executiveSourceLabel)}
                     </div>
                   </div>
@@ -2944,7 +2944,10 @@ export default function CrmPage() {
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
-                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Fechamento até</div>
+                  <div className="mb-3 min-h-[52px]">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Fechamento até</div>
+                    <div className="mt-2 text-[11px] text-zinc-500">Data limite do recorte</div>
+                  </div>
                   <input
                     type="date"
                     value={expectedCloseDateTo}
@@ -2954,7 +2957,10 @@ export default function CrmPage() {
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
-                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Valor mínimo</div>
+                  <div className="mb-3 min-h-[52px]">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Valor mínimo</div>
+                    <div className="mt-2 text-[11px] text-zinc-500">Threshold financeiro</div>
+                  </div>
                   <input
                     value={dealValueMin}
                     onChange={(event) => setDealValueMin(event.target.value)}
@@ -2964,7 +2970,10 @@ export default function CrmPage() {
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
-                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Probabilidade mínima</div>
+                  <div className="mb-3 min-h-[52px]">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Probabilidade mínima</div>
+                    <div className="mt-2 text-[11px] text-zinc-500">Threshold comercial</div>
+                  </div>
                   <input
                     value={probabilityMin}
                     onChange={(event) => setProbabilityMin(event.target.value)}
