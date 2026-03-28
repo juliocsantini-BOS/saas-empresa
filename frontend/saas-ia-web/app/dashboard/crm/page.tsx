@@ -324,6 +324,9 @@ const DEMO_ACCOUNT_INTELLIGENCE = [
 
 const DEMO_SALES_TARGET: CrmSalesTarget = {
   id: 'demo-target-q1',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-03-28T09:00:00.000Z',
+  companyId: 'demo-company',
   periodType: 'QUARTERLY',
   periodStart: '2026-01-01',
   periodEnd: '2026-03-31',
