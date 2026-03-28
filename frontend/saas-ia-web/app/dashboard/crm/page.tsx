@@ -11,8 +11,6 @@ import {
   TEMPERATURE_LABELS,
 } from './_crm/constants';
 import {
-  CrmExecutiveHero,
-  CrmMetricCard,
   CrmPanel,
   CrmSectionHeader,
   CrmStyles,
@@ -410,7 +408,6 @@ export default function CrmPage() {
   } = useCrmAnalytics(authHeaders, crmQueryParams);
 
   const {
-    averageProbability,
     applySavedFilters,
     branchFilter,
     branchOptions,
@@ -468,7 +465,6 @@ export default function CrmPage() {
     stats,
     statusFilter,
     temperatureFilter,
-    topOwner,
     totalForecast,
     totalPipelineValue,
     overdueNextStepOnly,
@@ -1804,37 +1800,6 @@ export default function CrmPage() {
     }
   }
 
-  const heroQuickCharts = useMemo(() => {
-    const bestStage = [...stageConversionReport].sort((a, b) => (b.rate || 0) - (a.rate || 0))[0];
-    const bestSource = [...sourceConversionReport].sort((a, b) => (b.value || 0) - (a.value || 0))[0];
-    const topOwnerPipeline = [...pipelineValueByOwnerReport].sort(
-      (a, b) => (b.value || 0) - (a.value || 0),
-    )[0];
-
-    return [
-      {
-        label: 'Conversão',
-        helper: bestStage
-          ? `${STATUS_LABELS[bestStage.label as LeadStatus] || bestStage.label}`
-          : 'Sem etapa líder',
-        value: bestStage?.rate || 0,
-        valueLabel: `${bestStage?.rate || 0}%`,
-      },
-      {
-        label: 'Origem',
-        helper: bestSource ? bestSource.label : 'Sem origem líder',
-        value: bestSource?.value || 0,
-        valueLabel: canSeeValues ? formatMoney(bestSource?.value || 0) : 'Sem acesso',
-      },
-      {
-        label: 'Owner',
-        helper: topOwnerPipeline ? topOwnerPipeline.label : 'Sem owner líder',
-        value: topOwnerPipeline?.value || 0,
-        valueLabel: canSeeValues ? formatMoney(topOwnerPipeline?.value || 0) : 'Sem acesso',
-      },
-    ];
-  }, [canSeeValues, pipelineValueByOwnerReport, sourceConversionReport, stageConversionReport]);
-
   const selectedWorkspaceMeta = useMemo(
     () => CRM_WORKSPACES.find((workspace) => workspace.key === selectedWorkspace) || CRM_WORKSPACES[0],
     [selectedWorkspace],
@@ -1851,150 +1816,154 @@ export default function CrmPage() {
     showExecutiveWorkspace || showEngagementWorkspace || showDocumentsWorkspace;
   const showOperationsGrid =
     showPipelineWorkspace || showAccountsWorkspace || showForecastWorkspace || showCoachingWorkspace;
+  const cycleAverageDays = useMemo(() => {
+    const weightedTotal = stageAgingReport.reduce(
+      (sum, item) => sum + (item.averageDays || 0) * item.count,
+      0,
+    );
+    const totalCount = stageAgingReport.reduce((sum, item) => sum + item.count, 0);
+    return totalCount > 0 ? Math.round(weightedTotal / totalCount) : 0;
+  }, [stageAgingReport]);
+
+  const lastUpdatedLabel = useMemo(() => {
+    const latestLeadUpdate = filteredLeads[0]?.updatedAt || analyticsUniverse[0]?.updatedAt;
+    return latestLeadUpdate ? `Atualizado ${formatRelativeTime(latestLeadUpdate)}` : 'Atualizado agora';
+  }, [analyticsUniverse, filteredLeads]);
+
+  const forecastGaugeValue = Math.max(0, Math.min(currentTargetProgress || 0, 100));
+
+  const executiveMetrics = useMemo(
+    () => [
+      {
+        label: 'Forecast',
+        value: canSeeValues ? formatMoney(totalForecast) : 'Sem acesso',
+        helper: 'Receita prevista no recorte',
+        trend: `${currentTargetProgress >= 100 ? '+' : ''}${currentTargetProgress}%`,
+        tone: 'positive' as const,
+      },
+      {
+        label: 'Pipeline total',
+        value: canSeeValues ? formatMoney(totalPipelineValue) : 'Sem acesso',
+        helper: 'Valor bruto em negociação',
+        trend: `+${stats.pipeline}`,
+        tone: 'info' as const,
+      },
+      {
+        label: 'Deals ativos',
+        value: String(stats.open),
+        helper: 'Oportunidades em andamento',
+        trend: `+${stats.newThisMonth}`,
+        tone: 'neutral' as const,
+      },
+      {
+        label: 'Win rate',
+        value: `${stats.conversionRate}%`,
+        helper: 'Conversão comercial atual',
+        trend: `${stats.conversionRate >= 30 ? '+' : ''}${stats.conversionRate - 30}%`,
+        tone: stats.conversionRate >= 30 ? ('positive' as const) : ('danger' as const),
+      },
+      {
+        label: 'Contas ativas',
+        value: String(accounts.length || accountIntelligence.length),
+        helper: 'Base ativa da operação',
+        trend: `+${accountIntelligence.length}`,
+        tone: 'positive' as const,
+      },
+      {
+        label: 'Ciclo médio',
+        value: `${cycleAverageDays || 0}d`,
+        helper: 'Velocidade média do funil',
+        trend: cycleAverageDays > 0 ? `-${Math.max(cycleAverageDays - 30, 0)}d` : '0d',
+        tone: 'positive' as const,
+      },
+    ],
+    [
+      accountIntelligence.length,
+      accounts.length,
+      canSeeValues,
+      currentTargetProgress,
+      cycleAverageDays,
+      stats.conversionRate,
+      stats.newThisMonth,
+      stats.open,
+      stats.pipeline,
+      totalForecast,
+      totalPipelineValue,
+    ],
+  );
+
+  const executivePriorityRows = useMemo(
+    () =>
+      guidedSellingQueue.slice(0, 4).map(({ lead, guidance }) => ({
+        id: lead.id,
+        title: normalizeUiText(lead.name),
+        subtitle: `${normalizeUiText(lead.companyName || 'Sem empresa')} · ${guidance.title}`,
+        meta: guidance.action,
+        accent: guidance.level,
+      })),
+    [guidedSellingQueue],
+  );
+
+  const executiveAccountRows = useMemo(
+    () =>
+      accountIntelligence.slice(0, 5).map((account) => ({
+        title: account.label,
+        subtitle: `${account.openDeals} oportunidade(s) · ${account.averageProbability}% prob.`,
+        meta: canSeeValues ? formatMoney(account.pipelineValue) : 'Sem acesso',
+        status:
+          account.stalled > 1 ? 'cold' : account.averageProbability >= 60 ? 'hot' : 'warm',
+      })),
+    [accountIntelligence, canSeeValues],
+  );
+
+  const executiveCoachRows = useMemo(
+    () =>
+      conversationInsights.slice(0, 4).map((insight, index) => ({
+        id: `${insight.id}-${index}`,
+        title: normalizeUiText(insight.summaryText || insight.sourceType || 'Insight comercial'),
+        body: normalizeUiText(
+          insight.coachingNotes ||
+            insight.summaryText ||
+            'Revisar contexto, objeções e próximo passo desta conversa.',
+        ),
+        tone:
+          Number(insight.sentimentScore || 0) < 0
+            ? 'danger'
+            : insight.coachingNotes?.trim()
+              ? 'positive'
+              : 'info',
+      })),
+    [conversationInsights],
+  );
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
       <CrmStyles />
 
       <div className="mx-auto flex w-full min-w-0 max-w-[1840px] flex-col gap-4">
-        <CrmExecutiveHero
-          stats={stats}
-          dominantStatus={dominantStatus}
-          topOwner={topOwner}
-          quickCharts={heroQuickCharts}
-          onAddLead={() => setIsCreateOpen(true)}
-          onManagePipeline={() => setIsPipelineManagerOpen(true)}
-          onViewPipeline={() =>
-            pipelineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }
-        />
-
-        <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-5">
-          <CrmMetricCard
-            label="Pipeline value"
-            value={canSeeValues ? formatMoney(totalPipelineValue) : 'Sem acesso'}
-            helper="Valor total das oportunidades filtradas"
-          />
-          <CrmMetricCard
-            label="Forecast"
-            value={canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
-            helper="Receita ponderada do pipeline"
-            accent="success"
-          />
-          <CrmMetricCard
-            label="Probabilidade média"
-            value={`${averageProbability}%`}
-            helper="Qualidade média das negociações"
-            accent="attention"
-          />
-          <CrmMetricCard
-            label="Em atenção"
-            value={stats.stalledLeads}
-            helper="Leads sem atividade recente"
-            accent={stats.stalledLeads > 0 ? 'danger' : 'success'}
-          />
-          <CrmMetricCard
-            label="Meta atual"
-            value={
-              !canReadSalesTargets
-                ? 'Sem acesso'
-                : currentSalesTarget && canSeeValues
-                  ? formatMoney(currentSalesTarget.targetValue)
-                  : currentSalesTarget
-                    ? `${currentSalesTarget.targetDeals || 0} negócios`
-                    : 'Não definida'
-            }
-            helper={
-              !canReadSalesTargets
-                ? 'Você não pode visualizar metas comerciais'
-                : currentSalesTarget
-                  ? `Atingimento: ${currentTargetProgress}%`
-                  : 'Cadastre metas para acompanhar o time'
-            }
-            accent={currentTargetProgress >= 100 ? 'success' : 'attention'}
-          />
-        </div>
-
         <CrmPanel className="p-4 md:p-5">
-          <CrmSectionHeader
-            eyebrow="Executive analytics"
-            title="Painel executivo de performance comercial"
-            description="Uma camada visual mais premium para ler tendencia, composicao do funil, distribuicao de receita e foco de execucao."
-          />
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="text-[28px] font-semibold tracking-[-0.05em] text-white md:text-[36px]">
+                {showExecutiveWorkspace ? 'Visão Executiva' : selectedWorkspaceMeta.label}
+              </div>
+              <div className="mt-2 text-sm text-zinc-500">
+                AI Business OS · {lastUpdatedLabel}
+              </div>
+            </div>
 
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
-            <ExecutiveAreaChartCard
-              title="Ritmo de fechamento"
-              subtitle="Ganhos e perdas recentes do CRM filtrado"
-              rows={wonLostByPeriodReport.slice(-6)}
-            />
-            <ExecutiveDonutCard
-              title="Composicao do pipeline"
-              subtitle="Distribuicao visual por etapa"
-              rows={pipelineTotals.map((item) => ({
-                label: STATUS_LABELS[item.status],
-                value: item.count,
-                helper: canSeeValues ? formatMoney(item.totalValue) : `${item.count} lead(s)`,
-              }))}
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/10 bg-emerald-500/10 px-3 py-1.5 text-xs text-zinc-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                Sistema operacional
+              </div>
+              <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300">
+                Q1 2026
+              </div>
+            </div>
           </div>
 
-          <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-            <ExecutiveColumnChartCard
-              title="Receita por owner"
-              subtitle="Concentracao do pipeline nas carteiras principais"
-              rows={pipelineValueByOwnerReport.slice(0, 6).map((item) => ({
-                label: item.label,
-                value: item.value || 0,
-                helper: `${item.count} lead(s)`,
-                valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
-              }))}
-            />
-            <ExecutiveRankCard
-              title="Prioridades do comercial"
-              subtitle="Onde agir primeiro para proteger forecast e conversao"
-              rows={[
-                {
-                  label: topOwner ? `Owner lider: ${topOwner[0]}` : 'Owner lider sem dado',
-                  value: topOwner ? `${topOwner[1]} lead(s)` : 'Sem carteira destaque',
-                  helper: 'Maior volume de oportunidades em andamento',
-                },
-                {
-                  label: `Leads parados`,
-                  value: `${stats.stalledLeads}`,
-                  helper: 'Negocios com baixa atividade recente',
-                },
-                {
-                  label: `Tarefas abertas`,
-                  value: `${totalOpenTasks}`,
-                  helper: 'Follow-ups pendentes no recorte atual',
-                },
-                {
-                  label: 'Meta atual',
-                  value:
-                    currentSalesTarget && canSeeValues
-                      ? formatMoney(currentSalesTarget.targetValue)
-                      : currentSalesTarget
-                        ? `${currentSalesTarget.targetDeals || 0} negocios`
-                        : 'Nao definida',
-                  helper:
-                    currentSalesTarget
-                      ? `${currentTargetProgress}% da meta coberta`
-                      : 'Cadastre uma meta para acompanhar a execucao',
-                },
-              ]}
-            />
-          </div>
-        </CrmPanel>
-
-        <CrmPanel className="p-4 md:p-5">
-          <CrmSectionHeader
-            eyebrow={selectedWorkspaceMeta.eyebrow}
-            title="Workspaces do CRM"
-            description={selectedWorkspaceMeta.description}
-          />
-
-          <div className="mb-4 grid gap-2 md:grid-cols-2 xl:grid-cols-7">
+          <div className="mt-5 flex flex-wrap gap-2">
             {CRM_WORKSPACES.map((workspace) => {
               const isActive = workspace.key === selectedWorkspace;
 
@@ -2004,75 +1973,102 @@ export default function CrmPage() {
                   type="button"
                   onClick={() => setSelectedWorkspace(workspace.key)}
                   className={classNames(
-                    'rounded-[24px] border px-4 py-3 text-left transition',
+                    'rounded-[16px] border px-4 py-2.5 text-sm transition',
                     isActive
-                      ? 'border-[#8B5CF6]/25 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.12))] shadow-[0_16px_36px_rgba(0,0,0,0.2)]'
-                      : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]',
+                      ? 'border-[#2C8BFF]/30 bg-[#11233A] text-white shadow-[0_12px_28px_rgba(0,0,0,0.18)]'
+                      : 'border-transparent bg-transparent text-zinc-500 hover:border-white/10 hover:bg-white/[0.03] hover:text-zinc-200',
                   )}
                 >
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                    {workspace.eyebrow}
-                  </div>
-                  <div className="mt-2 text-sm font-medium text-white">{workspace.label}</div>
+                  {workspace.label}
                 </button>
               );
             })}
           </div>
-
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <div className="rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.14))] p-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                Workspace ativo
-              </div>
-              <div className="mt-2 text-[20px] font-semibold tracking-[-0.03em] text-white">
-                {selectedWorkspaceMeta.label}
-              </div>
-              <div className="mt-2 text-sm leading-6 text-zinc-400">
-                {selectedWorkspaceMeta.description}
-              </div>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <CompactFilterStat label="Filtro rápido" value={selectedWorkspaceMeta.label} />
-              <CompactFilterStat
-                label="Prioridade"
-                value={
-                  showPipelineWorkspace
-                    ? 'Operação do funil'
-                    : showForecastWorkspace
-                      ? 'Cobertura e meta'
-                      : showCoachingWorkspace
-                        ? 'Governança e performance'
-                        : showEngagementWorkspace
-                          ? 'Canais e cadência'
-                          : showDocumentsWorkspace
-                            ? 'Proposta e assinatura'
-                            : showAccountsWorkspace
-                              ? 'Conta e stakeholders'
-                              : 'Leitura executiva'
-                }
-              />
-              <CompactFilterStat
-                label="Ação principal"
-                value={
-                  showPipelineWorkspace
-                    ? 'Mover oportunidades'
-                    : showForecastWorkspace
-                      ? 'Acompanhar receita'
-                      : showCoachingWorkspace
-                        ? 'Destravar time'
-                        : showEngagementWorkspace
-                          ? 'Operar inbox'
-                          : showDocumentsWorkspace
-                            ? 'Fechar assinatura'
-                            : showAccountsWorkspace
-                              ? 'Priorizar contas'
-                              : 'Ler o panorama'
-                }
-              />
-            </div>
-          </div>
         </CrmPanel>
+
+        {showExecutiveWorkspace ? (
+          <>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+              {executiveMetrics.map((item) => (
+                <ExecutiveOverviewCard
+                  key={item.label}
+                  label={item.label}
+                  value={item.value}
+                  helper={item.helper}
+                  trend={item.trend}
+                  tone={item.tone}
+                />
+              ))}
+            </div>
+
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,0.82fr)]">
+              <ExecutiveAreaChartCard
+                title="Revenue trend"
+                subtitle="Real vs meta mensal"
+                rows={wonLostByPeriodReport.slice(-6)}
+              />
+              <ExecutiveGaugeCard
+                title="Forecast Q1"
+                subtitle="Atingimento da meta trimestral"
+                value={forecastGaugeValue}
+                reachedValue={canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
+                targetValue={
+                  currentSalesTarget && canSeeValues
+                    ? formatMoney(currentSalesTarget.targetValue)
+                    : currentSalesTarget
+                      ? `${currentSalesTarget.targetDeals || 0} negócios`
+                      : 'Não definida'
+                }
+              />
+            </div>
+
+            <div className="grid gap-3 xl:grid-cols-2">
+              <ExecutiveStageBarsCard
+                title="Pipeline por estágio"
+                subtitle="Conversão e volume atual"
+                rows={pipelineTotals.map((item) => ({
+                  label: STATUS_LABELS[item.status],
+                  value: item.count,
+                }))}
+                badge={`${stats.open} deals`}
+              />
+              <ReportBarChartCard
+                title="Revenue por owner"
+                subtitle="Performance individual de vendas"
+                accent="blue"
+                rows={pipelineValueByOwnerReport.slice(0, 5).map((item) => ({
+                  label: item.label,
+                  value: item.value || 0,
+                  helper: `${item.count} lead(s)`,
+                  valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
+                }))}
+              />
+            </div>
+
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.08fr)]">
+              <ExecutivePriorityListCard
+                title="Tarefas críticas"
+                subtitle={`${guidedSellingQueue.length} prioridade(s) imediata(s)`}
+                rows={executivePriorityRows}
+                onSelect={(leadId) => {
+                  const nextLead = filteredLeads.find((lead) => lead.id === leadId);
+                  if (nextLead) void openLeadDetails(nextLead);
+                }}
+              />
+              <ExecutiveAccountFocusCard
+                title="Contas prioritárias"
+                subtitle="Deals que precisam de decisão"
+                rows={executiveAccountRows}
+              />
+              <ExecutiveInsightFeedCard
+                title="AI Coaching Insights"
+                subtitle="Recomendações baseadas em dados"
+                rows={executiveCoachRows}
+                footer={conversationCoachingSummary.alert}
+              />
+            </div>
+          </>
+        ) : null}
 
         {showExecutiveWorkspace ? (
         <CrmPanel className="p-4">
@@ -6935,188 +6931,162 @@ function ExecutiveAreaChartCard({
   );
 }
 
-function ExecutiveDonutCard({
+function ExecutiveOverviewCard({
+  label,
+  value,
+  helper,
+  trend,
+  tone,
+}: {
+  label: string;
+  value: string;
+  helper: string;
+  trend: string;
+  tone: 'positive' | 'danger' | 'info' | 'neutral';
+}) {
+  const trendClass =
+    tone === 'positive'
+      ? 'bg-emerald-500/10 text-emerald-300'
+      : tone === 'danger'
+        ? 'bg-red-500/10 text-red-300'
+        : tone === 'info'
+          ? 'bg-sky-500/10 text-sky-300'
+          : 'bg-white/[0.06] text-zinc-300';
+
+  return (
+    <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.22)]">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-[#2C8BFF]/20 bg-[#10233B] text-lg text-[#2C8BFF]">
+          ●
+        </div>
+        <div className={`rounded-full px-2.5 py-1 text-xs font-medium ${trendClass}`}>{trend}</div>
+      </div>
+      <div className="mt-5 text-[12px] uppercase tracking-[0.2em] text-zinc-500">{label}</div>
+      <div className="mt-2 text-[22px] font-semibold tracking-[-0.04em] text-white">{value}</div>
+      <div className="mt-1 text-sm text-zinc-500">{helper}</div>
+    </div>
+  );
+}
+
+function ExecutiveGaugeCard({
   title,
   subtitle,
-  rows,
+  value,
+  reachedValue,
+  targetValue,
 }: {
   title: string;
   subtitle: string;
-  rows: Array<{ label: string; value: number; helper: string }>;
+  value: number;
+  reachedValue: string;
+  targetValue: string;
 }) {
-  const items = rows.filter((row) => row.value > 0).slice(0, 5);
-  const total = items.reduce((sum, row) => sum + row.value, 0);
-  const palette = ['#DCEFFF', '#FFC98B', '#DFF0AE', '#8D95A6', '#7DD3FC'];
-  const dominantSegment =
-    [...items].sort((a, b) => b.value - a.value)[0] || null;
-
-  const segments = items.reduce<
-    Array<{ label: string; value: number; helper: string; color: string; start: number; angle: number }>
-  >((acc, item, index) => {
-    const angle = total > 0 ? (item.value / total) * 360 : 0;
-    const start = acc.length === 0 ? 0 : acc[acc.length - 1].start + acc[acc.length - 1].angle;
-    return [
-      ...acc,
-      { ...item, color: palette[index % palette.length], start, angle },
-    ];
-  }, []);
+  const safe = Math.max(0, Math.min(value, 100));
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_26%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
-          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
-        </div>
-        <div className="text-right">
-          <div className="text-2xl font-semibold text-white">{total}</div>
-          <div className="text-xs text-zinc-500">oportunidades</div>
-          <div className="mt-2 text-xs text-zinc-400">
-            {dominantSegment
-              ? `${Math.round((dominantSegment.value / Math.max(total, 1)) * 100)}% em ${normalizeUiText(dominantSegment.label)}`
-              : 'Sem concentracao dominante'}
-          </div>
-        </div>
-      </div>
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
 
-      <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="relative mx-auto h-[220px] w-[220px] shrink-0">
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background:
-                segments.length === 0
-                  ? 'conic-gradient(rgba(255,255,255,0.08) 0 360deg)'
-                  : `conic-gradient(${segments
-                      .map((segment) => `${segment.color} ${segment.start}deg ${segment.start + segment.angle}deg`)
-                      .join(', ')})`,
-            }}
-          />
-          <div className="absolute inset-[48px] rounded-full border border-white/10 bg-[#0F1524]" />
+      <div className="mt-6 flex items-center justify-center">
+        <div
+          className="relative h-[190px] w-[190px] rounded-full"
+          style={{
+            background: `conic-gradient(from 180deg, rgba(52,211,153,0.95) 0deg ${Math.max(
+              safe * 1.8,
+              12,
+            )}deg, rgba(255,255,255,0.08) ${Math.max(safe * 1.8, 12)}deg 180deg, transparent 180deg 360deg)`,
+          }}
+        >
+          <div className="absolute inset-[22px] rounded-full bg-[#11161E]" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Mix do funil</div>
-            <div className="mt-2 text-3xl font-semibold text-white">{total}</div>
-            <div className="mt-1 text-xs text-zinc-500">etapas com volume</div>
+            <div className="text-[40px] font-semibold tracking-[-0.05em] text-white">{safe}%</div>
+            <div className="mt-1 text-xs uppercase tracking-[0.18em] text-zinc-500">da meta</div>
           </div>
         </div>
+      </div>
 
-        <div className="flex-1 space-y-2.5">
-          {segments.length === 0 ? (
-            <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
-              Sem dados para este recorte.
-            </div>
-          ) : (
-            segments.map((segment) => (
-              <div
-                key={segment.label}
-                className="rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: segment.color }}
-                      />
-                      <span className="truncate text-sm font-medium text-white">
-                        {segment.label}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-xs text-zinc-500">{segment.helper}</div>
-                  </div>
-                  <div className="shrink-0 text-sm font-medium text-white">
-                    {total > 0 ? `${Math.round((segment.value / total) * 100)}%` : '0%'}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <MiniStat label="Atingido" value={reachedValue} />
+        <MiniStat label="Meta" value={targetValue} />
       </div>
     </div>
   );
 }
 
-function ExecutiveColumnChartCard({
+function ExecutiveStageBarsCard({
   title,
   subtitle,
   rows,
+  badge,
 }: {
   title: string;
   subtitle: string;
-  rows: Array<{ label: string; value: number; helper: string; valueLabel: string }>;
+  rows: Array<{ label: string; value: number }>;
+  badge: string;
 }) {
-  const items = rows.filter((row) => row.value >= 0).slice(0, 6);
-  const max = Math.max(...items.map((row) => row.value), 1);
-  const topItem = [...items].sort((a, b) => b.value - a.value)[0] || null;
-  const topShare = topItem ? Math.round((topItem.value / Math.max(items.reduce((sum, row) => sum + row.value, 0), 1)) * 100) : 0;
+  const palette = ['#2C8BFF', '#4E7EFF', '#5867F7', '#7B43E8', '#31C77B', '#F59E0B'];
+  const topRows = rows.slice(0, 6);
+  const max = Math.max(...topRows.map((row) => row.value), 1);
 
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(88,196,255,0.08),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
           <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
         </div>
-        <div className="text-right text-xs text-zinc-400">
-          {topItem ? `${normalizeUiText(topItem.label)} lidera com ${topShare}%` : 'Sem owner lider'}
+        <div className="rounded-full border border-[#2C8BFF]/20 bg-[#10233B] px-3 py-1 text-xs text-[#69B1FF]">
+          {badge}
         </div>
       </div>
 
-      <div className="mt-5">
-        {items.length === 0 ? (
-          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-12 text-center text-sm text-zinc-500">
-            Sem dados para este recorte.
-          </div>
-        ) : (
-          <>
-            <div className="flex h-[240px] items-end gap-3 rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.18))] p-4">
-              {items.map((item, index) => {
-                const height = Math.max((item.value / max) * 100, 14);
-                const active = index === items.length - 2 || index === items.length - 1;
-                return (
-                  <div key={item.label} className="flex min-w-0 flex-1 flex-col justify-end gap-3">
-                    <div className="text-center text-xs text-zinc-400">{item.valueLabel}</div>
-                    <div
-                      className={
-                        active
-                          ? 'rounded-t-[14px] bg-[linear-gradient(180deg,#41E0D0,#5D8BFF)] shadow-[0_0_22px_rgba(93,139,255,0.22)]'
-                          : 'rounded-t-[14px] bg-[linear-gradient(180deg,#CFE3EA,#8FB0C7)]'
-                      }
-                      style={{ height: `${height}%` }}
-                    />
-                    <div className="text-center text-xs text-zinc-500">{normalizeUiText(item.label)}</div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-3 grid gap-2 md:grid-cols-3">
-              {items.slice(0, 3).map((item) => (
-                <MiniStat
-                  key={`${title}-${item.label}`}
-                  label={normalizeUiText(item.label)}
-                  value={item.helper}
+      <div className="mt-6 flex h-[220px] items-end gap-5">
+        {topRows.map((row, index) => {
+          const height = Math.max((row.value / max) * 100, 12);
+          return (
+            <div key={row.label} className="flex min-w-0 flex-1 flex-col items-center gap-3">
+              <div className="text-xs text-zinc-500">{row.value}</div>
+              <div className="flex h-[170px] items-end">
+                <div
+                  className="w-12 rounded-t-[12px] shadow-[0_0_24px_rgba(44,139,255,0.18)]"
+                  style={{
+                    height: `${height}%`,
+                    background: `linear-gradient(180deg, ${palette[index % palette.length]}, rgba(255,255,255,0.12))`,
+                  }}
                 />
-              ))}
+              </div>
+              <div className="text-center text-xs text-zinc-400">{normalizeUiText(row.label)}</div>
             </div>
-          </>
-        )}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function ExecutiveRankCard({
+function ExecutivePriorityListCard({
   title,
   subtitle,
   rows,
+  onSelect,
 }: {
   title: string;
   subtitle: string;
-  rows: Array<{ label: string; value: string; helper: string }>;
+  rows: Array<{ id: string; title: string; subtitle: string; meta: string; accent: string }>;
+  onSelect: (leadId: string) => void;
 }) {
+  const accentClass = (accent: string) =>
+    accent === 'critical'
+      ? 'border-l-red-400'
+      : accent === 'high'
+        ? 'border-l-amber-400'
+        : accent === 'medium'
+          ? 'border-l-sky-400'
+          : 'border-l-emerald-400';
+
   return (
-    <div className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.04),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(6,10,20,0.28))] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -7125,26 +7095,131 @@ function ExecutiveRankCard({
       </div>
 
       <div className="mt-5 space-y-3">
-        {rows.map((row, index) => (
-          <div
-            key={`${title}-${row.label}`}
-            className="rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-3">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-xs text-zinc-300">
-                  0{index + 1}
-                </div>
+        {rows.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
+            Sem tarefas críticas neste recorte.
+          </div>
+        ) : (
+          rows.map((row) => (
+            <button
+              key={row.id}
+              type="button"
+              onClick={() => onSelect(row.id)}
+              className={`w-full rounded-[20px] border border-white/10 border-l-2 ${accentClass(row.accent)} bg-white/[0.03] px-4 py-3 text-left transition hover:bg-white/[0.05]`}
+            >
+              <div className="truncate text-base text-white">{row.title}</div>
+              <div className="mt-1 text-sm text-zinc-400">{row.subtitle}</div>
+              <div className="mt-2 text-xs text-zinc-500">{row.meta}</div>
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveAccountFocusCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ title: string; subtitle: string; meta: string; status: string }>;
+}) {
+  const badgeClass = (status: string) =>
+    status === 'hot'
+      ? 'bg-emerald-500/10 text-emerald-300'
+      : status === 'warm'
+        ? 'bg-amber-500/10 text-amber-300'
+        : 'bg-red-500/10 text-red-300';
+
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {rows.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
+            Sem contas prioritárias neste recorte.
+          </div>
+        ) : (
+          rows.map((row) => (
+            <div
+              key={`${row.title}-${row.meta}`}
+              className="rounded-[20px] border border-white/10 bg-white/[0.03] px-4 py-3"
+            >
+              <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-white">{row.label}</div>
-                  <div className="mt-1 text-xs text-zinc-500">{row.helper}</div>
+                  <div className="truncate text-base text-white">{row.title}</div>
+                  <div className="mt-1 text-sm text-zinc-400">{row.subtitle}</div>
+                </div>
+                <div className={`rounded-full px-2.5 py-1 text-xs font-medium uppercase ${badgeClass(row.status)}`}>
+                  {row.status}
                 </div>
               </div>
-              <div className="shrink-0 text-sm font-medium text-white">{row.value}</div>
+              <div className="mt-2 text-sm font-medium text-white">{row.meta}</div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+    </div>
+  );
+}
+
+function ExecutiveInsightFeedCard({
+  title,
+  subtitle,
+  rows,
+  footer,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ id: string; title: string; body: string; tone: string }>;
+  footer: string;
+}) {
+  const toneClass = (tone: string) =>
+    tone === 'danger'
+      ? 'bg-red-500/10 text-red-300'
+      : tone === 'positive'
+        ? 'bg-emerald-500/10 text-emerald-300'
+        : 'bg-sky-500/10 text-sky-300';
+
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,24,31,0.98),rgba(14,18,24,0.98))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div>
+        <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+        <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {rows.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
+            Sem insights recentes.
+          </div>
+        ) : (
+          rows.map((row) => (
+            <div key={row.id} className="rounded-[20px] border border-white/10 bg-white/[0.03] px-4 py-3">
+              <div className="flex items-start gap-3">
+                <div className={`mt-0.5 rounded-full px-2.5 py-1 text-xs font-medium ${toneClass(row.tone)}`}>
+                  AI
+                </div>
+                <div className="min-w-0">
+                  <div className="text-base text-white">{row.title}</div>
+                  <div className="mt-1 text-sm leading-6 text-zinc-400">{row.body}</div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="mt-4 text-sm text-zinc-500">{footer}</div>
     </div>
   );
 }
