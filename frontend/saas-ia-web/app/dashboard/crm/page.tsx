@@ -2077,7 +2077,7 @@ export default function CrmPage() {
                     <option value="ALL">Todas</option>
                     {sourceOptions.map((source) => (
                       <option key={source.id} value={source.id}>
-                        {source.label}
+                        {source.name}
                       </option>
                     ))}
                   </select>
