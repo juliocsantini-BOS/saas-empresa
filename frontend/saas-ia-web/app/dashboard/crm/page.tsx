@@ -170,6 +170,65 @@ const emptyStageForm = {
   statusBase: 'NEW' as LeadStatus,
 };
 
+type CrmWorkspaceKey =
+  | 'executive'
+  | 'pipeline'
+  | 'accounts'
+  | 'engagement'
+  | 'documents'
+  | 'forecast'
+  | 'coaching';
+
+const CRM_WORKSPACES: Array<{
+  key: CrmWorkspaceKey;
+  label: string;
+  eyebrow: string;
+  description: string;
+}> = [
+  {
+    key: 'executive',
+    label: 'Executivo',
+    eyebrow: 'Leitura principal',
+    description: 'Visão gerencial rápida com prioridades, cards enterprise e direção de execução.',
+  },
+  {
+    key: 'pipeline',
+    label: 'Pipeline',
+    eyebrow: 'Operação diária',
+    description: 'Funil, filtros, bulk actions, kanban e detalhe da oportunidade selecionada.',
+  },
+  {
+    key: 'accounts',
+    label: 'Contas',
+    eyebrow: 'Conta e stakeholders',
+    description: 'Leitura por empresa, concentração de receita, stakeholders e risco operacional.',
+  },
+  {
+    key: 'engagement',
+    label: 'Engagement',
+    eyebrow: 'Inbox omnichannel',
+    description: 'Mailboxes, canais, readiness operacional e cadências de relacionamento.',
+  },
+  {
+    key: 'documents',
+    label: 'Documents',
+    eyebrow: 'Proposal desk',
+    description: 'Quotes, propostas, contratos e assinatura comercial em um fluxo dedicado.',
+  },
+  {
+    key: 'forecast',
+    label: 'Forecast',
+    eyebrow: 'Gestão comercial',
+    description: 'Meta, cobertura, categorias de forecast e camada de acompanhamento executivo.',
+  },
+  {
+    key: 'coaching',
+    label: 'Coaching',
+    eyebrow: 'Governança',
+    description: 'Reporting, coaching, conversas e sinais para destravar performance do time.',
+  },
+];
+
 export default function CrmPage() {
   const pipelineRef = useRef<HTMLDivElement | null>(null);
 
@@ -230,6 +289,7 @@ export default function CrmPage() {
   const [isDocumentsWorkspaceOpen, setIsDocumentsWorkspaceOpen] = useState(false);
   const [isRoutingWorkspaceOpen, setIsRoutingWorkspaceOpen] = useState(false);
   const [isForecastWorkspaceOpen, setIsForecastWorkspaceOpen] = useState(false);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<CrmWorkspaceKey>('executive');
   const [accountForm, setAccountForm] = useState({
     name: '',
     website: '',
@@ -1775,6 +1835,23 @@ export default function CrmPage() {
     ];
   }, [canSeeValues, pipelineValueByOwnerReport, sourceConversionReport, stageConversionReport]);
 
+  const selectedWorkspaceMeta = useMemo(
+    () => CRM_WORKSPACES.find((workspace) => workspace.key === selectedWorkspace) || CRM_WORKSPACES[0],
+    [selectedWorkspace],
+  );
+
+  const showExecutiveWorkspace = selectedWorkspace === 'executive';
+  const showPipelineWorkspace = selectedWorkspace === 'pipeline';
+  const showAccountsWorkspace = selectedWorkspace === 'accounts';
+  const showEngagementWorkspace = selectedWorkspace === 'engagement';
+  const showDocumentsWorkspace = selectedWorkspace === 'documents';
+  const showForecastWorkspace = selectedWorkspace === 'forecast';
+  const showCoachingWorkspace = selectedWorkspace === 'coaching';
+  const showEnterpriseLauncher =
+    showExecutiveWorkspace || showEngagementWorkspace || showDocumentsWorkspace;
+  const showOperationsGrid =
+    showPipelineWorkspace || showAccountsWorkspace || showForecastWorkspace || showCoachingWorkspace;
+
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
       <CrmStyles />
@@ -1910,6 +1987,94 @@ export default function CrmPage() {
           </div>
         </CrmPanel>
 
+        <CrmPanel className="p-4 md:p-5">
+          <CrmSectionHeader
+            eyebrow={selectedWorkspaceMeta.eyebrow}
+            title="Workspaces do CRM"
+            description={selectedWorkspaceMeta.description}
+          />
+
+          <div className="mb-4 grid gap-2 md:grid-cols-2 xl:grid-cols-7">
+            {CRM_WORKSPACES.map((workspace) => {
+              const isActive = workspace.key === selectedWorkspace;
+
+              return (
+                <button
+                  key={workspace.key}
+                  type="button"
+                  onClick={() => setSelectedWorkspace(workspace.key)}
+                  className={classNames(
+                    'rounded-[24px] border px-4 py-3 text-left transition',
+                    isActive
+                      ? 'border-[#8B5CF6]/25 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.12))] shadow-[0_16px_36px_rgba(0,0,0,0.2)]'
+                      : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]',
+                  )}
+                >
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                    {workspace.eyebrow}
+                  </div>
+                  <div className="mt-2 text-sm font-medium text-white">{workspace.label}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+            <div className="rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.14))] p-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                Workspace ativo
+              </div>
+              <div className="mt-2 text-[20px] font-semibold tracking-[-0.03em] text-white">
+                {selectedWorkspaceMeta.label}
+              </div>
+              <div className="mt-2 text-sm leading-6 text-zinc-400">
+                {selectedWorkspaceMeta.description}
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <CompactFilterStat label="Filtro rápido" value={selectedWorkspaceMeta.label} />
+              <CompactFilterStat
+                label="Prioridade"
+                value={
+                  showPipelineWorkspace
+                    ? 'Operação do funil'
+                    : showForecastWorkspace
+                      ? 'Cobertura e meta'
+                      : showCoachingWorkspace
+                        ? 'Governança e performance'
+                        : showEngagementWorkspace
+                          ? 'Canais e cadência'
+                          : showDocumentsWorkspace
+                            ? 'Proposta e assinatura'
+                            : showAccountsWorkspace
+                              ? 'Conta e stakeholders'
+                              : 'Leitura executiva'
+                }
+              />
+              <CompactFilterStat
+                label="Ação principal"
+                value={
+                  showPipelineWorkspace
+                    ? 'Mover oportunidades'
+                    : showForecastWorkspace
+                      ? 'Acompanhar receita'
+                      : showCoachingWorkspace
+                        ? 'Destravar time'
+                        : showEngagementWorkspace
+                          ? 'Operar inbox'
+                          : showDocumentsWorkspace
+                            ? 'Fechar assinatura'
+                            : showAccountsWorkspace
+                              ? 'Priorizar contas'
+                              : 'Ler o panorama'
+                }
+              />
+            </div>
+          </div>
+        </CrmPanel>
+
+        {showExecutiveWorkspace ? (
         <CrmPanel className="p-4">
           <CrmSectionHeader
             eyebrow="Guided selling"
@@ -2001,54 +2166,79 @@ export default function CrmPage() {
             )}
           </div>
         </CrmPanel>
+        ) : null}
 
+        {showEnterpriseLauncher ? (
         <CrmPanel className="p-4">
           <CrmSectionHeader
             eyebrow="CRM enterprise"
-            title="Accounts, inbox, docs, routing e governança"
-            description="Fundação enterprise para o CRM operar contas, comunicação, proposals, distribuição automática e forecast gerencial."
+            title={
+              showEngagementWorkspace
+                ? 'Inbox, canais e cadências'
+                : showDocumentsWorkspace
+                  ? 'Quotes, propostas e assinatura'
+                  : 'Accounts, inbox, docs, routing e governança'
+            }
+            description={
+              showEngagementWorkspace
+                ? 'Workspace focado em operação omnichannel, readiness de caixas e execução de cadência.'
+                : showDocumentsWorkspace
+                  ? 'Workspace dedicado a quote, documento comercial e acompanhamento de assinatura.'
+                  : 'Fundação enterprise para o CRM operar contas, comunicação, proposals, distribuição automática e forecast gerencial.'
+            }
             action={
               <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAccountWorkspaceOpen(true)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  Conta
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEngagementWorkspaceOpen(true)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  Inbox
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsDocumentsWorkspaceOpen(true)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  Proposal
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsRoutingWorkspaceOpen(true)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  Routing
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsForecastWorkspaceOpen(true)}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-                >
-                  Forecast
-                </button>
+                {!showEngagementWorkspace && !showDocumentsWorkspace ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsAccountWorkspaceOpen(true)}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
+                  >
+                    Conta
+                  </button>
+                ) : null}
+                {!showDocumentsWorkspace ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsEngagementWorkspaceOpen(true)}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
+                  >
+                    Inbox
+                  </button>
+                ) : null}
+                {!showEngagementWorkspace ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsDocumentsWorkspaceOpen(true)}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
+                  >
+                    Proposal
+                  </button>
+                ) : null}
+                {!showEngagementWorkspace && !showDocumentsWorkspace ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsRoutingWorkspaceOpen(true)}
+                      className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
+                    >
+                      Routing
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsForecastWorkspaceOpen(true)}
+                      className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
+                    >
+                      Forecast
+                    </button>
+                  </>
+                ) : null}
               </div>
             }
           />
 
           <div className="grid gap-3 xl:grid-cols-5">
+            {!showEngagementWorkspace && !showDocumentsWorkspace ? (
             <EnterpriseHubCard
               title="Accounts e contatos"
               eyebrow="Account intelligence"
@@ -2067,7 +2257,9 @@ export default function CrmPage() {
               actionLabel="Gerenciar"
               onAction={() => setIsAccountWorkspaceOpen(true)}
             />
+            ) : null}
 
+            {!showDocumentsWorkspace ? (
             <EnterpriseHubCard
               title="Inbox e cadências"
               eyebrow="Email sync"
@@ -2100,7 +2292,9 @@ export default function CrmPage() {
               actionLabel="Operar"
               onAction={() => setIsEngagementWorkspaceOpen(true)}
             />
+            ) : null}
 
+            {!showEngagementWorkspace ? (
             <EnterpriseHubCard
               title="Quotes e documentos"
               eyebrow="Proposal desk"
@@ -2119,7 +2313,10 @@ export default function CrmPage() {
               actionLabel="Gerar"
               onAction={() => setIsDocumentsWorkspaceOpen(true)}
             />
+            ) : null}
 
+            {!showEngagementWorkspace && !showDocumentsWorkspace ? (
+            <>
             <EnterpriseHubCard
               title="Routing e coaching"
               eyebrow="Auto-assignment"
@@ -2174,9 +2371,46 @@ export default function CrmPage() {
               actionLabel="Conectar"
               onAction={() => setIsEngagementWorkspaceOpen(true)}
             />
+            </>
+            ) : (
+              <EnterpriseHubCard
+                title="Canais e execução"
+                eyebrow="Omnichannel"
+                metric={`${connectedChannelIntegrations.length} ativo(s)`}
+                helper={
+                  latestInboundChannel?.lastInboundAt
+                    ? `${omnichannelReadinessLabel} · ultimo inbound ${formatRelativeTime(latestInboundChannel.lastInboundAt)}`
+                    : `${omnichannelReadinessLabel} · conecte WhatsApp, Instagram e Facebook`
+                }
+                loading={loadingEnterpriseHub}
+                rows={
+                  channelIntegrations.length > 0
+                    ? channelIntegrations.slice(0, 3).map((integration) => ({
+                        label: normalizeUiText(integration.label),
+                        helper: integration.lastInboundAt
+                          ? `Inbound ${formatRelativeTime(integration.lastInboundAt)}`
+                          : normalizeUiText(
+                              integration.channelIdentifier || integration.provider,
+                            ),
+                        value: normalizeUiText(integration.status),
+                      }))
+                    : [
+                        {
+                          label: 'WhatsApp e social',
+                          helper: 'Receba mensagens e atualize o lead em tempo real',
+                          value: omnichannelReadinessLabel,
+                        },
+                      ]
+                }
+                actionLabel="Conectar"
+                onAction={() => setIsEngagementWorkspaceOpen(true)}
+              />
+            )}
           </div>
         </CrmPanel>
+        ) : null}
 
+        {showPipelineWorkspace ? (
         <CrmPanel className="p-4 md:p-5">
           <CrmSectionHeader
             eyebrow="Filtros inteligentes"
@@ -2479,6 +2713,7 @@ export default function CrmPage() {
             </>
           ) : null}
         </CrmPanel>
+        ) : null}
 
         {error ? (
           <div className="rounded-[24px] border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
@@ -2486,8 +2721,10 @@ export default function CrmPage() {
           </div>
         ) : null}
 
+        {showOperationsGrid ? (
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(360px,0.82fr)] 2xl:grid-cols-[minmax(0,1.55fr)_minmax(380px,0.82fr)]">
           <div ref={pipelineRef} className="min-w-0 space-y-5">
+            {showPipelineWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Inteligência do pipeline"
@@ -2530,7 +2767,9 @@ export default function CrmPage() {
                 ))}
               </div>
             </CrmPanel>
+            ) : null}
 
+            {showForecastWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Metas comerciais"
@@ -2671,7 +2910,9 @@ export default function CrmPage() {
                 </div>
               </div>
             </CrmPanel>
+            ) : null}
 
+            {showForecastWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Forecast management"
@@ -2750,7 +2991,9 @@ export default function CrmPage() {
                 </div>
               </div>
             </CrmPanel>
+            ) : null}
 
+            {showAccountsWorkspace || showCoachingWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Accounts intelligence"
@@ -2883,7 +3126,9 @@ export default function CrmPage() {
                 </div>
               </div>
             </CrmPanel>
+            ) : null}
 
+            {showCoachingWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Reporting"
@@ -3006,7 +3251,9 @@ export default function CrmPage() {
                 />
               </div>
             </CrmPanel>
+            ) : null}
 
+            {showPipelineWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Pipeline"
@@ -3457,6 +3704,7 @@ export default function CrmPage() {
                 </div>
               )}
             </CrmPanel>
+            ) : null}
           </div>
 
           <div className="min-w-0 space-y-5 xl:sticky xl:top-6 xl:self-start">
@@ -3476,14 +3724,8 @@ export default function CrmPage() {
                   label="Forecast ponderado"
                   value={canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
                 />
-                <SidebarMetric
-                  label="Conversão atual"
-                  value={`${stats.conversionRate}%`}
-                />
-                <SidebarMetric
-                  label="Leads novos no mês"
-                  value={String(stats.newThisMonth)}
-                />
+                <SidebarMetric label="Conversão atual" value={`${stats.conversionRate}%`} />
+                <SidebarMetric label="Leads novos no mês" value={String(stats.newThisMonth)} />
                 <SidebarMetric label="Total encontrado" value={String(total)} />
                 <SidebarMetric label="Páginas" value={String(totalPages)} />
                 <SidebarMetric label="Página atual" value={`${page} / ${totalPages || 1}`} />
@@ -3547,6 +3789,7 @@ export default function CrmPage() {
               </div>
             </CrmPanel>
 
+            {showPipelineWorkspace || showCoachingWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Lead intelligence"
@@ -3591,7 +3834,7 @@ export default function CrmPage() {
               ) : null}
 
               {selectedLead && canChangeLeadStatus ? (
-                 <div className="mb-4 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                <div className="mb-4 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                       Status do lead
@@ -4189,8 +4432,10 @@ export default function CrmPage() {
                 </div>
               )}
             </CrmPanel>
+            ) : null}
           </div>
         </div>
+        ) : null}
       </div>
 
       {isAccountWorkspaceOpen ? (
