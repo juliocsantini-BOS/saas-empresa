@@ -552,6 +552,7 @@ export default function CrmPage() {
   const [isRoutingWorkspaceOpen, setIsRoutingWorkspaceOpen] = useState(false);
   const [isForecastWorkspaceOpen, setIsForecastWorkspaceOpen] = useState(false);
   const [selectedWorkspace, setSelectedWorkspace] = useState<CrmWorkspaceKey>('executive');
+  const [layoutPreviewMode, setLayoutPreviewMode] = useState(true);
   const [accountForm, setAccountForm] = useState({
     name: '',
     website: '',
@@ -1241,7 +1242,7 @@ export default function CrmPage() {
       .slice(0, 5);
   }, [filteredLeads]);
 
-  const demoPreviewActive =
+  const autoDemoPreview =
     leads.length === 0 &&
     analyticsItems.length === 0 &&
     salesTargets.length === 0 &&
@@ -1251,6 +1252,7 @@ export default function CrmPage() {
     inboxMessages.length === 0 &&
     quotes.length === 0 &&
     documents.length === 0;
+  const demoPreviewActive = layoutPreviewMode || autoDemoPreview;
 
   const visualOwnerOptions = ownerOptions.length > 0 ? ownerOptions : DEMO_OWNER_OPTIONS;
   const visualSourceOptions = sourceOptions.length > 0 ? sourceOptions : DEMO_SOURCE_OPTIONS;
@@ -2771,6 +2773,18 @@ export default function CrmPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setLayoutPreviewMode((current) => !current)}
+                className={classNames(
+                  'rounded-full border px-3 py-1.5 text-xs transition',
+                  demoPreviewActive
+                    ? 'border-[#2C8BFF]/20 bg-[#2C8BFF]/10 text-[#9CCBFF]'
+                    : 'border-white/10 bg-white/[0.04] text-zinc-300 hover:bg-white/[0.08]',
+                )}
+              >
+                {demoPreviewActive ? 'Preview demo ativo' : 'Ativar preview demo'}
+              </button>
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/10 bg-emerald-500/10 px-3 py-1.5 text-xs text-zinc-300">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 Sistema operacional
