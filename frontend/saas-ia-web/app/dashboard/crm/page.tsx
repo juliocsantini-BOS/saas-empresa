@@ -1825,6 +1825,8 @@ export default function CrmPage() {
   const showOperationsGrid =
     showPipelineWorkspace ||
     showCommercialWorkspace ||
+    showEngagementWorkspace ||
+    showDocumentsWorkspace ||
     showAccountsWorkspace ||
     showForecastWorkspace ||
     showCoachingWorkspace;
@@ -1974,6 +1976,115 @@ export default function CrmPage() {
     pipelineValueByOwnerReport,
     stalledLeadsByOwnerReport,
   ]);
+
+  const inboxDirectionRows = useMemo(() => {
+    const counts = inboxMessages.reduce<Record<string, number>>((acc, message) => {
+      const key = normalizeUiText(message.direction || 'UNKNOWN');
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts).map(([label, value]) => ({
+      label,
+      value,
+      helper: 'Mensagens carregadas',
+      valueLabel: `${value} msg`,
+    }));
+  }, [inboxMessages]);
+
+  const integrationProviderRows = useMemo(() => {
+    const counts = channelIntegrations.reduce<Record<string, number>>((acc, integration) => {
+      const key = normalizeUiText(integration.provider || integration.label || 'CANAL');
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts).map(([label, value]) => ({
+      label,
+      value,
+      helper: 'Canais configurados',
+      valueLabel: `${value} canal(is)`,
+    }));
+  }, [channelIntegrations]);
+
+  const recentInboxRows = useMemo(
+    () =>
+      inboxMessages.slice(0, 5).map((message) => ({
+        label: normalizeUiText(message.subject || 'Sem assunto'),
+        value: normalizeUiText(message.direction || 'EMAIL'),
+        helper: normalizeUiText(message.fromEmail || message.toEmail || 'Sem remetente'),
+      })),
+    [inboxMessages],
+  );
+
+  const engagementIssuesRows = useMemo(() => {
+    const rows = [
+      ...mailboxErrors.slice(0, 3).map((mailbox) => ({
+        label: normalizeUiText(mailbox.label || mailbox.emailAddress || 'Mailbox'),
+        value: 'Erro',
+        helper: normalizeUiText(mailbox.errorMessage || 'Falha de sincronização'),
+      })),
+      ...pendingChannelIntegrations.slice(0, 3).map((integration) => ({
+        label: normalizeUiText(integration.label || integration.provider),
+        value: normalizeUiText(integration.status || 'PENDENTE'),
+        helper: normalizeUiText(
+          integration.channelIdentifier || integration.callbackUrl || 'Aguardando configuração',
+        ),
+      })),
+    ];
+
+    return rows;
+  }, [mailboxErrors, pendingChannelIntegrations]);
+
+  const documentSignatureRows = useMemo(() => {
+    const counts = documents.reduce<Record<string, number>>((acc, document) => {
+      const key = normalizeUiText(document.signatureStatus || 'DRAFT');
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts).map(([label, value]) => ({
+      label,
+      value,
+      helper: 'Documentos comerciais',
+      valueLabel: `${value} doc(s)`,
+    }));
+  }, [documents]);
+
+  const quoteStatusRows = useMemo(() => {
+    const counts = quotes.reduce<Record<string, number>>((acc, quote) => {
+      const key = normalizeUiText(quote.status || 'DRAFT');
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts).map(([label, value]) => ({
+      label,
+      value,
+      helper: 'Quotes no recorte',
+      valueLabel: `${value} quote(s)`,
+    }));
+  }, [quotes]);
+
+  const recentDocumentRows = useMemo(
+    () =>
+      documents.slice(0, 5).map((document) => ({
+        label: normalizeUiText(document.title),
+        value: normalizeUiText(document.signatureStatus || 'DRAFT'),
+        helper: normalizeUiText(document.type || document.provider || 'Documento comercial'),
+      })),
+    [documents],
+  );
+
+  const recentQuoteRows = useMemo(
+    () =>
+      quotes.slice(0, 5).map((quote) => ({
+        label: normalizeUiText(quote.title),
+        value: normalizeUiText(quote.status || 'DRAFT'),
+        helper: canSeeValues ? formatMoney(quote.amount || 0) : 'Sem acesso',
+      })),
+    [canSeeValues, quotes],
+  );
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
@@ -3160,6 +3271,168 @@ export default function CrmPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </CrmPanel>
+            ) : null}
+
+            {showEngagementWorkspace ? (
+            <CrmPanel className="p-4 md:p-5">
+              <CrmSectionHeader
+                eyebrow="Engagement hub"
+                title="Execucao dos canais e cadencias do time"
+                description="Uma leitura executiva de prontidao, volume, atividade recente e gargalos operacionais do CRM."
+              />
+
+              <div className="mb-3 grid gap-3 xl:grid-cols-4">
+                <ExecutiveSpotlightCard
+                  label="Email readiness"
+                  value={emailReadinessLabel}
+                  helper={`${connectedMailboxes.length}/${mailboxes.length || 0} mailbox(es) conectada(s)`}
+                  accent={connectedMailboxes.length > 0 ? 'success' : 'default'}
+                />
+                <ExecutiveSpotlightCard
+                  label="Canais ativos"
+                  value={String(connectedChannelIntegrations.length)}
+                  helper={`${pendingChannelIntegrations.length} canal(is) pendente(s)`}
+                  accent={connectedChannelIntegrations.length > 0 ? 'success' : 'default'}
+                />
+                <ExecutiveSpotlightCard
+                  label="Mensagens no inbox"
+                  value={String(inboxMessages.length)}
+                  helper={
+                    latestInboundChannel
+                      ? `Ultimo inbound via ${normalizeUiText(latestInboundChannel)}`
+                      : 'Sem inbound recente'
+                  }
+                />
+                <ExecutiveSpotlightCard
+                  label="Sincronizacao critica"
+                  value={String(mailboxErrors.length + pendingChannelIntegrations.length)}
+                  helper="Mailboxes com erro e canais aguardando configuracao"
+                  accent={
+                    mailboxErrors.length + pendingChannelIntegrations.length > 0
+                      ? 'danger'
+                      : 'success'
+                  }
+                />
+              </div>
+
+              <div className="grid gap-3 xl:grid-cols-2">
+                <ReportBarChartCard
+                  title="Canais por provider"
+                  subtitle="Base instalada de integracoes configuradas"
+                  accent="blue"
+                  rows={integrationProviderRows}
+                />
+                <ReportBarChartCard
+                  title="Direcao das mensagens"
+                  subtitle="Volume atual no inbox por tipo de trafego"
+                  accent="purple"
+                  rows={inboxDirectionRows}
+                />
+                <ReportListCard
+                  title="Ultimas mensagens"
+                  rows={recentInboxRows}
+                />
+                <ReportListCard
+                  title="Pontos de atencao"
+                  rows={
+                    engagementIssuesRows.length > 0
+                      ? engagementIssuesRows
+                      : [
+                          {
+                            label: 'Operacao estavel',
+                            value: 'Sem alertas',
+                            helper: 'Nao ha erros criticos de sync ou canais pendentes.',
+                          },
+                        ]
+                  }
+                />
+              </div>
+            </CrmPanel>
+            ) : null}
+
+            {showDocumentsWorkspace ? (
+            <CrmPanel className="p-4 md:p-5">
+              <CrmSectionHeader
+                eyebrow="Documents desk"
+                title="Propostas, quotes e assinatura sob controle"
+                description="Acompanhe o ritmo documental da operacao comercial com foco em aceite, assinatura e follow-up."
+              />
+
+              <div className="mb-3 grid gap-3 xl:grid-cols-4">
+                <ExecutiveSpotlightCard
+                  label="Quotes emitidos"
+                  value={String(quotes.length)}
+                  helper="Volume total do recorte atual"
+                />
+                <ExecutiveSpotlightCard
+                  label="Documentos ativos"
+                  value={String(documents.length)}
+                  helper="Materiais comerciais disponiveis"
+                />
+                <ExecutiveSpotlightCard
+                  label="Assinados"
+                  value={String(documents.filter((item) => item.signatureStatus === 'SIGNED').length)}
+                  helper="Documentos finalizados com o cliente"
+                  accent={
+                    documents.some((item) => item.signatureStatus === 'SIGNED')
+                      ? 'success'
+                      : 'default'
+                  }
+                />
+                <ExecutiveSpotlightCard
+                  label="Ultima proposta"
+                  value={latestQuote ? normalizeUiText(latestQuote.status || 'DRAFT') : 'Sem quote'}
+                  helper={
+                    latestQuote && canSeeValues
+                      ? formatMoney(latestQuote.amount || 0)
+                      : 'Sem valor disponivel'
+                  }
+                />
+              </div>
+
+              <div className="grid gap-3 xl:grid-cols-2">
+                <ReportBarChartCard
+                  title="Assinatura por status"
+                  subtitle="Onde os documentos estao travando no fluxo comercial"
+                  accent="purple"
+                  rows={documentSignatureRows}
+                />
+                <ReportBarChartCard
+                  title="Quotes por status"
+                  subtitle="Distribuicao atual entre draft, enviada e aprovada"
+                  accent="blue"
+                  rows={quoteStatusRows}
+                />
+                <ReportListCard
+                  title="Documentos recentes"
+                  rows={
+                    recentDocumentRows.length > 0
+                      ? recentDocumentRows
+                      : [
+                          {
+                            label: 'Sem documentos',
+                            value: 'Aguardando',
+                            helper: 'Nenhum documento comercial criado neste recorte.',
+                          },
+                        ]
+                  }
+                />
+                <ReportListCard
+                  title="Quotes recentes"
+                  rows={
+                    recentQuoteRows.length > 0
+                      ? recentQuoteRows
+                      : [
+                          {
+                            label: 'Sem quotes',
+                            value: 'Aguardando',
+                            helper: 'Nenhuma proposta gerada neste recorte.',
+                          },
+                        ]
+                  }
+                />
               </div>
             </CrmPanel>
             ) : null}
