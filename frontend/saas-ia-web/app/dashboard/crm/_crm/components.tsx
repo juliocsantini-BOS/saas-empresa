@@ -72,24 +72,23 @@ export function CrmStyles() {
         );
       }
 
-      :global(.crm-dashboard-shell select) {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
+      :global(.crm-dashboard-shell select),
+      :global(.crm-dashboard-shell input:not([type='checkbox']):not([type='radio'])),
+      :global(.crm-dashboard-shell textarea) {
         color-scheme: dark;
-        background-color: rgba(14, 18, 28, 0.92) !important;
-        background-image:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
-          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5.5 7.5L10 12L14.5 7.5' stroke='%2392A3C7' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat, no-repeat;
-        background-position: center, right 0.9rem center;
-        background-size: auto, 1rem;
-        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #f8fafc !important;
+        background-color: rgba(11, 15, 24, 0.9) !important;
+        background-image: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.045),
+          rgba(255, 255, 255, 0.018)
+        ) !important;
+        border-color: rgba(255, 255, 255, 0.09) !important;
         border-radius: 18px;
-        padding-right: 2.8rem;
         box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.04),
-          0 12px 30px rgba(0, 0, 0, 0.18);
+          inset 0 1px 0 rgba(255, 255, 255, 0.045),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.015),
+          0 14px 34px rgba(0, 0, 0, 0.22);
         transition:
           border-color 180ms ease,
           background-color 180ms ease,
@@ -97,22 +96,91 @@ export function CrmStyles() {
           transform 180ms ease;
       }
 
-      :global(.crm-dashboard-shell select:hover) {
-        border-color: rgba(255, 255, 255, 0.16) !important;
-        background-color: rgba(17, 23, 36, 0.96) !important;
+      :global(.crm-dashboard-shell select) {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+          radial-gradient(circle at top left, rgba(44, 139, 255, 0.1), transparent 55%),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5.5 7.25L10 11.75L14.5 7.25' stroke='%23B5C5E8' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat, no-repeat;
+        background-position: center, center, right 0.95rem center;
+        background-size: auto, auto, 1rem;
+        padding-right: 2.8rem;
       }
 
-      :global(.crm-dashboard-shell select:focus) {
-        border-color: rgba(44, 139, 255, 0.35) !important;
+      :global(.crm-dashboard-shell input[type='date']),
+      :global(.crm-dashboard-shell input[type='datetime-local']) {
+        appearance: none;
+        -webkit-appearance: none;
+        min-height: 48px;
+        padding-right: 2.85rem;
+        background-image:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
+          radial-gradient(circle at top left, rgba(44, 139, 255, 0.1), transparent 55%),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6.5 3.75V5.25M13.5 3.75V5.25M4.75 7.25H15.25M5.75 16.25H14.25C15.0784 16.25 15.75 15.5784 15.75 14.75V6.75C15.75 5.92157 15.0784 5.25 14.25 5.25H5.75C4.92157 5.25 4.25 5.92157 4.25 6.75V14.75C4.25 15.5784 4.92157 16.25 5.75 16.25Z' stroke='%23B5C5E8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat, no-repeat, no-repeat;
+        background-position: center, center, right 0.95rem center;
+        background-size: auto, auto, 1rem;
+      }
+
+      :global(.crm-dashboard-shell input::placeholder),
+      :global(.crm-dashboard-shell textarea::placeholder) {
+        color: rgba(148, 163, 184, 0.72) !important;
+      }
+
+      :global(.crm-dashboard-shell select:hover),
+      :global(.crm-dashboard-shell input:not([type='checkbox']):not([type='radio']):hover),
+      :global(.crm-dashboard-shell textarea:hover) {
+        border-color: rgba(255, 255, 255, 0.16) !important;
+        background-color: rgba(14, 20, 31, 0.96) !important;
         box-shadow:
           inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 16px 38px rgba(0, 0, 0, 0.26);
+      }
+
+      :global(.crm-dashboard-shell select:focus),
+      :global(.crm-dashboard-shell input:not([type='checkbox']):not([type='radio']):focus),
+      :global(.crm-dashboard-shell textarea:focus) {
+        outline: none;
+        border-color: rgba(44, 139, 255, 0.42) !important;
+        background-color: rgba(15, 23, 36, 0.98) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.06),
           0 0 0 1px rgba(44, 139, 255, 0.18),
-          0 18px 44px rgba(0, 0, 0, 0.22);
+          0 0 0 4px rgba(44, 139, 255, 0.08),
+          0 18px 44px rgba(0, 0, 0, 0.28);
+        transform: translateY(-1px);
       }
 
       :global(.crm-dashboard-shell select option),
       :global(.crm-dashboard-shell select optgroup) {
-        background: #0e1320;
+        background: #0b1220;
+        color: #eef2ff;
+      }
+
+      :global(.crm-dashboard-shell input[type='date']::-webkit-calendar-picker-indicator),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-calendar-picker-indicator) {
+        opacity: 0;
+        display: block;
+        width: 2.25rem;
+        height: 2.25rem;
+        cursor: pointer;
+      }
+
+      :global(.crm-dashboard-shell input[type='date']::-webkit-datetime-edit),
+      :global(.crm-dashboard-shell input[type='date']::-webkit-datetime-edit-text),
+      :global(.crm-dashboard-shell input[type='date']::-webkit-datetime-edit-month-field),
+      :global(.crm-dashboard-shell input[type='date']::-webkit-datetime-edit-day-field),
+      :global(.crm-dashboard-shell input[type='date']::-webkit-datetime-edit-year-field),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-text),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-month-field),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-day-field),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-year-field),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-hour-field),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-minute-field) {
         color: #eef2ff;
       }
 

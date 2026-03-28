@@ -2869,7 +2869,7 @@ export default function CrmPage() {
               />
 
               <div className="grid gap-3 xl:grid-cols-6">
-                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Status</div>
                   <select
                     value={statusFilter}
@@ -2885,7 +2885,7 @@ export default function CrmPage() {
                   </select>
                 </div>
 
-                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Responsável</div>
                   <select
                     value={ownerFilter}
@@ -2901,7 +2901,7 @@ export default function CrmPage() {
                   </select>
                 </div>
 
-                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Origem</div>
                   <select
                     value={sourceFilter}
@@ -2917,7 +2917,7 @@ export default function CrmPage() {
                   </select>
                 </div>
 
-                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Fechamento até</div>
                   <input
                     type="date"
@@ -2927,7 +2927,7 @@ export default function CrmPage() {
                   />
                 </div>
 
-                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Valor mínimo</div>
                   <input
                     value={dealValueMin}
@@ -2937,7 +2937,7 @@ export default function CrmPage() {
                   />
                 </div>
 
-                <div className="rounded-[20px] border border-white/10 bg-[#171D27] p-3.5">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Probabilidade mínima</div>
                   <input
                     value={probabilityMin}
