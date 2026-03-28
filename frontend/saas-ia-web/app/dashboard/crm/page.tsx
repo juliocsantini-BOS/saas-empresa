@@ -171,6 +171,7 @@ const emptyStageForm = {
 type CrmWorkspaceKey =
   | 'executive'
   | 'pipeline'
+  | 'commercial'
   | 'accounts'
   | 'engagement'
   | 'documents'
@@ -194,6 +195,12 @@ const CRM_WORKSPACES: Array<{
     label: 'Pipeline',
     eyebrow: 'Operação diária',
     description: 'Funil, filtros, bulk actions, kanban e detalhe da oportunidade selecionada.',
+  },
+  {
+    key: 'commercial',
+    label: 'Comercial',
+    eyebrow: 'Metas e performance',
+    description: 'Meta por time, cobertura, ranking de owners e performance comercial do recorte.',
   },
   {
     key: 'accounts',
@@ -1807,6 +1814,7 @@ export default function CrmPage() {
 
   const showExecutiveWorkspace = selectedWorkspace === 'executive';
   const showPipelineWorkspace = selectedWorkspace === 'pipeline';
+  const showCommercialWorkspace = selectedWorkspace === 'commercial';
   const showAccountsWorkspace = selectedWorkspace === 'accounts';
   const showEngagementWorkspace = selectedWorkspace === 'engagement';
   const showDocumentsWorkspace = selectedWorkspace === 'documents';
@@ -1815,7 +1823,11 @@ export default function CrmPage() {
   const showEnterpriseLauncher =
     showExecutiveWorkspace || showEngagementWorkspace || showDocumentsWorkspace;
   const showOperationsGrid =
-    showPipelineWorkspace || showAccountsWorkspace || showForecastWorkspace || showCoachingWorkspace;
+    showPipelineWorkspace ||
+    showCommercialWorkspace ||
+    showAccountsWorkspace ||
+    showForecastWorkspace ||
+    showCoachingWorkspace;
   const cycleAverageDays = useMemo(() => {
     const weightedTotal = stageAgingReport.reduce(
       (sum, item) => sum + (item.averageDays || 0) * item.count,
@@ -1935,6 +1947,33 @@ export default function CrmPage() {
       })),
     [conversationInsights],
   );
+
+  const commercialOwnerRows = useMemo(() => {
+    return pipelineValueByOwnerReport.slice(0, 6).map((owner) => {
+      const stalled = stalledLeadsByOwnerReport.find((item) => item.label === owner.label)?.count || 0;
+      const tasks = openTasksByOwnerReport.find((item) => item.label === owner.label)?.count || 0;
+      const executionLoad = owner.count > 0 ? Math.round((stalled / owner.count) * 100) : 0;
+
+      return {
+        label: owner.label,
+        pipelineValue: canSeeValues ? formatMoney(owner.value) : 'Sem acesso',
+        openDeals: `${owner.count} lead(s)`,
+        tasks: `${tasks} tarefa(s)`,
+        stalled: `${stalled} parado(s)`,
+        coverage:
+          currentSalesTarget && canSeeValues && parseMoney(currentSalesTarget.targetValue) > 0
+            ? `${Math.round((owner.value / parseMoney(currentSalesTarget.targetValue)) * 100)}% da meta`
+            : 'Cobertura em leitura',
+        executionLoad,
+      };
+    });
+  }, [
+    canSeeValues,
+    currentSalesTarget,
+    openTasksByOwnerReport,
+    pipelineValueByOwnerReport,
+    stalledLeadsByOwnerReport,
+  ]);
 
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
@@ -2764,7 +2803,7 @@ export default function CrmPage() {
             </CrmPanel>
             ) : null}
 
-            {showForecastWorkspace ? (
+            {showCommercialWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Metas comerciais"
@@ -2902,6 +2941,92 @@ export default function CrmPage() {
                       ) : null}
                     </div>
                   )}
+                </div>
+              </div>
+            </CrmPanel>
+            ) : null}
+
+            {showCommercialWorkspace ? (
+            <CrmPanel className="p-4 md:p-5">
+              <CrmSectionHeader
+                eyebrow="Performance comercial"
+                title="Meta, owners e ritmo do time"
+                description="Acompanhe quem está puxando receita, quem precisa destravar execução e como a carteira cobre a meta atual."
+              />
+
+              <div className="mb-3 grid gap-3 xl:grid-cols-4">
+                <ExecutiveSpotlightCard
+                  label="Cobertura atual"
+                  value={
+                    currentSalesTarget
+                      ? `${managementForecastSummary.commitCoverage}%`
+                      : 'Sem meta'
+                  }
+                  helper="Cobertura do commit sobre a meta vigente"
+                  accent={managementForecastSummary.commitCoverage >= 100 ? 'success' : 'default'}
+                />
+                <ExecutiveSpotlightCard
+                  label="Owners ativos"
+                  value={String(pipelineValueByOwnerReport.length)}
+                  helper="Carteiras com pipeline no recorte"
+                />
+                <ExecutiveSpotlightCard
+                  label="Tarefas abertas"
+                  value={String(totalOpenTasks)}
+                  helper="Follow-ups pendentes na operação"
+                  accent={totalOpenTasks > 0 ? 'danger' : 'success'}
+                />
+                <ExecutiveSpotlightCard
+                  label="Leads em atenção"
+                  value={String(stats.stalledLeads)}
+                  helper="Oportunidades com atividade fraca"
+                  accent={stats.stalledLeads > 0 ? 'danger' : 'default'}
+                />
+              </div>
+
+              <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                <ExecutiveOwnerPerformanceBoard rows={commercialOwnerRows} />
+                <div className="space-y-3">
+                  <ReportBarChartCard
+                    title="Cobertura por owner"
+                    subtitle="Peso financeiro individual no recorte atual"
+                    accent="blue"
+                    rows={pipelineValueByOwnerReport.slice(0, 5).map((item) => ({
+                      label: item.label,
+                      value: item.value || 0,
+                      helper: `${item.count} lead(s)`,
+                      valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
+                    }))}
+                  />
+                  <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                      Leitura de liderança
+                    </div>
+                    <div className="mt-3 space-y-3">
+                      <MiniStat
+                        label="Melhor carteira"
+                        value={pipelineValueByOwnerReport[0]?.label || 'Sem owner líder'}
+                      />
+                      <MiniStat
+                        label="Maior gargalo"
+                        value={
+                          ownerExecutionSignals[0]
+                            ? `${ownerExecutionSignals[0].name} · ${ownerExecutionSignals[0].stalled} parados`
+                            : 'Sem gargalo crítico'
+                        }
+                      />
+                      <MiniStat
+                        label="Meta vigente"
+                        value={
+                          currentSalesTarget && canSeeValues
+                            ? formatMoney(currentSalesTarget.targetValue)
+                            : currentSalesTarget
+                              ? `${currentSalesTarget.targetDeals || 0} negócios`
+                              : 'Não definida'
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </CrmPanel>
@@ -7295,6 +7420,72 @@ function ExecutiveInsightFeedCard({
       </div>
 
       <div className="mt-4 text-sm text-zinc-500">{footer}</div>
+    </div>
+  );
+}
+
+function ExecutiveOwnerPerformanceBoard({
+  rows,
+}: {
+  rows: Array<{
+    label: string;
+    pipelineValue: string;
+    openDeals: string;
+    tasks: string;
+    stalled: string;
+    coverage: string;
+    executionLoad: number;
+  }>;
+}) {
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+        Scoreboard do time
+      </div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">
+        Compare a carteira por owner, veja carga operacional e identifique quem precisa de intervenção.
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {rows.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
+            Sem owners ativos neste recorte.
+          </div>
+        ) : (
+          rows.map((row) => (
+            <div
+              key={row.label}
+              className="rounded-[20px] border border-white/8 bg-[#171D27] px-4 py-3"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-base text-white">{normalizeUiText(row.label)}</div>
+                  <div className="mt-1 text-sm text-zinc-400">
+                    {row.openDeals} · {row.tasks} · {row.stalled}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-medium text-white">{row.pipelineValue}</div>
+                  <div className="mt-1 text-xs text-zinc-500">{row.coverage}</div>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <div className="mb-1 flex items-center justify-between gap-3 text-xs text-zinc-500">
+                  <span>Carga operacional</span>
+                  <span>{row.executionLoad}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-white/[0.05]">
+                  <div
+                    className="h-2 rounded-full bg-[linear-gradient(90deg,#2C8BFF,#60A5FA)]"
+                    style={{ width: `${Math.min(Math.max(row.executionLoad, 8), 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
