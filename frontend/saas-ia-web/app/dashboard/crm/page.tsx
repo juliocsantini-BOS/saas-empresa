@@ -234,6 +234,215 @@ const CRM_WORKSPACES: Array<{
   },
 ];
 
+const DEMO_OWNER_OPTIONS = [
+  { id: 'demo-owner-1', name: 'Ana Silva' },
+  { id: 'demo-owner-2', name: 'Carlos Mendes' },
+  { id: 'demo-owner-3', name: 'Juliana Martins' },
+  { id: 'demo-owner-4', name: 'Rafael Costa' },
+];
+
+const DEMO_SOURCE_OPTIONS = [
+  { id: 'Inbound', name: 'Inbound' },
+  { id: 'Referral', name: 'Referral' },
+  { id: 'Event', name: 'Event' },
+  { id: 'Social', name: 'Social' },
+];
+
+const DEMO_BRANCH_OPTIONS = [
+  { id: 'demo-branch-sp', name: 'Sao Paulo' },
+  { id: 'demo-branch-rj', name: 'Rio de Janeiro' },
+];
+
+const DEMO_DEPARTMENT_OPTIONS = [
+  { id: 'demo-dept-smb', name: 'SMB Sales' },
+  { id: 'demo-dept-ent', name: 'Enterprise Sales' },
+];
+
+const DEMO_PIPELINE_TOTALS = [
+  { status: 'NEW' as LeadStatus, count: 18, totalValue: 720000, forecast: 180000, avgProbability: 18 },
+  { status: 'CONTACTED' as LeadStatus, count: 14, totalValue: 580000, forecast: 220000, avgProbability: 38 },
+  { status: 'QUALIFIED' as LeadStatus, count: 11, totalValue: 890000, forecast: 510000, avgProbability: 56 },
+  { status: 'PROPOSAL' as LeadStatus, count: 8, totalValue: 1200000, forecast: 760000, avgProbability: 72 },
+  { status: 'NEGOTIATION' as LeadStatus, count: 5, totalValue: 950000, forecast: 710000, avgProbability: 81 },
+];
+
+const DEMO_OWNER_REPORT = [
+  { label: 'Ana Silva', value: 510000, count: 10 },
+  { label: 'Carlos Mendes', value: 420000, count: 8 },
+  { label: 'Juliana Martins', value: 340000, count: 6 },
+  { label: 'Rafael Costa', value: 210000, count: 4 },
+];
+
+const DEMO_SOURCE_REPORT = [
+  { label: 'Inbound', value: 640000, count: 16, rate: 44 },
+  { label: 'Referral', value: 520000, count: 9, rate: 61 },
+  { label: 'Event', value: 280000, count: 5, rate: 33 },
+  { label: 'Social', value: 180000, count: 7, rate: 22 },
+];
+
+const DEMO_WON_LOST_REPORT = [
+  { period: 'Out', won: 8, lost: 3 },
+  { period: 'Nov', won: 10, lost: 4 },
+  { period: 'Dez', won: 12, lost: 2 },
+  { period: 'Jan', won: 7, lost: 5 },
+  { period: 'Fev', won: 9, lost: 3 },
+  { period: 'Mar', won: 11, lost: 2 },
+];
+
+const DEMO_ACCOUNT_INTELLIGENCE = [
+  {
+    label: 'TechCorp',
+    openDeals: 3,
+    contacts: 5,
+    owners: 2,
+    averageProbability: 68,
+    pipelineValue: 420000,
+    forecastValue: 258000,
+    stalled: 1,
+  },
+  {
+    label: 'Banco Digital',
+    openDeals: 2,
+    contacts: 4,
+    owners: 1,
+    averageProbability: 74,
+    pipelineValue: 340000,
+    forecastValue: 251600,
+    stalled: 0,
+  },
+  {
+    label: 'HealthTech',
+    openDeals: 2,
+    contacts: 3,
+    owners: 1,
+    averageProbability: 41,
+    pipelineValue: 180000,
+    forecastValue: 73800,
+    stalled: 1,
+  },
+];
+
+const DEMO_SALES_TARGET: CrmSalesTarget = {
+  id: 'demo-target-q1',
+  periodType: 'QUARTERLY',
+  periodStart: '2026-01-01',
+  periodEnd: '2026-03-31',
+  targetValue: 2800000,
+  targetDeals: 35,
+  branchId: null,
+  departmentId: null,
+  userId: null,
+};
+
+const DEMO_MAILBOXES: CrmMailbox[] = [
+  {
+    id: 'demo-mailbox-1',
+    provider: 'GOOGLE',
+    label: 'SDR Team',
+    emailAddress: 'sdr@empresa-demo.com',
+    isActive: true,
+    syncStatus: 'CONNECTED',
+    lastSyncAt: '2026-03-28T10:10:00.000Z',
+  },
+  {
+    id: 'demo-mailbox-2',
+    provider: 'MICROSOFT',
+    label: 'Closers',
+    emailAddress: 'closers@empresa-demo.com',
+    isActive: true,
+    syncStatus: 'CONNECTED',
+    lastSyncAt: '2026-03-28T10:06:00.000Z',
+  },
+];
+
+const DEMO_CHANNELS: CrmChannelIntegration[] = [
+  {
+    id: 'demo-channel-1',
+    provider: 'WHATSAPP',
+    category: 'MESSAGING',
+    connectionMode: 'TOKEN',
+    status: 'CONNECTED',
+    label: 'WhatsApp Comercial',
+    channelIdentifier: '+55 11 99999-0001',
+    scopes: [],
+    lastInboundAt: '2026-03-28T09:48:00.000Z',
+  },
+  {
+    id: 'demo-channel-2',
+    provider: 'INSTAGRAM',
+    category: 'SOCIAL',
+    connectionMode: 'OAUTH',
+    status: 'CONNECTED',
+    label: 'Instagram Ads',
+    channelIdentifier: '@empresa.demo',
+    scopes: [],
+    lastInboundAt: '2026-03-28T08:15:00.000Z',
+  },
+];
+
+const DEMO_INBOX_MESSAGES: CrmEmailMessage[] = [
+  {
+    id: 'demo-msg-1',
+    subject: 'Re: proposta enterprise',
+    body: 'Podemos avançar na proposta?',
+    direction: 'INBOUND',
+    syncSource: 'GMAIL',
+    fromEmail: 'compras@techcorp.com',
+    toEmail: 'closers@empresa-demo.com',
+    receivedAt: '2026-03-28T09:42:00.000Z',
+  },
+  {
+    id: 'demo-msg-2',
+    subject: 'Follow-up de discovery',
+    body: 'Compartilhando próximos passos.',
+    direction: 'OUTBOUND',
+    syncSource: 'OUTLOOK',
+    fromEmail: 'sdr@empresa-demo.com',
+    toEmail: 'ceo@healthtech.com',
+    sentAt: '2026-03-28T08:10:00.000Z',
+  },
+];
+
+const DEMO_QUOTES: CrmQuote[] = [
+  {
+    id: 'demo-quote-1',
+    number: 'Q-2026-001',
+    title: 'Proposta TechCorp Enterprise',
+    status: 'APPROVED',
+    currency: 'BRL',
+    total: 180000,
+    validUntil: '2026-04-15',
+  },
+  {
+    id: 'demo-quote-2',
+    number: 'Q-2026-002',
+    title: 'Proposta Banco Digital',
+    status: 'SENT',
+    currency: 'BRL',
+    total: 120000,
+    validUntil: '2026-04-12',
+  },
+];
+
+const DEMO_DOCUMENTS: CrmDocument[] = [
+  {
+    id: 'demo-doc-1',
+    title: 'Contrato TechCorp',
+    type: 'CONTRACT',
+    signatureStatus: 'SIGNED',
+    provider: 'Clicksign',
+    signedAt: '2026-03-27T16:00:00.000Z',
+  },
+  {
+    id: 'demo-doc-2',
+    title: 'Proposta Banco Digital',
+    type: 'PROPOSAL',
+    signatureStatus: 'OPENED',
+    provider: 'Clicksign',
+    openedAt: '2026-03-28T08:30:00.000Z',
+  },
+];
+
 export default function CrmPage() {
   const pipelineRef = useRef<HTMLDivElement | null>(null);
 
@@ -983,6 +1192,107 @@ export default function CrmPage() {
       .sort((a, b) => b.pipelineValue - a.pipelineValue || b.openDeals - a.openDeals)
       .slice(0, 5);
   }, [filteredLeads]);
+
+  const demoPreviewActive =
+    leads.length === 0 &&
+    analyticsItems.length === 0 &&
+    salesTargets.length === 0 &&
+    accounts.length === 0 &&
+    mailboxes.length === 0 &&
+    channelIntegrations.length === 0 &&
+    inboxMessages.length === 0 &&
+    quotes.length === 0 &&
+    documents.length === 0;
+
+  const visualOwnerOptions = ownerOptions.length > 0 ? ownerOptions : DEMO_OWNER_OPTIONS;
+  const visualSourceOptions = sourceOptions.length > 0 ? sourceOptions : DEMO_SOURCE_OPTIONS;
+  const visualBranchOptions = branchOptions.length > 0 ? branchOptions : DEMO_BRANCH_OPTIONS;
+  const visualDepartmentOptions =
+    departmentOptions.length > 0 ? departmentOptions : DEMO_DEPARTMENT_OPTIONS;
+  const visualStats = demoPreviewActive
+    ? {
+        ...stats,
+        open: 57,
+        pipeline: 57,
+        newThisMonth: 9,
+        conversionRate: 32,
+        stalledLeads: 5,
+      }
+    : stats;
+  const visualPipelineTotals = pipelineTotals.length > 0 ? pipelineTotals : DEMO_PIPELINE_TOTALS;
+  const visualPipelineValueByOwnerReport =
+    pipelineValueByOwnerReport.length > 0 ? pipelineValueByOwnerReport : DEMO_OWNER_REPORT;
+  const visualSourceConversionReport =
+    sourceConversionReport.length > 0 ? sourceConversionReport : DEMO_SOURCE_REPORT;
+  const visualWonLostByPeriodReport =
+    wonLostByPeriodReport.length > 0 ? wonLostByPeriodReport : DEMO_WON_LOST_REPORT;
+  const visualAccountIntelligence =
+    accountIntelligence.length > 0 ? accountIntelligence : DEMO_ACCOUNT_INTELLIGENCE;
+  const visualCurrentSalesTarget = currentSalesTarget || (demoPreviewActive ? DEMO_SALES_TARGET : null);
+  const visualTotalPipelineValue =
+    totalPipelineValue > 0
+      ? totalPipelineValue
+      : DEMO_PIPELINE_TOTALS.reduce((sum, item) => sum + item.totalValue, 0);
+  const visualTotalForecast =
+    totalForecast > 0
+      ? totalForecast
+      : Math.round(DEMO_PIPELINE_TOTALS.reduce((sum, item) => sum + item.forecast, 0));
+  const visualCurrentTargetProgress =
+    visualCurrentSalesTarget && parseMoney(visualCurrentSalesTarget.targetValue) > 0
+      ? Math.round(
+          (visualTotalForecast / parseMoney(visualCurrentSalesTarget.targetValue)) * 100,
+        )
+      : currentTargetProgress;
+  const visualManagementForecastSummary =
+    managementForecastSummary.categories.length > 0
+      ? managementForecastSummary
+      : {
+          categories: [
+            {
+              key: 'pipeline',
+              label: 'Pipeline',
+              helper: 'Ate 39% de probabilidade',
+              count: 18,
+              totalValue: 720000,
+              forecastValue: 180000,
+            },
+            {
+              key: 'bestCase',
+              label: 'Best case',
+              helper: '40% a 69% de probabilidade',
+              count: 14,
+              totalValue: 980000,
+              forecastValue: 620000,
+            },
+            {
+              key: 'commit',
+              label: 'Commit',
+              helper: '70%+ com maior chance de fechamento',
+              count: 8,
+              totalValue: 1100000,
+              forecastValue: 760000,
+            },
+            {
+              key: 'won',
+              label: 'Closed won',
+              helper: 'Receita ja ganha no recorte filtrado',
+              count: 7,
+              totalValue: 1950000,
+              forecastValue: 1950000,
+            },
+          ],
+          commitCoverage: 70,
+          gapValue: 850000,
+          targetValue: parseMoney(DEMO_SALES_TARGET.targetValue),
+          commitValue: 760000,
+          bestCaseValue: 620000,
+        };
+  const visualMailboxes = mailboxes.length > 0 ? mailboxes : DEMO_MAILBOXES;
+  const visualChannelIntegrations =
+    channelIntegrations.length > 0 ? channelIntegrations : DEMO_CHANNELS;
+  const visualInboxMessages = inboxMessages.length > 0 ? inboxMessages : DEMO_INBOX_MESSAGES;
+  const visualQuotes = quotes.length > 0 ? quotes : DEMO_QUOTES;
+  const visualDocuments = documents.length > 0 ? documents : DEMO_DOCUMENTS;
 
   const pipelineGovernanceSummary = useMemo(() => {
     const openLeads = filteredLeads.filter((lead) => !['WON', 'LOST'].includes(lead.status));
@@ -1849,59 +2159,60 @@ export default function CrmPage() {
     () => [
       {
         label: 'Forecast',
-        value: canSeeValues ? formatMoney(totalForecast) : 'Sem acesso',
+        value: canSeeValues ? formatMoney(visualTotalForecast) : 'Sem acesso',
         helper: 'Receita prevista no recorte',
-        trend: `${currentTargetProgress >= 100 ? '+' : ''}${currentTargetProgress}%`,
+        trend: `${visualCurrentTargetProgress >= 100 ? '+' : ''}${visualCurrentTargetProgress}%`,
         tone: 'positive' as const,
       },
       {
         label: 'Pipeline total',
-        value: canSeeValues ? formatMoney(totalPipelineValue) : 'Sem acesso',
+        value: canSeeValues ? formatMoney(visualTotalPipelineValue) : 'Sem acesso',
         helper: 'Valor bruto em negociação',
-        trend: `+${stats.pipeline}`,
+        trend: `+${visualStats.pipeline}`,
         tone: 'info' as const,
       },
       {
         label: 'Deals ativos',
-        value: String(stats.open),
+        value: String(visualStats.open),
         helper: 'Oportunidades em andamento',
-        trend: `+${stats.newThisMonth}`,
+        trend: `+${visualStats.newThisMonth}`,
         tone: 'neutral' as const,
       },
       {
-        label: 'Win rate',
-        value: `${stats.conversionRate}%`,
+        label: demoPreviewActive ? 'Deals ativos' : 'Win rate',
+        value: demoPreviewActive ? '364' : `${visualStats.conversionRate}%`,
         helper: 'Conversão comercial atual',
-        trend: `${stats.conversionRate >= 30 ? '+' : ''}${stats.conversionRate - 30}%`,
-        tone: stats.conversionRate >= 30 ? ('positive' as const) : ('danger' as const),
+        trend: `${visualStats.conversionRate >= 30 ? '+' : ''}${visualStats.conversionRate - 30}%`,
+        tone: visualStats.conversionRate >= 30 ? ('positive' as const) : ('danger' as const),
       },
       {
         label: 'Contas ativas',
-        value: String(accounts.length || accountIntelligence.length),
+        value: demoPreviewActive ? '128' : String(accounts.length || visualAccountIntelligence.length),
         helper: 'Base ativa da operação',
-        trend: `+${accountIntelligence.length}`,
+        trend: `+${visualAccountIntelligence.length}`,
         tone: 'positive' as const,
       },
       {
         label: 'Ciclo médio',
-        value: `${cycleAverageDays || 0}d`,
+        value: demoPreviewActive ? '38d' : `${cycleAverageDays || 0}d`,
         helper: 'Velocidade média do funil',
         trend: cycleAverageDays > 0 ? `-${Math.max(cycleAverageDays - 30, 0)}d` : '0d',
         tone: 'positive' as const,
       },
     ],
     [
-      accountIntelligence.length,
+      demoPreviewActive,
+      visualAccountIntelligence.length,
       accounts.length,
       canSeeValues,
-      currentTargetProgress,
+      visualCurrentTargetProgress,
       cycleAverageDays,
-      stats.conversionRate,
-      stats.newThisMonth,
-      stats.open,
-      stats.pipeline,
-      totalForecast,
-      totalPipelineValue,
+      visualStats.conversionRate,
+      visualStats.newThisMonth,
+      visualStats.open,
+      visualStats.pipeline,
+      visualTotalForecast,
+      visualTotalPipelineValue,
     ],
   );
 
@@ -1919,14 +2230,14 @@ export default function CrmPage() {
 
   const executiveAccountRows = useMemo(
     () =>
-      accountIntelligence.slice(0, 5).map((account) => ({
+      visualAccountIntelligence.slice(0, 5).map((account) => ({
         title: account.label,
         subtitle: `${account.openDeals} oportunidade(s) · ${account.averageProbability}% prob.`,
         meta: canSeeValues ? formatMoney(account.pipelineValue) : 'Sem acesso',
         status:
           account.stalled > 1 ? 'cold' : account.averageProbability >= 60 ? 'hot' : 'warm',
       })),
-    [accountIntelligence, canSeeValues],
+    [canSeeValues, visualAccountIntelligence],
   );
 
   const executiveCoachRows = useMemo(
@@ -1950,7 +2261,7 @@ export default function CrmPage() {
   );
 
   const commercialOwnerRows = useMemo(() => {
-    return pipelineValueByOwnerReport.slice(0, 6).map((owner) => {
+    return visualPipelineValueByOwnerReport.slice(0, 6).map((owner) => {
       const stalled = stalledLeadsByOwnerReport.find((item) => item.label === owner.label)?.count || 0;
       const tasks = openTasksByOwnerReport.find((item) => item.label === owner.label)?.count || 0;
       const executionLoad = owner.count > 0 ? Math.round((stalled / owner.count) * 100) : 0;
@@ -1962,22 +2273,24 @@ export default function CrmPage() {
         tasks: `${tasks} tarefa(s)`,
         stalled: `${stalled} parado(s)`,
         coverage:
-          currentSalesTarget && canSeeValues && parseMoney(currentSalesTarget.targetValue) > 0
-            ? `${Math.round((((owner.value || 0) / parseMoney(currentSalesTarget.targetValue)) * 100))}% da meta`
+          visualCurrentSalesTarget &&
+          canSeeValues &&
+          parseMoney(visualCurrentSalesTarget.targetValue) > 0
+            ? `${Math.round((((owner.value || 0) / parseMoney(visualCurrentSalesTarget.targetValue)) * 100))}% da meta`
             : 'Cobertura em leitura',
         executionLoad,
       };
     });
   }, [
     canSeeValues,
-    currentSalesTarget,
+    visualCurrentSalesTarget,
     openTasksByOwnerReport,
-    pipelineValueByOwnerReport,
+    visualPipelineValueByOwnerReport,
     stalledLeadsByOwnerReport,
   ]);
 
   const inboxDirectionRows = useMemo(() => {
-    const counts = inboxMessages.reduce<Record<string, number>>((acc, message) => {
+    const counts = visualInboxMessages.reduce<Record<string, number>>((acc, message) => {
       const key = normalizeUiText(message.direction || 'UNKNOWN');
       acc[key] = (acc[key] || 0) + 1;
       return acc;
@@ -1989,10 +2302,10 @@ export default function CrmPage() {
       helper: 'Mensagens carregadas',
       valueLabel: `${value} msg`,
     }));
-  }, [inboxMessages]);
+  }, [visualInboxMessages]);
 
   const integrationProviderRows = useMemo(() => {
-    const counts = channelIntegrations.reduce<Record<string, number>>((acc, integration) => {
+    const counts = visualChannelIntegrations.reduce<Record<string, number>>((acc, integration) => {
       const key = normalizeUiText(integration.provider || integration.label || 'CANAL');
       acc[key] = (acc[key] || 0) + 1;
       return acc;
@@ -2004,16 +2317,16 @@ export default function CrmPage() {
       helper: 'Canais configurados',
       valueLabel: `${value} canal(is)`,
     }));
-  }, [channelIntegrations]);
+  }, [visualChannelIntegrations]);
 
   const recentInboxRows = useMemo(
     () =>
-      inboxMessages.slice(0, 5).map((message) => ({
+      visualInboxMessages.slice(0, 5).map((message) => ({
         label: normalizeUiText(message.subject || 'Sem assunto'),
         value: normalizeUiText(message.direction || 'EMAIL'),
         helper: normalizeUiText(message.fromEmail || message.toEmail || 'Sem remetente'),
       })),
-    [inboxMessages],
+    [visualInboxMessages],
   );
 
   const engagementIssuesRows = useMemo(() => {
@@ -2036,7 +2349,7 @@ export default function CrmPage() {
   }, [mailboxErrors, pendingChannelIntegrations]);
 
   const documentSignatureRows = useMemo(() => {
-    const counts = documents.reduce<Record<string, number>>((acc, document) => {
+    const counts = visualDocuments.reduce<Record<string, number>>((acc, document) => {
       const key = normalizeUiText(document.signatureStatus || 'DRAFT');
       acc[key] = (acc[key] || 0) + 1;
       return acc;
@@ -2048,10 +2361,10 @@ export default function CrmPage() {
       helper: 'Documentos comerciais',
       valueLabel: `${value} doc(s)`,
     }));
-  }, [documents]);
+  }, [visualDocuments]);
 
   const quoteStatusRows = useMemo(() => {
-    const counts = quotes.reduce<Record<string, number>>((acc, quote) => {
+    const counts = visualQuotes.reduce<Record<string, number>>((acc, quote) => {
       const key = normalizeUiText(quote.status || 'DRAFT');
       acc[key] = (acc[key] || 0) + 1;
       return acc;
@@ -2063,26 +2376,26 @@ export default function CrmPage() {
       helper: 'Quotes no recorte',
       valueLabel: `${value} quote(s)`,
     }));
-  }, [quotes]);
+  }, [visualQuotes]);
 
   const recentDocumentRows = useMemo(
     () =>
-      documents.slice(0, 5).map((document) => ({
+      visualDocuments.slice(0, 5).map((document) => ({
         label: normalizeUiText(document.title),
         value: normalizeUiText(document.signatureStatus || 'DRAFT'),
         helper: normalizeUiText(document.type || document.provider || 'Documento comercial'),
       })),
-    [documents],
+    [visualDocuments],
   );
 
   const recentQuoteRows = useMemo(
     () =>
-      quotes.slice(0, 5).map((quote) => ({
+      visualQuotes.slice(0, 5).map((quote) => ({
         label: normalizeUiText(quote.title),
         value: normalizeUiText(quote.status || 'DRAFT'),
         helper: canSeeValues ? formatMoney(quote.total || quote.subtotal || 0) : 'Sem acesso',
       })),
-    [canSeeValues, quotes],
+    [canSeeValues, visualQuotes],
   );
 
   const commercialPerformanceChartRows = useMemo(
@@ -2136,22 +2449,22 @@ export default function CrmPage() {
       return [
         {
           label: 'Deals abertos',
-          value: String(stats.open),
+          value: String(visualStats.open),
           helper: 'Volume vivo no funil',
         },
         {
           label: 'Pipeline',
-          value: canSeeValues ? formatMoney(totalPipelineValue) : 'Sem acesso',
+          value: canSeeValues ? formatMoney(visualTotalPipelineValue) : 'Sem acesso',
           helper: 'Valor bruto no recorte',
         },
         {
           label: 'Stalled',
-          value: String(stats.stalledLeads),
+          value: String(visualStats.stalledLeads),
           helper: 'Leads exigindo destrave',
         },
         {
           label: 'Win rate',
-          value: `${stats.conversionRate}%`,
+          value: `${visualStats.conversionRate}%`,
           helper: 'Conversao comercial atual',
         },
       ];
@@ -2162,28 +2475,28 @@ export default function CrmPage() {
         {
           label: 'Meta vigente',
           value:
-            currentSalesTarget && canSeeValues
-              ? formatMoney(currentSalesTarget.targetValue)
-              : currentSalesTarget
-                ? `${currentSalesTarget.targetDeals || 0} negócios`
+            visualCurrentSalesTarget && canSeeValues
+              ? formatMoney(visualCurrentSalesTarget.targetValue)
+              : visualCurrentSalesTarget
+                ? `${visualCurrentSalesTarget.targetDeals || 0} negócios`
                 : 'Nao definida',
           helper: 'Objetivo principal do time',
         },
         {
           label: 'Forecast',
-          value: canSeeValues ? formatMoney(totalForecast) : 'Sem acesso',
+          value: canSeeValues ? formatMoney(visualTotalForecast) : 'Sem acesso',
           helper: 'Receita prevista no recorte',
         },
         {
           label: 'Owners ativos',
-          value: String(pipelineValueByOwnerReport.length),
+          value: String(visualPipelineValueByOwnerReport.length),
           helper: 'Carteiras com pipeline',
         },
         {
           label: 'Gap',
           value:
-            currentSalesTarget && canSeeValues
-              ? formatMoney(managementForecastSummary.gapValue)
+            visualCurrentSalesTarget && canSeeValues
+              ? formatMoney(visualManagementForecastSummary.gapValue)
               : 'Em leitura',
           helper: 'Distancia para a meta',
         },
@@ -2194,7 +2507,7 @@ export default function CrmPage() {
       return [
         {
           label: 'Contas ativas',
-          value: String(accountIntelligence.length),
+          value: String(visualAccountIntelligence.length),
           helper: 'Empresas com relevancia no funil',
         },
         {
@@ -2219,7 +2532,7 @@ export default function CrmPage() {
       return [
         {
           label: 'Mailboxes',
-          value: `${connectedMailboxes.length}/${mailboxes.length || 0}`,
+          value: `${connectedMailboxes.length || visualMailboxes.length}/${mailboxes.length || visualMailboxes.length || 0}`,
           helper: 'Caixas conectadas',
         },
         {
@@ -2229,7 +2542,7 @@ export default function CrmPage() {
         },
         {
           label: 'Inbox',
-          value: String(inboxMessages.length),
+          value: String(visualInboxMessages.length),
           helper: 'Mensagens carregadas',
         },
         {
@@ -2244,17 +2557,17 @@ export default function CrmPage() {
       return [
         {
           label: 'Quotes',
-          value: String(quotes.length),
+          value: String(visualQuotes.length),
           helper: 'Propostas emitidas',
         },
         {
           label: 'Documentos',
-          value: String(documents.length),
+          value: String(visualDocuments.length),
           helper: 'Materiais comerciais ativos',
         },
         {
           label: 'Assinados',
-          value: String(documents.filter((item) => item.signatureStatus === 'SIGNED').length),
+          value: String(visualDocuments.filter((item) => item.signatureStatus === 'SIGNED').length),
           helper: 'Fechamentos concluídos',
         },
         {
@@ -2269,24 +2582,24 @@ export default function CrmPage() {
       return [
         {
           label: 'Forecast',
-          value: canSeeValues ? formatMoney(totalForecast) : 'Sem acesso',
+          value: canSeeValues ? formatMoney(visualTotalForecast) : 'Sem acesso',
           helper: 'Receita prevista',
         },
         {
           label: 'Commit',
-          value: `${managementForecastSummary.commitCoverage}%`,
+          value: `${visualManagementForecastSummary.commitCoverage}%`,
           helper: 'Cobertura da meta',
         },
         {
           label: 'Best case',
-          value: canSeeValues ? formatMoney(managementForecastSummary.bestCaseValue) : 'Sem acesso',
+          value: canSeeValues ? formatMoney(visualManagementForecastSummary.bestCaseValue) : 'Sem acesso',
           helper: 'Camada de upside',
         },
         {
           label: 'Gap',
           value:
-            currentSalesTarget && canSeeValues
-              ? formatMoney(managementForecastSummary.gapValue)
+            visualCurrentSalesTarget && canSeeValues
+              ? formatMoney(visualManagementForecastSummary.gapValue)
               : 'Nao aplicavel',
           helper: 'Distancia para o target',
         },
@@ -2324,25 +2637,26 @@ export default function CrmPage() {
     return [];
   }, [
     accountContacts.length,
-    accountIntelligence.length,
+    visualAccountIntelligence.length,
     canSeeValues,
     connectedChannelIntegrations.length,
     connectedMailboxes.length,
     conversationCoachingSummary,
-    currentSalesTarget,
-    documents,
-    inboxMessages.length,
-    mailboxErrors.length,
+    visualCurrentSalesTarget,
+    visualDocuments,
+    visualInboxMessages.length,
     mailboxes.length,
-    managementForecastSummary.bestCaseValue,
-    managementForecastSummary.commitCoverage,
-    managementForecastSummary.gapValue,
+    mailboxErrors.length,
+    visualMailboxes.length,
+    visualManagementForecastSummary.bestCaseValue,
+    visualManagementForecastSummary.commitCoverage,
+    visualManagementForecastSummary.gapValue,
     pendingChannelIntegrations.length,
     pipelineGovernanceSummary.blockers.length,
     pipelineGovernanceSummary.readiness,
-    pipelineValueByOwnerReport.length,
+    visualPipelineValueByOwnerReport.length,
     quoteStatusRows,
-    quotes.length,
+    visualQuotes.length,
     showAccountsWorkspace,
     showCoachingWorkspace,
     showCommercialWorkspace,
@@ -2350,11 +2664,11 @@ export default function CrmPage() {
     showEngagementWorkspace,
     showForecastWorkspace,
     showPipelineWorkspace,
-    stats.conversionRate,
-    stats.open,
-    stats.stalledLeads,
-    totalForecast,
-    totalPipelineValue,
+    visualStats.conversionRate,
+    visualStats.open,
+    visualStats.stalledLeads,
+    visualTotalForecast,
+    visualTotalPipelineValue,
   ]);
 
   return (
@@ -2441,7 +2755,7 @@ export default function CrmPage() {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
                   >
                     <option value="ALL">Todos</option>
-                    {ownerOptions.map((owner) => (
+                    {visualOwnerOptions.map((owner) => (
                       <option key={owner.id} value={owner.id}>
                         {owner.name}
                       </option>
@@ -2457,7 +2771,7 @@ export default function CrmPage() {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
                   >
                     <option value="ALL">Todas</option>
-                    {sourceOptions.map((source) => (
+                    {visualSourceOptions.map((source) => (
                       <option key={source.id} value={source.id}>
                         {source.name}
                       </option>
@@ -2558,18 +2872,18 @@ export default function CrmPage() {
               <ExecutiveAreaChartCard
                 title="Revenue trend"
                 subtitle="Real vs meta mensal"
-                rows={wonLostByPeriodReport.slice(-6)}
+                rows={visualWonLostByPeriodReport.slice(-6)}
               />
               <ExecutiveGaugeCard
                 title="Forecast Q1"
                 subtitle="Atingimento da meta trimestral"
-                value={forecastGaugeValue}
-                reachedValue={canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
+                value={demoPreviewActive ? 78 : forecastGaugeValue}
+                reachedValue={canSeeValues ? formatMoney(visualTotalForecast) : 'Sem acesso'}
                 targetValue={
-                  currentSalesTarget && canSeeValues
-                    ? formatMoney(currentSalesTarget.targetValue)
-                    : currentSalesTarget
-                      ? `${currentSalesTarget.targetDeals || 0} negócios`
+                  visualCurrentSalesTarget && canSeeValues
+                    ? formatMoney(visualCurrentSalesTarget.targetValue)
+                    : visualCurrentSalesTarget
+                      ? `${visualCurrentSalesTarget.targetDeals || 0} negócios`
                       : 'Não definida'
                 }
               />
@@ -2579,16 +2893,16 @@ export default function CrmPage() {
               <ExecutiveStageBarsCard
                 title="Pipeline por estágio"
                 subtitle="Conversão e volume atual"
-                rows={pipelineTotals.map((item) => ({
+                rows={visualPipelineTotals.map((item) => ({
                   label: STATUS_LABELS[item.status],
                   value: item.count,
                 }))}
-                badge={`${stats.open} deals`}
+                badge={demoPreviewActive ? '364 deals' : `${visualStats.open} deals`}
               />
               <ExecutiveOwnerBarsCard
                 title="Revenue por owner"
                 subtitle="Performance individual de vendas"
-                rows={pipelineValueByOwnerReport.slice(0, 5).map((item) => ({
+                rows={visualPipelineValueByOwnerReport.slice(0, 5).map((item) => ({
                   label: item.label,
                   value: item.value || 0,
                   helper: `${item.count} lead(s)`,
@@ -2913,7 +3227,7 @@ export default function CrmPage() {
                 value={
                   ownerFilter === 'ALL'
                     ? 'Todos'
-                    : ownerOptions.find((item) => item.id === ownerFilter)?.name || 'Selecionado'
+                    : visualOwnerOptions.find((item) => item.id === ownerFilter)?.name || 'Selecionado'
                 }
               />
               <CompactFilterStat
@@ -3035,7 +3349,7 @@ export default function CrmPage() {
                 label="Responsável"
                 options={[
                   { id: 'ALL', label: 'Todos' },
-                  ...ownerOptions.map((item) => ({ id: item.id, label: item.name })),
+                  ...visualOwnerOptions.map((item) => ({ id: item.id, label: item.name })),
                 ]}
                 value={ownerFilter}
                 onChange={setOwnerFilter}
@@ -3092,27 +3406,27 @@ export default function CrmPage() {
               onMinChange={setProbabilityMin}
               onMaxChange={setProbabilityMax}
             />
-            <FilterGroup
-              label="Origem"
-              options={[
-                { id: 'ALL', label: 'Todas' },
-                ...sourceOptions.map((item) => ({ id: item.id, label: item.name })),
-              ]}
-              value={sourceFilter}
-              onChange={setSourceFilter}
-            />
+              <FilterGroup
+                label="Origem"
+                options={[
+                  { id: 'ALL', label: 'Todas' },
+                  ...visualSourceOptions.map((item) => ({ id: item.id, label: item.name })),
+                ]}
+                value={sourceFilter}
+                onChange={setSourceFilter}
+              />
           </div>
 
           <div className="mt-3 grid gap-3 md:grid-cols-2 2xl:grid-cols-4">
-            <FilterGroup
-              label="Filial"
-              options={[
-                { id: 'ALL', label: 'Todas' },
-                ...branchOptions.map((item) => ({ id: item.id, label: item.name })),
-              ]}
-              value={branchFilter}
-              onChange={setBranchFilter}
-            />
+              <FilterGroup
+                label="Filial"
+                options={[
+                  { id: 'ALL', label: 'Todas' },
+                  ...visualBranchOptions.map((item) => ({ id: item.id, label: item.name })),
+                ]}
+                value={branchFilter}
+                onChange={setBranchFilter}
+              />
             <FilterGroup
               label="Temperatura"
               options={[
@@ -3145,12 +3459,12 @@ export default function CrmPage() {
           </div>
 
           <div className="mt-3 grid gap-3 md:grid-cols-2">
-            {departmentOptions.length > 0 ? (
+            {visualDepartmentOptions.length > 0 ? (
               <FilterGroup
                 label="Departamento"
                 options={[
                   { id: 'ALL', label: 'Todos' },
-                  ...departmentOptions.map((item) => ({ id: item.id, label: item.name })),
+                  ...visualDepartmentOptions.map((item) => ({ id: item.id, label: item.name })),
                 ]}
                 value={departmentFilter}
                 onChange={setDepartmentFilter}
@@ -3387,16 +3701,16 @@ export default function CrmPage() {
                 <ExecutiveSpotlightCard
                   label="Cobertura atual"
                   value={
-                    currentSalesTarget
-                      ? `${managementForecastSummary.commitCoverage}%`
+                    visualCurrentSalesTarget
+                      ? `${visualManagementForecastSummary.commitCoverage}%`
                       : 'Sem meta'
                   }
                   helper="Cobertura do commit sobre a meta vigente"
-                  accent={managementForecastSummary.commitCoverage >= 100 ? 'success' : 'default'}
+                  accent={visualManagementForecastSummary.commitCoverage >= 100 ? 'success' : 'default'}
                 />
                 <ExecutiveSpotlightCard
                   label="Owners ativos"
-                  value={String(pipelineValueByOwnerReport.length)}
+                  value={String(visualPipelineValueByOwnerReport.length)}
                   helper="Carteiras com pipeline no recorte"
                 />
                 <ExecutiveSpotlightCard
@@ -3429,7 +3743,7 @@ export default function CrmPage() {
                     <div className="mt-3 space-y-3">
                       <MiniStat
                         label="Melhor carteira"
-                        value={pipelineValueByOwnerReport[0]?.label || 'Sem owner líder'}
+                        value={visualPipelineValueByOwnerReport[0]?.label || 'Sem owner líder'}
                       />
                       <MiniStat
                         label="Maior gargalo"
@@ -3442,10 +3756,10 @@ export default function CrmPage() {
                       <MiniStat
                         label="Meta vigente"
                         value={
-                          currentSalesTarget && canSeeValues
-                            ? formatMoney(currentSalesTarget.targetValue)
-                            : currentSalesTarget
-                              ? `${currentSalesTarget.targetDeals || 0} negócios`
+                          visualCurrentSalesTarget && canSeeValues
+                            ? formatMoney(visualCurrentSalesTarget.targetValue)
+                            : visualCurrentSalesTarget
+                              ? `${visualCurrentSalesTarget.targetDeals || 0} negócios`
                               : 'Não definida'
                         }
                       />
@@ -3468,18 +3782,18 @@ export default function CrmPage() {
                 <ExecutiveSpotlightCard
                   label="Email readiness"
                   value={emailReadinessLabel}
-                  helper={`${connectedMailboxes.length}/${mailboxes.length || 0} mailbox(es) conectada(s)`}
-                  accent={connectedMailboxes.length > 0 ? 'success' : 'default'}
+                  helper={`${connectedMailboxes.length || visualMailboxes.length}/${mailboxes.length || visualMailboxes.length || 0} mailbox(es) conectada(s)`}
+                  accent={(connectedMailboxes.length || visualMailboxes.length) > 0 ? 'success' : 'default'}
                 />
                 <ExecutiveSpotlightCard
                   label="Canais ativos"
-                  value={String(connectedChannelIntegrations.length)}
+                  value={String(connectedChannelIntegrations.length || visualChannelIntegrations.length)}
                   helper={`${pendingChannelIntegrations.length} canal(is) pendente(s)`}
-                  accent={connectedChannelIntegrations.length > 0 ? 'success' : 'default'}
+                  accent={(connectedChannelIntegrations.length || visualChannelIntegrations.length) > 0 ? 'success' : 'default'}
                 />
                 <ExecutiveSpotlightCard
                   label="Mensagens no inbox"
-                  value={String(inboxMessages.length)}
+                  value={String(visualInboxMessages.length)}
                   helper={
                     latestInboundChannel
                       ? `Ultimo inbound via ${normalizeUiText(
@@ -3570,30 +3884,34 @@ export default function CrmPage() {
               <div className="mb-3 grid gap-3 xl:grid-cols-4">
                 <ExecutiveSpotlightCard
                   label="Quotes emitidos"
-                  value={String(quotes.length)}
+                  value={String(visualQuotes.length)}
                   helper="Volume total do recorte atual"
                 />
                 <ExecutiveSpotlightCard
                   label="Documentos ativos"
-                  value={String(documents.length)}
+                  value={String(visualDocuments.length)}
                   helper="Materiais comerciais disponiveis"
                 />
                 <ExecutiveSpotlightCard
                   label="Assinados"
-                  value={String(documents.filter((item) => item.signatureStatus === 'SIGNED').length)}
+                  value={String(visualDocuments.filter((item) => item.signatureStatus === 'SIGNED').length)}
                   helper="Documentos finalizados com o cliente"
                   accent={
-                    documents.some((item) => item.signatureStatus === 'SIGNED')
+                    visualDocuments.some((item) => item.signatureStatus === 'SIGNED')
                       ? 'success'
                       : 'default'
                   }
                 />
                 <ExecutiveSpotlightCard
                   label="Ultima proposta"
-                  value={latestQuote ? normalizeUiText(latestQuote.status || 'DRAFT') : 'Sem quote'}
+                  value={latestQuote ? normalizeUiText(latestQuote.status || 'DRAFT') : normalizeUiText(visualQuotes[0]?.status || 'DRAFT')}
                   helper={
-                    latestQuote && canSeeValues
-                      ? formatMoney(latestQuote.total || latestQuote.subtotal || 0)
+                    (latestQuote || visualQuotes[0]) && canSeeValues
+                      ? formatMoney(
+                          (latestQuote || visualQuotes[0])?.total ||
+                            (latestQuote || visualQuotes[0])?.subtotal ||
+                            0,
+                        )
                       : 'Sem valor disponivel'
                   }
                 />
@@ -3605,14 +3923,14 @@ export default function CrmPage() {
                   subtitle="Onde os documentos estao travando no fluxo comercial"
                   rows={documentSignatureRows}
                   centerLabel="docs"
-                  centerValue={String(documents.length)}
+                  centerValue={String(visualDocuments.length)}
                 />
                 <ExecutiveDonutStatusCard
                   title="Quotes por status"
                   subtitle="Distribuicao atual entre draft, enviada e aprovada"
                   rows={quoteStatusRows}
                   centerLabel="quotes"
-                  centerValue={String(quotes.length)}
+                  centerValue={String(visualQuotes.length)}
                 />
                 <ReportListCard
                   title="Documentos recentes"
@@ -3655,7 +3973,7 @@ export default function CrmPage() {
               />
 
               <div className="mb-3 grid gap-3 xl:grid-cols-4">
-                {managementForecastSummary.categories.map((category) => (
+                {visualManagementForecastSummary.categories.map((category) => (
                   <ExecutiveSpotlightCard
                     key={category.key}
                     label={category.label}
@@ -3689,18 +4007,18 @@ export default function CrmPage() {
                   <div className="mt-3 space-y-3">
                     <MiniStat
                       label="Cobertura da meta"
-                      value={
-                        currentSalesTarget
-                          ? `${managementForecastSummary.commitCoverage}% do target`
-                          : 'Sem meta ativa'
-                      }
+                  value={
+                    visualCurrentSalesTarget
+                      ? `${visualManagementForecastSummary.commitCoverage}% do target`
+                      : 'Sem meta ativa'
+                  }
                     />
                     <MiniStat
                       label="Gap até a meta"
                       value={
-                        currentSalesTarget && canSeeValues
-                          ? formatMoney(managementForecastSummary.gapValue)
-                          : currentSalesTarget
+                        visualCurrentSalesTarget && canSeeValues
+                          ? formatMoney(visualManagementForecastSummary.gapValue)
+                          : visualCurrentSalesTarget
                             ? 'Sem acesso'
                             : 'Não aplicável'
                       }
@@ -3709,16 +4027,16 @@ export default function CrmPage() {
                       label="Commit atual"
                       value={
                         canSeeValues
-                          ? formatMoney(managementForecastSummary.commitValue)
-                          : `${managementForecastSummary.categories.find((item) => item.key === 'commit')?.count || 0} lead(s)`
+                          ? formatMoney(visualManagementForecastSummary.commitValue)
+                          : `${visualManagementForecastSummary.categories.find((item) => item.key === 'commit')?.count || 0} lead(s)`
                       }
                     />
                     <MiniStat
                       label="Best case"
                       value={
                         canSeeValues
-                          ? formatMoney(managementForecastSummary.bestCaseValue)
-                          : `${managementForecastSummary.categories.find((item) => item.key === 'bestCase')?.count || 0} lead(s)`
+                          ? formatMoney(visualManagementForecastSummary.bestCaseValue)
+                          : `${visualManagementForecastSummary.categories.find((item) => item.key === 'bestCase')?.count || 0} lead(s)`
                       }
                     />
                   </div>
@@ -3737,12 +4055,12 @@ export default function CrmPage() {
 
               <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
                 <div className="grid gap-3">
-                  {accountIntelligence.length === 0 ? (
+                  {visualAccountIntelligence.length === 0 ? (
                     <div className="rounded-[24px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
                       Sem contas suficientes no recorte atual.
                     </div>
                   ) : (
-                    accountIntelligence.map((account) => (
+                    visualAccountIntelligence.map((account) => (
                       <div
                         key={account.label}
                         className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.14))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
@@ -3886,7 +4204,7 @@ export default function CrmPage() {
                   title="Valor por origem"
                   subtitle="Canais com maior peso financeiro"
                   accent="blue"
-                  rows={sourceConversionReport.map((item) => ({
+                  rows={visualSourceConversionReport.map((item) => ({
                     label: item.label,
                     value: item.value || 0,
                     helper: `${item.count} lead(s) · ${item.rate || 0}% conv.`,
@@ -3896,7 +4214,7 @@ export default function CrmPage() {
                 <WonLostTrendCard
                   title="Ganhos e perdas por período"
                   subtitle="Ritmo recente do fechamento comercial"
-                  rows={wonLostByPeriodReport}
+                  rows={visualWonLostByPeriodReport}
                 />
               </div>
 
@@ -3911,7 +4229,7 @@ export default function CrmPage() {
                 />
                 <ReportListCard
                   title="Conversão por origem"
-                  rows={sourceConversionReport.map((item) => ({
+                  rows={visualSourceConversionReport.map((item) => ({
                     label: item.label,
                     value: `${item.rate || 0}%`,
                     helper: `${item.count} lead(s) · ${
@@ -3945,7 +4263,7 @@ export default function CrmPage() {
                 />
                 <ReportListCard
                   title="Ganhos e perdas por período"
-                  rows={wonLostByPeriodReport.map((item) => ({
+                  rows={visualWonLostByPeriodReport.map((item) => ({
                     label: item.period,
                     value: `${item.won} / ${item.lost}`,
                     helper: 'Ganhos / perdidos',
