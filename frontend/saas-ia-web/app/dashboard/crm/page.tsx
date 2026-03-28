@@ -1214,11 +1214,16 @@ export default function CrmPage() {
     documents.length === 0;
   const demoPreviewActive = layoutPreviewMode || autoDemoPreview;
 
-  const visualOwnerOptions = ownerOptions.length > 0 ? ownerOptions : DEMO_OWNER_OPTIONS;
-  const visualSourceOptions = sourceOptions.length > 0 ? sourceOptions : DEMO_SOURCE_OPTIONS;
-  const visualBranchOptions = branchOptions.length > 0 ? branchOptions : DEMO_BRANCH_OPTIONS;
+  const visualOwnerOptions =
+    demoPreviewActive || ownerOptions.length === 0 ? DEMO_OWNER_OPTIONS : ownerOptions;
+  const visualSourceOptions =
+    demoPreviewActive || sourceOptions.length === 0 ? DEMO_SOURCE_OPTIONS : sourceOptions;
+  const visualBranchOptions =
+    demoPreviewActive || branchOptions.length === 0 ? DEMO_BRANCH_OPTIONS : branchOptions;
   const visualDepartmentOptions =
-    departmentOptions.length > 0 ? departmentOptions : DEMO_DEPARTMENT_OPTIONS;
+    demoPreviewActive || departmentOptions.length === 0
+      ? DEMO_DEPARTMENT_OPTIONS
+      : departmentOptions;
   const visualStats = demoPreviewActive
     ? {
         ...stats,
@@ -1229,22 +1234,36 @@ export default function CrmPage() {
         stalledLeads: 5,
       }
     : stats;
-  const visualPipelineTotals = pipelineTotals.length > 0 ? pipelineTotals : DEMO_PIPELINE_TOTALS;
+  const visualPipelineTotals =
+    demoPreviewActive || pipelineTotals.length === 0 ? DEMO_PIPELINE_TOTALS : pipelineTotals;
   const visualPipelineValueByOwnerReport =
-    pipelineValueByOwnerReport.length > 0 ? pipelineValueByOwnerReport : DEMO_OWNER_REPORT;
+    demoPreviewActive || pipelineValueByOwnerReport.length === 0
+      ? DEMO_OWNER_REPORT
+      : pipelineValueByOwnerReport;
   const visualSourceConversionReport =
-    sourceConversionReport.length > 0 ? sourceConversionReport : DEMO_SOURCE_REPORT;
+    demoPreviewActive || sourceConversionReport.length === 0
+      ? DEMO_SOURCE_REPORT
+      : sourceConversionReport;
   const visualWonLostByPeriodReport =
-    wonLostByPeriodReport.length > 0 ? wonLostByPeriodReport : DEMO_WON_LOST_REPORT;
+    demoPreviewActive || wonLostByPeriodReport.length === 0
+      ? DEMO_WON_LOST_REPORT
+      : wonLostByPeriodReport;
   const visualAccountIntelligence =
-    accountIntelligence.length > 0 ? accountIntelligence : DEMO_ACCOUNT_INTELLIGENCE;
-  const visualCurrentSalesTarget = currentSalesTarget || (demoPreviewActive ? DEMO_SALES_TARGET : null);
+    demoPreviewActive || accountIntelligence.length === 0
+      ? DEMO_ACCOUNT_INTELLIGENCE
+      : accountIntelligence;
+  const visualCurrentSalesTarget =
+    demoPreviewActive ? DEMO_SALES_TARGET : currentSalesTarget;
   const visualTotalPipelineValue =
-    totalPipelineValue > 0
+    demoPreviewActive
+      ? DEMO_PIPELINE_TOTALS.reduce((sum, item) => sum + item.totalValue, 0)
+      : totalPipelineValue > 0
       ? totalPipelineValue
       : DEMO_PIPELINE_TOTALS.reduce((sum, item) => sum + item.totalValue, 0);
   const visualTotalForecast =
-    totalForecast > 0
+    demoPreviewActive
+      ? Math.round(DEMO_PIPELINE_TOTALS.reduce((sum, item) => sum + item.forecast, 0))
+      : totalForecast > 0
       ? totalForecast
       : Math.round(DEMO_PIPELINE_TOTALS.reduce((sum, item) => sum + item.forecast, 0));
   const visualCurrentTargetProgress =
@@ -1254,7 +1273,7 @@ export default function CrmPage() {
         )
       : currentTargetProgress;
   const visualManagementForecastSummary =
-    managementForecastSummary.categories.length > 0
+    !demoPreviewActive && managementForecastSummary.categories.length > 0
       ? managementForecastSummary
       : {
           categories: [
@@ -1297,12 +1316,15 @@ export default function CrmPage() {
           commitValue: 760000,
           bestCaseValue: 620000,
         };
-  const visualMailboxes = mailboxes.length > 0 ? mailboxes : DEMO_MAILBOXES;
+  const visualMailboxes =
+    demoPreviewActive || mailboxes.length === 0 ? DEMO_MAILBOXES : mailboxes;
   const visualChannelIntegrations =
-    channelIntegrations.length > 0 ? channelIntegrations : DEMO_CHANNELS;
-  const visualInboxMessages = inboxMessages.length > 0 ? inboxMessages : DEMO_INBOX_MESSAGES;
-  const visualQuotes = quotes.length > 0 ? quotes : DEMO_QUOTES;
-  const visualDocuments = documents.length > 0 ? documents : DEMO_DOCUMENTS;
+    demoPreviewActive || channelIntegrations.length === 0 ? DEMO_CHANNELS : channelIntegrations;
+  const visualInboxMessages =
+    demoPreviewActive || inboxMessages.length === 0 ? DEMO_INBOX_MESSAGES : inboxMessages;
+  const visualQuotes = demoPreviewActive || quotes.length === 0 ? DEMO_QUOTES : quotes;
+  const visualDocuments =
+    demoPreviewActive || documents.length === 0 ? DEMO_DOCUMENTS : documents;
   const visualConnectedMailboxes = useMemo(
     () =>
       visualMailboxes.filter((mailbox) =>
