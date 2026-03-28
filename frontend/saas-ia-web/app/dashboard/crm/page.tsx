@@ -1052,31 +1052,9 @@ export default function CrmPage() {
   const primarySequence = sequences[0] || null;
   const latestQuote = quotes[0] || null;
   const latestForecastSnapshot = forecastSnapshots[0] || null;
-  const connectedMailboxes = useMemo(
-    () =>
-      mailboxes.filter((mailbox) =>
-        ['CONNECTED', 'ACTIVE', 'SYNCED'].includes(
-          String(mailbox.syncStatus || '')
-            .trim()
-            .toUpperCase(),
-        ),
-      ),
-    [mailboxes],
-  );
   const mailboxErrors = useMemo(
     () => mailboxes.filter((mailbox) => mailbox.errorMessage),
     [mailboxes],
-  );
-  const connectedChannelIntegrations = useMemo(
-    () =>
-      channelIntegrations.filter((integration) =>
-        ['CONNECTED', 'READY'].includes(
-          String(integration.status || '')
-            .trim()
-            .toUpperCase(),
-        ),
-      ),
-    [channelIntegrations],
   );
   const pendingChannelIntegrations = useMemo(
     () =>
@@ -1089,34 +1067,6 @@ export default function CrmPage() {
       ),
     [channelIntegrations],
   );
-  const latestInboundChannel = useMemo(
-    () =>
-      [...channelIntegrations]
-        .filter((integration) => integration.lastInboundAt)
-        .sort(
-          (a, b) =>
-            new Date(b.lastInboundAt || 0).getTime() -
-            new Date(a.lastInboundAt || 0).getTime(),
-        )[0] || null,
-    [channelIntegrations],
-  );
-  const emailReadinessLabel = useMemo(() => {
-    if (connectedMailboxes.length > 0) return 'Operacional';
-    if (mailboxes.length > 0) return 'Parcial';
-    if (emailTemplates.length > 0 || sequences.length > 0) return 'Estruturando';
-    return 'Nao conectado';
-  }, [connectedMailboxes.length, emailTemplates.length, mailboxes.length, sequences.length]);
-  const omnichannelReadinessLabel = useMemo(() => {
-    if (connectedChannelIntegrations.length > 0) return 'Operacional';
-    if (pendingChannelIntegrations.length > 0) return 'Pendente';
-    if (channelIntegrations.length > 0) return 'Configurando';
-    return 'Nao conectado';
-  }, [
-    channelIntegrations.length,
-    connectedChannelIntegrations.length,
-    pendingChannelIntegrations.length,
-  ]);
-
   const managementForecastSummary = useMemo(() => {
     const openLeads = filteredLeads.filter((lead) => !['WON', 'LOST'].includes(lead.status));
     const wonLeads = filteredLeads.filter((lead) => lead.status === 'WON');
@@ -1343,6 +1293,60 @@ export default function CrmPage() {
   const visualInboxMessages = inboxMessages.length > 0 ? inboxMessages : DEMO_INBOX_MESSAGES;
   const visualQuotes = quotes.length > 0 ? quotes : DEMO_QUOTES;
   const visualDocuments = documents.length > 0 ? documents : DEMO_DOCUMENTS;
+  const visualConnectedMailboxes = useMemo(
+    () =>
+      visualMailboxes.filter((mailbox) =>
+        ['CONNECTED', 'ACTIVE'].includes(normalizeUiText(mailbox.status).toUpperCase()),
+      ),
+    [visualMailboxes],
+  );
+  const visualMailboxErrors = useMemo(
+    () => visualMailboxes.filter((mailbox) => Boolean(mailbox.errorMessage)),
+    [visualMailboxes],
+  );
+  const visualConnectedChannelIntegrations = useMemo(
+    () =>
+      visualChannelIntegrations.filter((integration) =>
+        ['ACTIVE', 'CONNECTED'].includes(normalizeUiText(integration.status).toUpperCase()),
+      ),
+    [visualChannelIntegrations],
+  );
+  const visualPendingChannelIntegrations = useMemo(
+    () =>
+      visualChannelIntegrations.filter((integration) =>
+        ['PENDING', 'PENDING_AUTH', 'CONFIGURING'].includes(
+          normalizeUiText(integration.status).toUpperCase(),
+        ),
+      ),
+    [visualChannelIntegrations],
+  );
+  const visualLatestInboundChannel = useMemo(
+    () =>
+      [...visualChannelIntegrations]
+        .filter((integration) => integration.lastInboundAt)
+        .sort(
+          (a, b) =>
+            new Date(b.lastInboundAt || 0).getTime() -
+            new Date(a.lastInboundAt || 0).getTime(),
+        )[0] || null,
+    [visualChannelIntegrations],
+  );
+  const visualEmailReadinessLabel = useMemo(() => {
+    if (visualConnectedMailboxes.length > 0) return 'Operacional';
+    if (visualMailboxes.length > 0) return 'Parcial';
+    if (emailTemplates.length > 0 || sequences.length > 0) return 'Estruturando';
+    return 'Nao conectado';
+  }, [emailTemplates.length, sequences.length, visualConnectedMailboxes.length, visualMailboxes.length]);
+  const visualOmnichannelReadinessLabel = useMemo(() => {
+    if (visualConnectedChannelIntegrations.length > 0) return 'Operacional';
+    if (visualPendingChannelIntegrations.length > 0) return 'Pendente';
+    if (visualChannelIntegrations.length > 0) return 'Configurando';
+    return 'Nao conectado';
+  }, [
+    visualChannelIntegrations.length,
+    visualConnectedChannelIntegrations.length,
+    visualPendingChannelIntegrations.length,
+  ]);
   const visualPrimaryAccount =
     primaryAccount ||
     (demoPreviewActive
@@ -1538,7 +1542,7 @@ export default function CrmPage() {
   const selectedLeadRoutingSuggestion = useMemo(() => {
     if (!selectedLead) return null;
 
-    const candidates = ownerOptions
+    const candidates = visualOwnerOptions
       .map((owner) => {
         const ownerLeads = analyticsUniverse.filter((lead) => lead.ownerUser?.id === owner.id);
         const sameBranch = selectedLead.branchId
@@ -1573,7 +1577,7 @@ export default function CrmPage() {
       .sort((a, b) => b.fitScore - a.fitScore || a.openDeals - b.openDeals);
 
     return candidates[0] || null;
-  }, [analyticsUniverse, openTasksByOwnerReport, ownerOptions, selectedLead]);
+  }, [analyticsUniverse, openTasksByOwnerReport, selectedLead, visualOwnerOptions]);
 
   function applyPlaybookPreset(preset: ReturnType<typeof getStagePlaybook>[number]) {
     if (!selectedLead) return;
@@ -1615,7 +1619,7 @@ export default function CrmPage() {
       { name: string; stalled: number; tasks: number; pipelineValue: number; score: number }
     >();
 
-    pipelineValueByOwnerReport.forEach((item) => {
+    visualPipelineValueByOwnerReport.forEach((item) => {
       ownerMap.set(item.label, {
         name: item.label,
         stalled: 0,
@@ -1656,7 +1660,7 @@ export default function CrmPage() {
       }))
       .sort((a, b) => b.score - a.score || b.pipelineValue - a.pipelineValue)
       .slice(0, 3);
-  }, [openTasksByOwnerReport, pipelineValueByOwnerReport, stalledLeadsByOwnerReport]);
+  }, [openTasksByOwnerReport, stalledLeadsByOwnerReport, visualPipelineValueByOwnerReport]);
 
   async function applyBulkStatus() {
     if (bulkStatusValue === 'ALL') return;
@@ -2233,7 +2237,7 @@ export default function CrmPage() {
     return latestLeadUpdate ? `Atualizado ${formatRelativeTime(latestLeadUpdate)}` : 'Atualizado agora';
   }, [analyticsUniverse, filteredLeads]);
 
-  const forecastGaugeValue = Math.max(0, Math.min(currentTargetProgress || 0, 100));
+  const forecastGaugeValue = Math.max(0, Math.min(visualCurrentTargetProgress || 0, 100));
 
   const executiveMetrics = useMemo(
     () => [
@@ -2485,7 +2489,7 @@ export default function CrmPage() {
 
   const commercialPerformanceChartRows = useMemo(
     () =>
-      pipelineValueByOwnerReport.slice(0, 5).map((owner) => {
+      visualPipelineValueByOwnerReport.slice(0, 5).map((owner) => {
         const signal = ownerExecutionSignals.find((item) => item.name === owner.label);
         const executionHealth = Math.max(
           12,
@@ -2499,33 +2503,33 @@ export default function CrmPage() {
           deals: owner.count,
         };
       }),
-    [ownerExecutionSignals, pipelineValueByOwnerReport],
+    [ownerExecutionSignals, visualPipelineValueByOwnerReport],
   );
 
   const engagementHealthRows = useMemo(
     () => [
       {
         label: 'Mailboxes conectadas',
-        value: connectedMailboxes.length,
+        value: visualConnectedMailboxes.length,
       },
       {
         label: 'Canais ativos',
-        value: connectedChannelIntegrations.length,
+        value: visualConnectedChannelIntegrations.length,
       },
       {
         label: 'Pendencias',
-        value: pendingChannelIntegrations.length,
+        value: visualPendingChannelIntegrations.length,
       },
       {
         label: 'Erros de sync',
-        value: mailboxErrors.length,
+        value: visualMailboxErrors.length,
       },
     ],
     [
-      connectedChannelIntegrations.length,
-      connectedMailboxes.length,
-      mailboxErrors.length,
-      pendingChannelIntegrations.length,
+      visualConnectedChannelIntegrations.length,
+      visualConnectedMailboxes.length,
+      visualMailboxErrors.length,
+      visualPendingChannelIntegrations.length,
     ],
   );
 
@@ -2617,12 +2621,12 @@ export default function CrmPage() {
       return [
         {
           label: 'Mailboxes',
-          value: `${connectedMailboxes.length || visualMailboxes.length}/${mailboxes.length || visualMailboxes.length || 0}`,
+          value: `${visualConnectedMailboxes.length}/${visualMailboxes.length || 0}`,
           helper: 'Caixas conectadas',
         },
         {
           label: 'Canais ativos',
-          value: String(connectedChannelIntegrations.length),
+          value: String(visualConnectedChannelIntegrations.length),
           helper: 'Integracoes operacionais',
         },
         {
@@ -2632,7 +2636,7 @@ export default function CrmPage() {
         },
         {
           label: 'Pendencias',
-          value: String(mailboxErrors.length + pendingChannelIntegrations.length),
+          value: String(visualMailboxErrors.length + visualPendingChannelIntegrations.length),
           helper: 'Sync e setup em atencao',
         },
       ];
@@ -2724,19 +2728,18 @@ export default function CrmPage() {
     accountContacts.length,
     visualAccountIntelligence.length,
     canSeeValues,
-    connectedChannelIntegrations.length,
-    connectedMailboxes.length,
+    visualConnectedChannelIntegrations.length,
+    visualConnectedMailboxes.length,
     conversationCoachingSummary,
     visualCurrentSalesTarget,
     visualDocuments,
     visualInboxMessages.length,
-    mailboxes.length,
-    mailboxErrors.length,
+    visualMailboxErrors.length,
     visualMailboxes.length,
     visualManagementForecastSummary.bestCaseValue,
     visualManagementForecastSummary.commitCoverage,
     visualManagementForecastSummary.gapValue,
-    pendingChannelIntegrations.length,
+    visualPendingChannelIntegrations.length,
     pipelineGovernanceSummary.blockers.length,
     pipelineGovernanceSummary.readiness,
     visualPipelineValueByOwnerReport.length,
@@ -3110,7 +3113,7 @@ export default function CrmPage() {
             <EnterpriseHubCard
               title="Accounts e contatos"
               eyebrow="Account intelligence"
-              metric={`${accounts.length} conta(s)`}
+              metric={`${visualAccountIntelligence.length} conta(s)`}
               helper={
                 visualPrimaryAccount
                   ? `${normalizeUiText(visualPrimaryAccount.name)} com ${(visualPrimaryAccount.contacts || accountContacts).length} stakeholder(s)`
@@ -3131,10 +3134,10 @@ export default function CrmPage() {
             <EnterpriseHubCard
               title="Inbox e cadências"
               eyebrow="Email sync"
-              metric={`${mailboxes.length} mailbox(es)`}
+              metric={`${visualMailboxes.length} mailbox(es)`}
               helper={
                 visualMailboxes[0]
-                  ? `${emailReadinessLabel} · ${connectedMailboxes.length || visualMailboxes.length}/${mailboxes.length || visualMailboxes.length} conectada(s)`
+                  ? `${visualEmailReadinessLabel} · ${visualConnectedMailboxes.length}/${visualMailboxes.length} conectada(s)`
                   : visualPrimarySequence
                     ? `${emailTemplates.length || 6} template(s) · ${normalizeUiText(visualPrimarySequence.name)}`
                     : 'Conecte caixas, templates e sequences reais.'
@@ -3149,11 +3152,11 @@ export default function CrmPage() {
                     }))
                   : [
                       {
-                        label: `${connectedMailboxes.length || visualMailboxes.length} mailbox(es) conectada(s)`,
-                        helper: mailboxErrors[0]
-                          ? normalizeUiText(mailboxErrors[0].errorMessage || 'Erro de sincronizacao')
+                        label: `${visualConnectedMailboxes.length} mailbox(es) conectada(s)`,
+                        helper: visualMailboxErrors[0]
+                          ? normalizeUiText(visualMailboxErrors[0].errorMessage || 'Erro de sincronizacao')
                           : 'Pronto para sincronizar entrada e saida comercial',
-                        value: emailReadinessLabel,
+                        value: visualEmailReadinessLabel,
                       },
                     ]
               }
@@ -3210,20 +3213,20 @@ export default function CrmPage() {
             <EnterpriseHubCard
               title="Canais e execução"
               eyebrow="Omnichannel"
-              metric={`${connectedChannelIntegrations.length} ativo(s)`}
+              metric={`${visualConnectedChannelIntegrations.length} ativo(s)`}
               helper={
-                latestInboundChannel?.lastInboundAt
-                  ? `${omnichannelReadinessLabel} · ultimo inbound ${formatRelativeTime(latestInboundChannel.lastInboundAt)}`
-                  : `${omnichannelReadinessLabel} · conecte WhatsApp, Instagram e Facebook`
+                visualLatestInboundChannel?.lastInboundAt
+                  ? `${visualOmnichannelReadinessLabel} · ultimo inbound ${formatRelativeTime(visualLatestInboundChannel.lastInboundAt)}`
+                  : `${visualOmnichannelReadinessLabel} · conecte WhatsApp, Instagram e Facebook`
               }
               loading={loadingEnterpriseHub}
               rows={
                 visualChannelIntegrations.length > 0
                   ? visualChannelIntegrations.slice(0, 3).map((integration) => ({
                       label: normalizeUiText(integration.label),
-                      helper: integration.lastInboundAt
-                        ? `Inbound ${formatRelativeTime(integration.lastInboundAt)}`
-                        : normalizeUiText(
+                        helper: integration.lastInboundAt
+                          ? `Inbound ${formatRelativeTime(integration.lastInboundAt)}`
+                          : normalizeUiText(
                             integration.channelIdentifier || integration.provider,
                           ),
                       value: normalizeUiText(integration.status),
@@ -3232,7 +3235,7 @@ export default function CrmPage() {
                       {
                         label: 'WhatsApp e social',
                         helper: 'Receba mensagens e atualize o lead em tempo real',
-                        value: omnichannelReadinessLabel,
+                        value: visualOmnichannelReadinessLabel,
                       },
                     ]
               }
@@ -3244,11 +3247,11 @@ export default function CrmPage() {
               <EnterpriseHubCard
                 title="Canais e execução"
                 eyebrow="Omnichannel"
-                metric={`${connectedChannelIntegrations.length} ativo(s)`}
+                metric={`${visualConnectedChannelIntegrations.length} ativo(s)`}
                 helper={
-                  latestInboundChannel?.lastInboundAt
-                    ? `${omnichannelReadinessLabel} · ultimo inbound ${formatRelativeTime(latestInboundChannel.lastInboundAt)}`
-                    : `${omnichannelReadinessLabel} · conecte WhatsApp, Instagram e Facebook`
+                  visualLatestInboundChannel?.lastInboundAt
+                    ? `${visualOmnichannelReadinessLabel} · ultimo inbound ${formatRelativeTime(visualLatestInboundChannel.lastInboundAt)}`
+                    : `${visualOmnichannelReadinessLabel} · conecte WhatsApp, Instagram e Facebook`
                 }
                 loading={loadingEnterpriseHub}
                 rows={
@@ -3266,7 +3269,7 @@ export default function CrmPage() {
                         {
                           label: 'WhatsApp e social',
                           helper: 'Receba mensagens e atualize o lead em tempo real',
-                          value: omnichannelReadinessLabel,
+                          value: visualOmnichannelReadinessLabel,
                         },
                       ]
                 }
@@ -3610,7 +3613,7 @@ export default function CrmPage() {
               />
 
               <div className="grid gap-3 2xl:grid-cols-2">
-                {pipelineTotals.map((item) => (
+                {visualPipelineTotals.map((item) => (
                   <div
                     key={item.status}
                     className="rounded-[22px] border border-white/10 bg-black/20 p-4"
@@ -3675,35 +3678,35 @@ export default function CrmPage() {
                     <div className="mt-4 rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
                       Você não tem permissão para visualizar metas comerciais.
                     </div>
-                  ) : currentSalesTarget ? (
+                  ) : visualCurrentSalesTarget ? (
                     <>
                       <div className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-white">
-                        {canSeeValues && currentSalesTarget.targetValue
-                          ? formatMoney(currentSalesTarget.targetValue)
-                          : currentSalesTarget.targetDeals
-                            ? `${currentSalesTarget.targetDeals} negócio(s)`
+                        {canSeeValues && visualCurrentSalesTarget.targetValue
+                          ? formatMoney(visualCurrentSalesTarget.targetValue)
+                          : visualCurrentSalesTarget.targetDeals
+                            ? `${visualCurrentSalesTarget.targetDeals} negócio(s)`
                             : 'Meta cadastrada'}
                       </div>
 
                       <div className="mt-2 text-sm text-zinc-400">
-                        {normalizeUiText(formatSalesTargetScope(currentSalesTarget))}
+                        {normalizeUiText(formatSalesTargetScope(visualCurrentSalesTarget))}
                       </div>
 
                       <div className="mt-2 text-xs text-zinc-500">
-                        {formatSalesTargetPeriodLabel(currentSalesTarget.periodType)} ·{' '}
-                        {formatDateShort(currentSalesTarget.periodStart)} até{' '}
-                        {formatDateShort(currentSalesTarget.periodEnd)}
+                        {formatSalesTargetPeriodLabel(visualCurrentSalesTarget.periodType)} ·{' '}
+                        {formatDateShort(visualCurrentSalesTarget.periodStart)} até{' '}
+                        {formatDateShort(visualCurrentSalesTarget.periodEnd)}
                       </div>
 
                       <div className="mt-4 rounded-[22px] border border-white/10 bg-black/20 p-3.5">
                         <div className="mb-2 flex items-center justify-between gap-3 text-xs text-zinc-400">
                           <span>Progresso do forecast</span>
-                          <span className="text-white">{currentTargetProgress}%</span>
+                          <span className="text-white">{visualCurrentTargetProgress}%</span>
                         </div>
                         <div className="h-2 rounded-full bg-white/5">
                           <div
                             className="h-2 rounded-full bg-[linear-gradient(90deg,#8B5CF6,#C4B5FD)]"
-                            style={{ width: `${Math.min(currentTargetProgress, 100)}%` }}
+                            style={{ width: `${Math.min(visualCurrentTargetProgress, 100)}%` }}
                           />
                         </div>
                       </div>
@@ -3711,9 +3714,9 @@ export default function CrmPage() {
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
                         <MiniStat
                           label="Forecast atual"
-                          value={canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
+                          value={canSeeValues ? formatMoney(visualTotalForecast) : 'Sem acesso'}
                         />
-                        <MiniStat label="Negócios em aberto" value={String(stats.pipeline)} />
+                        <MiniStat label="Negócios em aberto" value={String(visualStats.pipeline)} />
                       </div>
                     </>
                   ) : (
@@ -3821,9 +3824,9 @@ export default function CrmPage() {
                 />
                 <ExecutiveSpotlightCard
                   label="Leads em atenção"
-                  value={String(stats.stalledLeads)}
+                  value={String(visualStats.stalledLeads)}
                   helper="Oportunidades com atividade fraca"
-                  accent={stats.stalledLeads > 0 ? 'danger' : 'default'}
+                  accent={visualStats.stalledLeads > 0 ? 'danger' : 'default'}
                 />
               </div>
 
@@ -3881,33 +3884,33 @@ export default function CrmPage() {
               <div className="mb-3 grid gap-3 xl:grid-cols-4">
                 <ExecutiveSpotlightCard
                   label="Email readiness"
-                  value={emailReadinessLabel}
-                  helper={`${connectedMailboxes.length || visualMailboxes.length}/${mailboxes.length || visualMailboxes.length || 0} mailbox(es) conectada(s)`}
-                  accent={(connectedMailboxes.length || visualMailboxes.length) > 0 ? 'success' : 'default'}
+                  value={visualEmailReadinessLabel}
+                  helper={`${visualConnectedMailboxes.length}/${visualMailboxes.length || 0} mailbox(es) conectada(s)`}
+                  accent={visualConnectedMailboxes.length > 0 ? 'success' : 'default'}
                 />
                 <ExecutiveSpotlightCard
                   label="Canais ativos"
-                  value={String(connectedChannelIntegrations.length || visualChannelIntegrations.length)}
-                  helper={`${pendingChannelIntegrations.length} canal(is) pendente(s)`}
-                  accent={(connectedChannelIntegrations.length || visualChannelIntegrations.length) > 0 ? 'success' : 'default'}
+                  value={String(visualConnectedChannelIntegrations.length || visualChannelIntegrations.length)}
+                  helper={`${visualPendingChannelIntegrations.length} canal(is) pendente(s)`}
+                  accent={(visualConnectedChannelIntegrations.length || visualChannelIntegrations.length) > 0 ? 'success' : 'default'}
                 />
                 <ExecutiveSpotlightCard
                   label="Mensagens no inbox"
                   value={String(visualInboxMessages.length)}
                   helper={
-                    latestInboundChannel
+                    visualLatestInboundChannel
                       ? `Ultimo inbound via ${normalizeUiText(
-                          latestInboundChannel.label || latestInboundChannel.provider || 'canal',
+                          visualLatestInboundChannel.label || visualLatestInboundChannel.provider || 'canal',
                         )}`
                       : 'Sem inbound recente'
                   }
                 />
                 <ExecutiveSpotlightCard
                   label="Sincronizacao critica"
-                  value={String(mailboxErrors.length + pendingChannelIntegrations.length)}
+                  value={String(visualMailboxErrors.length + visualPendingChannelIntegrations.length)}
                   helper="Mailboxes com erro e canais aguardando configuracao"
                   accent={
-                    mailboxErrors.length + pendingChannelIntegrations.length > 0
+                    visualMailboxErrors.length + visualPendingChannelIntegrations.length > 0
                       ? 'danger'
                       : 'success'
                   }
@@ -3926,12 +3929,12 @@ export default function CrmPage() {
                       Math.min(
                         100,
                         Math.round(
-                          ((connectedMailboxes.length + connectedChannelIntegrations.length) /
+                          ((visualConnectedMailboxes.length + visualConnectedChannelIntegrations.length) /
                             Math.max(
-                              connectedMailboxes.length +
-                                connectedChannelIntegrations.length +
-                                pendingChannelIntegrations.length +
-                                mailboxErrors.length,
+                              visualConnectedMailboxes.length +
+                                visualConnectedChannelIntegrations.length +
+                                visualPendingChannelIntegrations.length +
+                                visualMailboxErrors.length,
                               1,
                             )) *
                             100,
@@ -4004,12 +4007,12 @@ export default function CrmPage() {
                 />
                 <ExecutiveSpotlightCard
                   label="Ultima proposta"
-                  value={latestQuote ? normalizeUiText(latestQuote.status || 'DRAFT') : normalizeUiText(visualQuotes[0]?.status || 'DRAFT')}
+                  value={visualLatestQuote ? normalizeUiText(visualLatestQuote.status || 'DRAFT') : normalizeUiText(visualQuotes[0]?.status || 'DRAFT')}
                   helper={
-                    (latestQuote || visualQuotes[0]) && canSeeValues
+                    (visualLatestQuote || visualQuotes[0]) && canSeeValues
                       ? formatMoney(
-                          (latestQuote || visualQuotes[0])?.total ||
-                            (latestQuote || visualQuotes[0])?.subtotal ||
+                          (visualLatestQuote || visualQuotes[0])?.total ||
+                            (visualLatestQuote || visualQuotes[0])?.subtotal ||
                             0,
                         )
                       : 'Sem valor disponivel'
@@ -4339,7 +4342,7 @@ export default function CrmPage() {
                 />
                 <ReportListCard
                   title="Pipeline por responsável"
-                  rows={pipelineValueByOwnerReport.map((item) => ({
+                  rows={visualPipelineValueByOwnerReport.map((item) => ({
                     label: item.label,
                     value: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
                     helper: `${item.count} lead(s)`,
@@ -4486,7 +4489,7 @@ export default function CrmPage() {
                       >
                         <option value="ALL">Selecionar responsável</option>
                         <option value="UNASSIGNED">Sem responsável</option>
-                        {ownerOptions.map((item) => (
+                        {visualOwnerOptions.map((item) => (
                           <option key={item.id} value={item.id}>
                             {item.name}
                           </option>
@@ -4870,14 +4873,14 @@ export default function CrmPage() {
               <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-1">
                 <SidebarMetric
                   label="Pipeline total"
-                  value={canSeeValues ? formatMoney(totalPipelineValue) : 'Sem acesso'}
+                  value={canSeeValues ? formatMoney(visualTotalPipelineValue) : 'Sem acesso'}
                 />
                 <SidebarMetric
                   label="Forecast ponderado"
-                  value={canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
+                  value={canSeeValues ? formatMoney(visualTotalForecast) : 'Sem acesso'}
                 />
-                <SidebarMetric label="Conversão atual" value={`${stats.conversionRate}%`} />
-                <SidebarMetric label="Leads novos no mês" value={String(stats.newThisMonth)} />
+                <SidebarMetric label="Conversão atual" value={`${visualStats.conversionRate}%`} />
+                <SidebarMetric label="Leads novos no mês" value={String(visualStats.newThisMonth)} />
                 <SidebarMetric label="Total encontrado" value={String(total)} />
                 <SidebarMetric label="Páginas" value={String(totalPages)} />
                 <SidebarMetric label="Página atual" value={`${page} / ${totalPages || 1}`} />
@@ -4889,8 +4892,8 @@ export default function CrmPage() {
                   Insight prioritário
                 </div>
                 <div className="mt-2.5 text-[15px] font-medium leading-6 text-white">
-                  {stats.stalledLeads > 0
-                    ? `Recupere ${stats.stalledLeads} lead(s) em atenção para proteger o forecast.`
+                  {visualStats.stalledLeads > 0
+                    ? `Recupere ${visualStats.stalledLeads} lead(s) em atenção para proteger o forecast.`
                     : 'O pipeline está com ritmo saudável e sem gargalos críticos agora.'}
                 </div>
                 <div className="mt-2 text-xs leading-5 text-zinc-500">
@@ -5684,12 +5687,12 @@ export default function CrmPage() {
               </div>
             </div>
             <div className="space-y-3">
-              {documents.length === 0 ? (
+              {visualDocuments.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-white/10 px-4 py-5 text-sm text-zinc-500">
                   Nenhum documento comercial gerado ainda.
                 </div>
               ) : (
-                documents.slice(0, 4).map((document) => (
+                visualDocuments.slice(0, 4).map((document) => (
                   <div
                     key={document.id}
                     className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3"
@@ -5927,18 +5930,18 @@ export default function CrmPage() {
           <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4 xl:col-span-2">
               <div className="grid gap-3 md:grid-cols-4">
-                <MiniStat label="Email readiness" value={emailReadinessLabel} />
+                <MiniStat label="Email readiness" value={visualEmailReadinessLabel} />
                 <MiniStat
                   label="Mailboxes conectadas"
-                  value={`${connectedMailboxes.length}/${mailboxes.length || 0}`}
+                  value={`${visualConnectedMailboxes.length}/${visualMailboxes.length || 0}`}
                 />
                 <MiniStat
                   label="Omnichannel readiness"
-                  value={omnichannelReadinessLabel}
+                  value={visualOmnichannelReadinessLabel}
                 />
                 <MiniStat
                   label="Canais pendentes"
-                  value={String(pendingChannelIntegrations.length)}
+                  value={String(visualPendingChannelIntegrations.length)}
                 />
               </div>
             </div>
@@ -5948,12 +5951,12 @@ export default function CrmPage() {
                 Conexões ativas
               </div>
               <div className="space-y-3">
-                {channelIntegrations.length === 0 ? (
+                {visualChannelIntegrations.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-white/10 px-4 py-5 text-sm text-zinc-500">
                     Nenhuma integração omnichannel conectada ainda.
                   </div>
                 ) : (
-                  channelIntegrations.slice(0, 4).map((integration) => (
+                  visualChannelIntegrations.slice(0, 4).map((integration) => (
                     <div
                       key={integration.id}
                       className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3"
@@ -6678,7 +6681,7 @@ export default function CrmPage() {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-[#8B5CF6]/20"
                   >
                     <option value="">Empresa inteira</option>
-                    {branchOptions.map((branch) => (
+                    {visualBranchOptions.map((branch) => (
                       <option key={branch.id} value={branch.id}>
                         {branch.name}
                       </option>
@@ -6699,7 +6702,7 @@ export default function CrmPage() {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-[#8B5CF6]/20"
                   >
                     <option value="">Todos os departamentos</option>
-                    {departmentOptions
+                    {visualDepartmentOptions
                       .filter((department) => {
                         if (!salesTargetForm.branchId) return true;
                         return (
@@ -6727,7 +6730,7 @@ export default function CrmPage() {
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-[#8B5CF6]/20"
                   >
                     <option value="">Todos os usuários</option>
-                    {ownerOptions.map((owner) => (
+                    {visualOwnerOptions.map((owner) => (
                       <option key={owner.id} value={owner.id}>
                         {owner.name}
                       </option>
