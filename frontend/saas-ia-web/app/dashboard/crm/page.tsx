@@ -1371,10 +1371,6 @@ export default function CrmPage() {
   const visualPrimarySequence =
     primarySequence || (demoPreviewActive ? { id: 'demo-seq-1', name: 'Cadencia Enterprise Q1' } : null);
   const visualLatestQuote = latestQuote || visualQuotes[0] || null;
-  const visualExecutivePriorityRows =
-    executivePriorityRows.length > 0 ? executivePriorityRows : DEMO_PRIORITY_ROWS;
-  const visualExecutiveCoachRows =
-    executiveCoachRows.length > 0 ? executiveCoachRows : DEMO_COACH_ROWS;
 
   const pipelineGovernanceSummary = useMemo(() => {
     const openLeads = filteredLeads.filter((lead) => !['WON', 'LOST'].includes(lead.status));
@@ -2341,6 +2337,11 @@ export default function CrmPage() {
       })),
     [conversationInsights],
   );
+
+  const visualExecutivePriorityRows =
+    executivePriorityRows.length > 0 ? executivePriorityRows : DEMO_PRIORITY_ROWS;
+  const visualExecutiveCoachRows =
+    executiveCoachRows.length > 0 ? executiveCoachRows : DEMO_COACH_ROWS;
 
   const commercialOwnerRows = useMemo(() => {
     return visualPipelineValueByOwnerReport.slice(0, 6).map((owner) => {
