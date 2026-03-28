@@ -2086,6 +2086,52 @@ export default function CrmPage() {
     [canSeeValues, quotes],
   );
 
+  const commercialPerformanceChartRows = useMemo(
+    () =>
+      pipelineValueByOwnerReport.slice(0, 5).map((owner) => {
+        const signal = ownerExecutionSignals.find((item) => item.name === owner.label);
+        const executionHealth = Math.max(
+          12,
+          100 - ((signal?.stalled || 0) * 10 + (signal?.tasks || 0) * 4),
+        );
+
+        return {
+          label: owner.label,
+          value: owner.value || 0,
+          secondary: executionHealth,
+          deals: owner.count,
+        };
+      }),
+    [ownerExecutionSignals, pipelineValueByOwnerReport],
+  );
+
+  const engagementHealthRows = useMemo(
+    () => [
+      {
+        label: 'Mailboxes conectadas',
+        value: connectedMailboxes.length,
+      },
+      {
+        label: 'Canais ativos',
+        value: connectedChannelIntegrations.length,
+      },
+      {
+        label: 'Pendencias',
+        value: pendingChannelIntegrations.length,
+      },
+      {
+        label: 'Erros de sync',
+        value: mailboxErrors.length,
+      },
+    ],
+    [
+      connectedChannelIntegrations.length,
+      connectedMailboxes.length,
+      mailboxErrors.length,
+      pendingChannelIntegrations.length,
+    ],
+  );
+
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
       <CrmStyles />
@@ -3230,16 +3276,11 @@ export default function CrmPage() {
               <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
                 <ExecutiveOwnerPerformanceBoard rows={commercialOwnerRows} />
                 <div className="space-y-3">
-                  <ReportBarChartCard
-                    title="Cobertura por owner"
-                    subtitle="Peso financeiro individual no recorte atual"
-                    accent="blue"
-                    rows={pipelineValueByOwnerReport.slice(0, 5).map((item) => ({
-                      label: item.label,
-                      value: item.value || 0,
-                      helper: `${item.count} lead(s)`,
-                      valueLabel: canSeeValues ? formatMoney(item.value) : 'Sem acesso',
-                    }))}
+                  <ExecutiveMixedPerformanceChartCard
+                    title="Ranking de vendedores"
+                    subtitle="Receita ganha vs pipeline aberto com saude de execucao"
+                    rows={commercialPerformanceChartRows}
+                    canSeeValues={canSeeValues}
                   />
                   <div className="rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.12))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
@@ -3320,16 +3361,40 @@ export default function CrmPage() {
               </div>
 
               <div className="grid gap-3 xl:grid-cols-2">
+                <ExecutiveDonutStatusCard
+                  title="Health dos canais"
+                  subtitle="Prontidao operacional de inbox, canais e sync"
+                  rows={engagementHealthRows}
+                  centerLabel="readiness"
+                  centerValue={String(
+                    Math.max(
+                      0,
+                      Math.min(
+                        100,
+                        Math.round(
+                          ((connectedMailboxes.length + connectedChannelIntegrations.length) /
+                            Math.max(
+                              connectedMailboxes.length +
+                                connectedChannelIntegrations.length +
+                                pendingChannelIntegrations.length +
+                                mailboxErrors.length,
+                              1,
+                            )) *
+                            100,
+                        ),
+                      ),
+                    ),
+                  )}
+                />
                 <ReportBarChartCard
                   title="Canais por provider"
                   subtitle="Base instalada de integracoes configuradas"
                   accent="blue"
                   rows={integrationProviderRows}
                 />
-                <ReportBarChartCard
+                <ExecutiveActivityRibbonCard
                   title="Direcao das mensagens"
-                  subtitle="Volume atual no inbox por tipo de trafego"
-                  accent="purple"
+                  subtitle="Leitura visual do trafego entre inbound e outbound"
                   rows={inboxDirectionRows}
                 />
                 <ReportListCard
@@ -3395,17 +3460,19 @@ export default function CrmPage() {
               </div>
 
               <div className="grid gap-3 xl:grid-cols-2">
-                <ReportBarChartCard
+                <ExecutiveDonutStatusCard
                   title="Assinatura por status"
                   subtitle="Onde os documentos estao travando no fluxo comercial"
-                  accent="purple"
                   rows={documentSignatureRows}
+                  centerLabel="docs"
+                  centerValue={String(documents.length)}
                 />
-                <ReportBarChartCard
+                <ExecutiveDonutStatusCard
                   title="Quotes por status"
                   subtitle="Distribuicao atual entre draft, enviada e aprovada"
-                  accent="blue"
                   rows={quoteStatusRows}
+                  centerLabel="quotes"
+                  centerValue={String(quotes.length)}
                 />
                 <ReportListCard
                   title="Documentos recentes"
@@ -7453,6 +7520,238 @@ function ExecutiveAreaChartCard({
             <div className="mt-3 grid grid-cols-6 gap-2 text-center text-xs text-zinc-500">
               {points.map((row) => (
                 <div key={row.period}>{normalizeUiText(row.period)}</div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveMixedPerformanceChartCard({
+  title,
+  subtitle,
+  rows,
+  canSeeValues,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: number; secondary: number; deals: number }>;
+  canSeeValues: boolean;
+}) {
+  const items = rows.slice(0, 5);
+  const maxValue = Math.max(...items.map((item) => item.value), 1);
+
+  return (
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+
+      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] p-4">
+        {items.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+            Sem dados para este recorte.
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {items.map((item) => {
+              const width = Math.max((item.value / maxValue) * 100, 8);
+              const lineX = `${Math.max(6, Math.min(item.secondary, 100))}%`;
+
+              return (
+                <div key={item.label} className="space-y-2.5">
+                  <div className="flex items-end justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium text-white">
+                        {normalizeUiText(item.label)}
+                      </div>
+                      <div className="mt-1 text-xs text-zinc-500">{item.deals} lead(s)</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-white">
+                        {canSeeValues ? formatMoney(item.value) : 'Sem acesso'}
+                      </div>
+                      <div className="mt-1 text-xs text-rose-300">
+                        Saude {item.secondary}%
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative h-14 rounded-[18px] border border-white/6 bg-[#182231]">
+                    <div
+                      className="absolute bottom-0 left-0 rounded-[18px] bg-[linear-gradient(180deg,rgba(173,216,255,0.7),rgba(44,139,255,0.95))] shadow-[0_0_24px_rgba(44,139,255,0.22)]"
+                      style={{ height: '100%', width: `${width}%` }}
+                    />
+                    <div
+                      className="absolute bottom-[-2px] h-[calc(100%+4px)] w-px border-l border-dashed border-rose-300/80"
+                      style={{ left: lineX }}
+                    />
+                    <div
+                      className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-rose-200 bg-rose-300 shadow-[0_0_18px_rgba(253,164,175,0.32)]"
+                      style={{ left: lineX }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveDonutStatusCard({
+  title,
+  subtitle,
+  rows,
+  centerLabel,
+  centerValue,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: number }>;
+  centerLabel: string;
+  centerValue: string;
+}) {
+  const palette = ['#E2E8F0', '#8FB3D9', '#5F86B3', '#223B63', '#2C8BFF'];
+  const items = rows.filter((row) => row.value > 0).slice(0, 5);
+  const total = items.reduce((sum, row) => sum + row.value, 0);
+  const segments = items.reduce<
+    Array<{ label: string; value: number; color: string; dash: string; offset: number }>
+  >((acc, item, index) => {
+    const previousPortion = acc.reduce((sum, segment) => sum + segment.value / Math.max(total, 1), 0);
+    const portion = total > 0 ? item.value / total : 0;
+
+    acc.push({
+      ...item,
+      color: palette[index % palette.length],
+      dash: `${portion * 282.6} 282.6`,
+      offset: -(previousPortion * 282.6),
+    });
+
+    return acc;
+  }, []);
+
+  return (
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+
+      <div className="mt-5 grid gap-4 xl:grid-cols-[180px_minmax(0,1fr)] xl:items-center">
+        <div className="relative mx-auto h-[180px] w-[180px]">
+          <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+            <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="14" />
+            {segments.map((segment) => (
+              <circle
+                key={segment.label}
+                cx="60"
+                cy="60"
+                r="45"
+                fill="none"
+                stroke={segment.color}
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={segment.dash}
+                strokeDashoffset={segment.offset}
+              />
+            ))}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <div className="text-[30px] font-semibold tracking-[-0.04em] text-white">{centerValue}</div>
+            <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+              {centerLabel}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {segments.length === 0 ? (
+            <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
+              Sem dados para este recorte.
+            </div>
+          ) : (
+            segments.map((segment) => (
+              <div
+                key={segment.label}
+                className="flex items-center justify-between gap-3 rounded-[18px] border border-white/8 bg-[#171D27] px-3.5 py-3"
+              >
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span
+                    className="h-3 w-3 rounded-full"
+                    style={{ backgroundColor: segment.color }}
+                  />
+                  <span className="truncate text-sm text-white">
+                    {normalizeUiText(segment.label)}
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-white">{segment.value}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExecutiveActivityRibbonCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; value: number; helper: string; valueLabel: string }>;
+}) {
+  const items = rows.slice(0, 4);
+  const max = Math.max(...items.map((item) => item.value), 1);
+  const path = items
+    .map((item, index) => {
+      const x = items.length === 1 ? 8 : 8 + (index / Math.max(items.length - 1, 1)) * 84;
+      const y = 72 - (item.value / max) * 46;
+      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+    })
+    .join(' ');
+
+  return (
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+
+      <div className="mt-5 rounded-[22px] border border-white/6 bg-[#121823] p-4">
+        {items.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+            Sem dados para este recorte.
+          </div>
+        ) : (
+          <>
+            <div className="relative h-[170px] overflow-hidden rounded-[18px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.14))] p-3">
+              <div className="pointer-events-none absolute inset-3 grid grid-rows-4">
+                {[0, 1, 2, 3].map((line) => (
+                  <div key={line} className="border-b border-dashed border-white/10 last:border-b-0" />
+                ))}
+              </div>
+              <svg viewBox="0 0 100 80" className="relative h-full w-full overflow-visible">
+                <defs>
+                  <linearGradient id="crm-ribbon-fill" x1="0%" x2="0%" y1="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(171,198,230,0.6)" />
+                    <stop offset="100%" stopColor="rgba(171,198,230,0.04)" />
+                  </linearGradient>
+                </defs>
+                <path d={`${path} L 92 78 L 8 78 Z`} fill="url(#crm-ribbon-fill)" />
+                <path d={path} fill="none" stroke="rgba(179,201,226,0.95)" strokeWidth="1.6" />
+              </svg>
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {items.map((item) => (
+                <div key={item.label} className="rounded-[16px] border border-white/8 bg-[#171D27] px-3 py-2.5">
+                  <div className="truncate text-xs uppercase tracking-[0.14em] text-zinc-500">
+                    {normalizeUiText(item.label)}
+                  </div>
+                  <div className="mt-1 text-base font-medium text-white">{item.valueLabel}</div>
+                  <div className="mt-1 text-[11px] text-zinc-500">{item.helper}</div>
+                </div>
               ))}
             </div>
           </>
