@@ -2081,7 +2081,7 @@ export default function CrmPage() {
       quotes.slice(0, 5).map((quote) => ({
         label: normalizeUiText(quote.title),
         value: normalizeUiText(quote.status || 'DRAFT'),
-        helper: canSeeValues ? formatMoney(quote.amount || 0) : 'Sem acesso',
+        helper: canSeeValues ? formatMoney(quote.total || quote.subtotal || 0) : 'Sem acesso',
       })),
     [canSeeValues, quotes],
   );
@@ -3386,7 +3386,7 @@ export default function CrmPage() {
                   value={latestQuote ? normalizeUiText(latestQuote.status || 'DRAFT') : 'Sem quote'}
                   helper={
                     latestQuote && canSeeValues
-                      ? formatMoney(latestQuote.amount || 0)
+                      ? formatMoney(latestQuote.total || latestQuote.subtotal || 0)
                       : 'Sem valor disponivel'
                   }
                 />
