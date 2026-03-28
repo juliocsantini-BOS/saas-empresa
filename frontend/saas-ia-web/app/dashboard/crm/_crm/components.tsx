@@ -71,6 +71,54 @@ export function CrmStyles() {
           rgba(139, 92, 246, 0.28)
         );
       }
+
+      :global(.crm-dashboard-shell select) {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        color-scheme: dark;
+        background-color: rgba(14, 18, 28, 0.92) !important;
+        background-image:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015)),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5.5 7.5L10 12L14.5 7.5' stroke='%2392A3C7' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat, no-repeat;
+        background-position: center, right 0.9rem center;
+        background-size: auto, 1rem;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 18px;
+        padding-right: 2.8rem;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.04),
+          0 12px 30px rgba(0, 0, 0, 0.18);
+        transition:
+          border-color 180ms ease,
+          background-color 180ms ease,
+          box-shadow 180ms ease,
+          transform 180ms ease;
+      }
+
+      :global(.crm-dashboard-shell select:hover) {
+        border-color: rgba(255, 255, 255, 0.16) !important;
+        background-color: rgba(17, 23, 36, 0.96) !important;
+      }
+
+      :global(.crm-dashboard-shell select:focus) {
+        border-color: rgba(44, 139, 255, 0.35) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 0 0 1px rgba(44, 139, 255, 0.18),
+          0 18px 44px rgba(0, 0, 0, 0.22);
+      }
+
+      :global(.crm-dashboard-shell select option),
+      :global(.crm-dashboard-shell select optgroup) {
+        background: #0e1320;
+        color: #eef2ff;
+      }
+
+      :global(.crm-dashboard-shell select::-ms-expand) {
+        display: none;
+      }
     `}</style>
   );
 }

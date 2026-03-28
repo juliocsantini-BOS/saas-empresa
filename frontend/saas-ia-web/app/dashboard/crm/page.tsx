@@ -2798,7 +2798,7 @@ export default function CrmPage() {
   ]);
 
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
+    <div className="crm-dashboard-shell min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
       <CrmStyles />
 
       <div className="mx-auto flex w-full min-w-0 max-w-[1840px] flex-col gap-4">
