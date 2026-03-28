@@ -290,6 +290,15 @@ const DEMO_WON_LOST_REPORT = [
   { period: 'Mar', won: 11, lost: 2 },
 ];
 
+const DEMO_ACTIVITY_RIBBON_ROWS = [
+  { label: 'Out', value: 118, helper: 'Email + WhatsApp', valueLabel: '118 interações' },
+  { label: 'Nov', value: 142, helper: 'Inbound comercial', valueLabel: '142 interações' },
+  { label: 'Dez', value: 156, helper: 'Cadências e replies', valueLabel: '156 interações' },
+  { label: 'Jan', value: 128, helper: 'Retomada do trimestre', valueLabel: '128 interações' },
+  { label: 'Fev', value: 171, helper: 'Aceleração outbound', valueLabel: '171 interações' },
+  { label: 'Mar', value: 194, helper: 'Pico de execução', valueLabel: '194 interações' },
+];
+
 const DEMO_ACCOUNT_INTELLIGENCE = [
   {
     label: 'TechCorp',
@@ -2382,6 +2391,10 @@ export default function CrmPage() {
   ]);
 
   const inboxDirectionRows = useMemo(() => {
+    if (demoPreviewActive && inboxMessages.length === 0) {
+      return DEMO_ACTIVITY_RIBBON_ROWS;
+    }
+
     const counts = visualInboxMessages.reduce<Record<string, number>>((acc, message) => {
       const key = normalizeUiText(message.direction || 'UNKNOWN');
       acc[key] = (acc[key] || 0) + 1;
@@ -2394,7 +2407,7 @@ export default function CrmPage() {
       helper: 'Mensagens carregadas',
       valueLabel: `${value} msg`,
     }));
-  }, [visualInboxMessages]);
+  }, [demoPreviewActive, inboxMessages.length, visualInboxMessages]);
 
   const integrationProviderRows = useMemo(() => {
     const counts = visualChannelIntegrations.reduce<Record<string, number>>((acc, integration) => {
@@ -7922,7 +7935,7 @@ function WonLostTrendCard({
   subtitle: string;
   rows: Array<{ period: string; won: number; lost: number }>;
 }) {
-  const topRows = rows.slice(0, 5);
+  const topRows = rows.slice(0, 6);
   const maxValue = topRows.reduce((current, row) => Math.max(current, row.won + row.lost), 0);
 
   return (
@@ -8315,7 +8328,7 @@ function ExecutiveActivityRibbonCard({
   subtitle: string;
   rows: Array<{ label: string; value: number; helper: string; valueLabel: string }>;
 }) {
-  const items = rows.slice(0, 4);
+  const items = rows.slice(0, 6);
   const max = Math.max(...items.map((item) => item.value), 1);
   const path = items
     .map((item, index) => {
