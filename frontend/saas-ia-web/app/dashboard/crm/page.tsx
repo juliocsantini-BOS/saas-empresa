@@ -1820,8 +1820,7 @@ export default function CrmPage() {
   const showDocumentsWorkspace = selectedWorkspace === 'documents';
   const showForecastWorkspace = selectedWorkspace === 'forecast';
   const showCoachingWorkspace = selectedWorkspace === 'coaching';
-  const showEnterpriseLauncher =
-    showExecutiveWorkspace || showEngagementWorkspace || showDocumentsWorkspace;
+  const showEnterpriseLauncher = showEngagementWorkspace || showDocumentsWorkspace;
   const showOperationsGrid =
     showPipelineWorkspace ||
     showCommercialWorkspace ||
@@ -2132,6 +2131,232 @@ export default function CrmPage() {
     ],
   );
 
+  const workspaceHeroCards = useMemo(() => {
+    if (showPipelineWorkspace) {
+      return [
+        {
+          label: 'Deals abertos',
+          value: String(stats.open),
+          helper: 'Volume vivo no funil',
+        },
+        {
+          label: 'Pipeline',
+          value: canSeeValues ? formatMoney(totalPipelineValue) : 'Sem acesso',
+          helper: 'Valor bruto no recorte',
+        },
+        {
+          label: 'Stalled',
+          value: String(stats.stalledLeads),
+          helper: 'Leads exigindo destrave',
+        },
+        {
+          label: 'Win rate',
+          value: `${stats.conversionRate}%`,
+          helper: 'Conversao comercial atual',
+        },
+      ];
+    }
+
+    if (showCommercialWorkspace) {
+      return [
+        {
+          label: 'Meta vigente',
+          value:
+            currentSalesTarget && canSeeValues
+              ? formatMoney(currentSalesTarget.targetValue)
+              : currentSalesTarget
+                ? `${currentSalesTarget.targetDeals || 0} negócios`
+                : 'Nao definida',
+          helper: 'Objetivo principal do time',
+        },
+        {
+          label: 'Forecast',
+          value: canSeeValues ? formatMoney(totalForecast) : 'Sem acesso',
+          helper: 'Receita prevista no recorte',
+        },
+        {
+          label: 'Owners ativos',
+          value: String(pipelineValueByOwnerReport.length),
+          helper: 'Carteiras com pipeline',
+        },
+        {
+          label: 'Gap',
+          value:
+            currentSalesTarget && canSeeValues
+              ? formatMoney(managementForecastSummary.gapValue)
+              : 'Em leitura',
+          helper: 'Distancia para a meta',
+        },
+      ];
+    }
+
+    if (showAccountsWorkspace) {
+      return [
+        {
+          label: 'Contas ativas',
+          value: String(accountIntelligence.length),
+          helper: 'Empresas com relevancia no funil',
+        },
+        {
+          label: 'Readiness',
+          value: `${pipelineGovernanceSummary.readiness}%`,
+          helper: 'Saude geral da operacao',
+        },
+        {
+          label: 'Stakeholders',
+          value: String(accountContacts.length),
+          helper: 'Contatos mapeados',
+        },
+        {
+          label: 'Bloqueios',
+          value: String(pipelineGovernanceSummary.blockers.length),
+          helper: 'Gargalos do pipeline',
+        },
+      ];
+    }
+
+    if (showEngagementWorkspace) {
+      return [
+        {
+          label: 'Mailboxes',
+          value: `${connectedMailboxes.length}/${mailboxes.length || 0}`,
+          helper: 'Caixas conectadas',
+        },
+        {
+          label: 'Canais ativos',
+          value: String(connectedChannelIntegrations.length),
+          helper: 'Integracoes operacionais',
+        },
+        {
+          label: 'Inbox',
+          value: String(inboxMessages.length),
+          helper: 'Mensagens carregadas',
+        },
+        {
+          label: 'Pendencias',
+          value: String(mailboxErrors.length + pendingChannelIntegrations.length),
+          helper: 'Sync e setup em atencao',
+        },
+      ];
+    }
+
+    if (showDocumentsWorkspace) {
+      return [
+        {
+          label: 'Quotes',
+          value: String(quotes.length),
+          helper: 'Propostas emitidas',
+        },
+        {
+          label: 'Documentos',
+          value: String(documents.length),
+          helper: 'Materiais comerciais ativos',
+        },
+        {
+          label: 'Assinados',
+          value: String(documents.filter((item) => item.signatureStatus === 'SIGNED').length),
+          helper: 'Fechamentos concluídos',
+        },
+        {
+          label: 'Aprovacao',
+          value: String(quoteStatusRows.find((item) => item.label === 'APPROVED')?.value || 0),
+          helper: 'Quotes aprovados no recorte',
+        },
+      ];
+    }
+
+    if (showForecastWorkspace) {
+      return [
+        {
+          label: 'Forecast',
+          value: canSeeValues ? formatMoney(totalForecast) : 'Sem acesso',
+          helper: 'Receita prevista',
+        },
+        {
+          label: 'Commit',
+          value: `${managementForecastSummary.commitCoverage}%`,
+          helper: 'Cobertura da meta',
+        },
+        {
+          label: 'Best case',
+          value: canSeeValues ? formatMoney(managementForecastSummary.bestCaseValue) : 'Sem acesso',
+          helper: 'Camada de upside',
+        },
+        {
+          label: 'Gap',
+          value:
+            currentSalesTarget && canSeeValues
+              ? formatMoney(managementForecastSummary.gapValue)
+              : 'Nao aplicavel',
+          helper: 'Distancia para o target',
+        },
+      ];
+    }
+
+    if (showCoachingWorkspace) {
+      return [
+        {
+          label: 'Insights',
+          value: String(conversationCoachingSummary.total),
+          helper: 'Sinais recentes da operacao',
+        },
+        {
+          label: 'Cobertura',
+          value: `${conversationCoachingSummary.coachingCoverage}%`,
+          helper: 'Leads com coaching aplicado',
+        },
+        {
+          label: 'Sentimento',
+          value:
+            conversationCoachingSummary.averageSentiment !== null
+              ? String(conversationCoachingSummary.averageSentiment)
+              : 'Sem score',
+          helper: 'Media das conversas',
+        },
+        {
+          label: 'Canal dominante',
+          value: conversationCoachingSummary.dominantSource,
+          helper: 'Origem mais presente',
+        },
+      ];
+    }
+
+    return [];
+  }, [
+    accountContacts.length,
+    accountIntelligence.length,
+    canSeeValues,
+    connectedChannelIntegrations.length,
+    connectedMailboxes.length,
+    conversationCoachingSummary,
+    currentSalesTarget,
+    documents,
+    inboxMessages.length,
+    mailboxErrors.length,
+    mailboxes.length,
+    managementForecastSummary.bestCaseValue,
+    managementForecastSummary.commitCoverage,
+    managementForecastSummary.gapValue,
+    pendingChannelIntegrations.length,
+    pipelineGovernanceSummary.blockers.length,
+    pipelineGovernanceSummary.readiness,
+    pipelineValueByOwnerReport.length,
+    quoteStatusRows,
+    quotes.length,
+    showAccountsWorkspace,
+    showCoachingWorkspace,
+    showCommercialWorkspace,
+    showDocumentsWorkspace,
+    showEngagementWorkspace,
+    showForecastWorkspace,
+    showPipelineWorkspace,
+    stats.conversionRate,
+    stats.open,
+    stats.stalledLeads,
+    totalForecast,
+    totalPipelineValue,
+  ]);
+
   return (
     <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#07090A] px-4 py-5 text-white md:px-6 md:py-6">
       <CrmStyles />
@@ -2395,100 +2620,6 @@ export default function CrmPage() {
               />
             </div>
           </>
-        ) : null}
-
-        {showExecutiveWorkspace ? (
-        <CrmPanel className="p-4">
-          <CrmSectionHeader
-            eyebrow="Guided selling"
-            title="Fila de execução sugerida"
-            description="O CRM prioriza automaticamente onde a operação comercial deve agir agora."
-          />
-
-          <div className="mb-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setOverdueNextStepOnly('YES');
-                setStalledOnly('ALL');
-                setDealValueMin('');
-                pipelineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-[#8B5CF6]/15"
-            >
-              Ver follow-up vencido
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setStalledOnly('YES');
-                setOverdueNextStepOnly('ALL');
-                setDealValueMin('10000');
-                pipelineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-            >
-              Alto valor parado
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setStalledOnly('ALL');
-                setOverdueNextStepOnly('ALL');
-                setDealValueMin('');
-                setSearchTerm('');
-              }}
-              className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium text-zinc-300 transition hover:bg-white/10 hover:text-white"
-            >
-              Limpar atalhos
-            </button>
-          </div>
-
-          <div className="grid gap-3 xl:grid-cols-4">
-            {guidedSellingQueue.length === 0 ? (
-              <div className="xl:col-span-4 rounded-[24px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
-                Sem oportunidades suficientes para montar a fila de execução.
-              </div>
-            ) : (
-              guidedSellingQueue.map(({ lead, guidance }) => (
-                <button
-                  key={lead.id}
-                  type="button"
-                  onClick={() => void openLeadDetails(lead)}
-                  className="group rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.14))] p-4 text-left shadow-[0_18px_48px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-medium text-white">
-                        {normalizeUiText(lead.name)}
-                      </div>
-                      <div className="mt-1 truncate text-xs text-zinc-500">
-                        {normalizeUiText(lead.companyName || 'Sem empresa')}
-                      </div>
-                    </div>
-                    <div
-                      className={classNames(
-                        'rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.16em]',
-                        getLeadGuidanceClass(guidance.level),
-                      )}
-                    >
-                      {guidance.score}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                    {guidance.title}
-                  </div>
-                  <div className="mt-2 text-sm leading-6 text-zinc-300">{guidance.reason}</div>
-
-                  <div className="mt-4 rounded-[18px] border border-white/10 bg-black/20 px-3 py-2.5 text-xs text-zinc-300">
-                    Próxima ação: <span className="text-white">{guidance.action}</span>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-        </CrmPanel>
         ) : null}
 
         {showEnterpriseLauncher ? (
@@ -3042,6 +3173,15 @@ export default function CrmPage() {
           <div className="rounded-[24px] border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {normalizeUiText(error)}
           </div>
+        ) : null}
+
+        {!showExecutiveWorkspace ? (
+          <WorkspaceHeroPanel
+            eyebrow={selectedWorkspaceMeta.eyebrow}
+            title={selectedWorkspaceMeta.label}
+            description={selectedWorkspaceMeta.description}
+            cards={workspaceHeroCards}
+          />
         ) : null}
 
         {showOperationsGrid ? (
@@ -7526,6 +7666,53 @@ function ExecutiveAreaChartCard({
         )}
       </div>
     </div>
+  );
+}
+
+function WorkspaceHeroPanel({
+  eyebrow,
+  title,
+  description,
+  cards,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  cards: Array<{ label: string; value: string; helper: string }>;
+}) {
+  return (
+    <CrmPanel className="overflow-hidden p-4 md:p-5">
+      <div className="rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.08),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.18))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.18)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-3xl">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{eyebrow}</div>
+            <div className="mt-2 text-[30px] font-semibold tracking-[-0.05em] text-white md:text-[34px]">
+              {title}
+            </div>
+            <div className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{description}</div>
+          </div>
+
+          <div className="rounded-full border border-emerald-500/10 bg-emerald-500/10 px-3 py-1.5 text-xs text-zinc-300">
+            Workspace ativo
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {cards.map((card) => (
+            <div
+              key={`${title}-${card.label}`}
+              className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,20,29,0.9),rgba(10,14,20,0.88))] p-4 shadow-[0_18px_48px_rgba(0,0,0,0.16)]"
+            >
+              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">{card.label}</div>
+              <div className="mt-3 text-[24px] font-semibold tracking-[-0.04em] text-white">
+                {card.value}
+              </div>
+              <div className="mt-1 text-sm text-zinc-500">{card.helper}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </CrmPanel>
   );
 }
 
