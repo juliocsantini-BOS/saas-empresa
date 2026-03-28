@@ -115,13 +115,15 @@ export function CrmStyles() {
         appearance: none;
         -webkit-appearance: none;
         min-height: 48px;
-        padding-right: 2.85rem;
+        width: 100%;
+        min-width: 0;
+        padding-right: 3.2rem;
         background-image:
           linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018)),
           radial-gradient(circle at top left, rgba(44, 139, 255, 0.1), transparent 55%),
           url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M6.5 3.75V5.25M13.5 3.75V5.25M4.75 7.25H15.25M5.75 16.25H14.25C15.0784 16.25 15.75 15.5784 15.75 14.75V6.75C15.75 5.92157 15.0784 5.25 14.25 5.25H5.75C4.92157 5.25 4.25 5.92157 4.25 6.75V14.75C4.25 15.5784 4.92157 16.25 5.75 16.25Z' stroke='%23B5C5E8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
         background-repeat: no-repeat, no-repeat, no-repeat;
-        background-position: center, center, right 0.95rem center;
+        background-position: center, center, right 0.85rem center;
         background-size: auto, auto, 1rem;
       }
 
@@ -182,6 +184,11 @@ export function CrmStyles() {
       :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-hour-field),
       :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-minute-field) {
         color: #eef2ff;
+      }
+
+      :global(.crm-dashboard-shell input[type='date']::-webkit-datetime-edit-fields-wrapper),
+      :global(.crm-dashboard-shell input[type='datetime-local']::-webkit-datetime-edit-fields-wrapper) {
+        padding-right: 0.35rem;
       }
 
       :global(.crm-dashboard-shell select::-ms-expand) {

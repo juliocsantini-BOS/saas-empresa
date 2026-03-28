@@ -2271,6 +2271,17 @@ export default function CrmPage() {
     return latestLeadUpdate ? `Atualizado ${formatRelativeTime(latestLeadUpdate)}` : 'Atualizado agora';
   }, [analyticsUniverse, filteredLeads]);
 
+  const executiveStatusLabel =
+    statusFilter === 'ALL' ? 'Todos os estágios' : STATUS_LABELS[statusFilter];
+  const executiveOwnerLabel =
+    ownerFilter === 'ALL'
+      ? 'Todos os owners'
+      : visualOwnerOptions.find((owner) => owner.id === ownerFilter)?.name || 'Owner filtrado';
+  const executiveSourceLabel =
+    sourceFilter === 'ALL'
+      ? 'Todas as origens'
+      : visualSourceOptions.find((source) => source.id === sourceFilter)?.name || 'Origem filtrada';
+
   const forecastGaugeValue = Math.max(0, Math.min(visualCurrentTargetProgress || 0, 100));
 
   const executiveMetrics = useMemo(
@@ -2868,13 +2879,16 @@ export default function CrmPage() {
                 description="Ajuste o recorte executivo sem abrir a camada completa de operação."
               />
 
-              <div className="grid gap-3 xl:grid-cols-6">
-                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
+              <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+                <div className="relative overflow-hidden rounded-[24px] border border-[#2C8BFF]/15 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.12),transparent_52%),linear-gradient(180deg,rgba(19,26,39,0.98),rgba(12,17,27,0.94))] p-3.5 shadow-[0_18px_42px_rgba(0,0,0,0.2)]">
+                  <div className="absolute right-3.5 top-3.5 rounded-full border border-[#2C8BFF]/15 bg-[#2C8BFF]/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-[#9CCBFF]">
+                    {normalizeUiText(executiveStatusLabel)}
+                  </div>
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Status</div>
                   <select
                     value={statusFilter}
                     onChange={(event) => setStatusFilter(event.target.value as 'ALL' | LeadStatus)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                    className="mt-7 w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-3 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
                   >
                     <option value="ALL">Todos</option>
                     {STATUS_ORDER.map((status) => (
@@ -2885,12 +2899,15 @@ export default function CrmPage() {
                   </select>
                 </div>
 
-                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
+                <div className="relative overflow-hidden rounded-[24px] border border-emerald-400/12 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.1),transparent_50%),linear-gradient(180deg,rgba(19,26,39,0.98),rgba(12,17,27,0.94))] p-3.5 shadow-[0_18px_42px_rgba(0,0,0,0.2)]">
+                  <div className="absolute right-3.5 top-3.5 rounded-full border border-emerald-400/12 bg-emerald-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-emerald-200">
+                    {normalizeUiText(executiveOwnerLabel)}
+                  </div>
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Responsável</div>
                   <select
                     value={ownerFilter}
                     onChange={(event) => setOwnerFilter(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                    className="mt-7 w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-3 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
                   >
                     <option value="ALL">Todos</option>
                     {visualOwnerOptions.map((owner) => (
@@ -2901,12 +2918,15 @@ export default function CrmPage() {
                   </select>
                 </div>
 
-                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(19,26,39,0.96),rgba(13,18,28,0.92))] p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)]">
+                <div className="relative overflow-hidden rounded-[24px] border border-violet-400/12 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.12),transparent_50%),linear-gradient(180deg,rgba(19,26,39,0.98),rgba(12,17,27,0.94))] p-3.5 shadow-[0_18px_42px_rgba(0,0,0,0.2)]">
+                  <div className="absolute right-3.5 top-3.5 rounded-full border border-violet-400/12 bg-violet-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-violet-200">
+                    {normalizeUiText(executiveSourceLabel)}
+                  </div>
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">Origem</div>
                   <select
                     value={sourceFilter}
                     onChange={(event) => setSourceFilter(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                    className="mt-7 w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-3 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
                   >
                     <option value="ALL">Todas</option>
                     {visualSourceOptions.map((source) => (
@@ -2923,7 +2943,7 @@ export default function CrmPage() {
                     type="date"
                     value={expectedCloseDateTo}
                     onChange={(event) => setExpectedCloseDateTo(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#2C8BFF]/25"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-3 text-[15px] text-white outline-none transition focus:border-[#2C8BFF]/25"
                   />
                 </div>
 
