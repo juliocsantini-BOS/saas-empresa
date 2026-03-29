@@ -3685,11 +3685,11 @@ export default function CrmPage() {
                 description="Entenda onde o pipeline concentra volume, onde o valor está parado e quais owners precisam destravar etapas agora."
               />
 
-              <div className="mb-4 grid gap-4 md:grid-cols-2 2xl:grid-cols-5">
+              <div className="mb-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {visualPipelineTotals.map((item) => (
                   <div
                     key={item.status}
-                    className="rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.08),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.16))] p-5 shadow-[0_16px_40px_rgba(0,0,0,0.18)]"
+                    className="rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.08),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.16))] p-5 shadow-[0_16px_40px_rgba(0,0,0,0.18)]"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div>
@@ -3698,6 +3698,9 @@ export default function CrmPage() {
                         </div>
                         <div className="mt-2 text-[2rem] font-semibold tracking-[-0.04em] text-white">
                           {item.count} lead(s)
+                        </div>
+                        <div className="mt-1 text-sm text-zinc-500">
+                          {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'} em carteira
                         </div>
                       </div>
                       <div
@@ -3708,33 +3711,28 @@ export default function CrmPage() {
                       />
                     </div>
 
-                    <div className="mt-4 rounded-[20px] border border-white/8 bg-black/20 p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                            Valor
-                          </div>
-                          <div className="text-sm font-medium text-white">
-                            {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-4">
+                    <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-[18px] border border-white/8 bg-black/20 px-4 py-3">
                           <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                             Forecast
                           </div>
-                          <div className="text-sm font-medium text-white">
+                          <div className="mt-2 text-base font-semibold text-white">
                             {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
                           </div>
                         </div>
-
-                        <div className="flex items-center justify-between gap-4 border-t border-white/8 pt-3">
+                        <div className="rounded-[18px] border border-white/8 bg-black/20 px-4 py-3">
                           <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                            Probabilidade
+                            Ritmo
                           </div>
-                          <div className="inline-flex min-w-[64px] items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-xs font-medium text-cyan-200">
-                            {item.avgProbability}%
+                          <div className="mt-2 text-base font-semibold text-white">
+                            {item.avgProbability}% de chance
                           </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-start sm:justify-end">
+                        <div className="inline-flex min-w-[92px] items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-sm font-medium text-cyan-200">
+                          {item.avgProbability}% prob.
                         </div>
                       </div>
                     </div>
