@@ -8623,7 +8623,7 @@ function ExecutiveStageBarsCard({
   const max = Math.max(...topRows.map((row) => row.value), 1);
 
   return (
-    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -8634,29 +8634,37 @@ function ExecutiveStageBarsCard({
         </div>
       </div>
 
-      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] px-4 pb-4 pt-6">
-        <div className="pointer-events-none mb-4 grid h-[1px] grid-cols-1">
-          <div className="h-px bg-transparent" />
-        </div>
-        <div className="flex h-[220px] items-end gap-5">
-        {topRows.map((row, index) => {
-          const height = Math.max((row.value / max) * 100, 12);
-          return (
-            <div key={row.label} className="flex min-w-0 flex-1 flex-col items-center gap-3">
-              <div className="text-xs text-zinc-500">{row.value}</div>
-              <div className="flex h-[170px] items-end">
-                <div
-                  className="w-12 rounded-t-[12px] shadow-[0_0_24px_rgba(44,139,255,0.18)]"
-                  style={{
-                    height: `${height}%`,
-                    background: `linear-gradient(180deg, ${palette[index % palette.length]}, rgba(255,255,255,0.12))`,
-                  }}
-                />
+      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] p-4">
+        <div className="space-y-4">
+          {topRows.map((row, index) => {
+            const width = Math.max((row.value / max) * 100, 10);
+            return (
+              <div key={row.label} className="grid items-center gap-3 md:grid-cols-[140px_minmax(0,1fr)_56px]">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-white">
+                    {normalizeUiText(row.label)}
+                  </div>
+                  <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+                    etapa do funil
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="h-12 overflow-hidden rounded-[16px] border border-white/6 bg-[#182231]">
+                    <div
+                      className="h-full rounded-[16px] shadow-[0_0_24px_rgba(44,139,255,0.18)]"
+                      style={{
+                        width: `${width}%`,
+                        background: `linear-gradient(90deg, ${palette[index % palette.length]}, rgba(255,255,255,0.14))`,
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="text-right text-lg font-semibold tracking-[-0.03em] text-white">
+                  {row.value}
+                </div>
               </div>
-              <div className="text-center text-xs text-zinc-400">{normalizeUiText(row.label)}</div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </div>
     </div>
