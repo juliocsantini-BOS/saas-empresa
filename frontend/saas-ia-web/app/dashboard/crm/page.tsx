@@ -3694,7 +3694,7 @@ export default function CrmPage() {
 
               <PipelineStageBoardCard rows={visualPipelineTotals} canSeeValues={canSeeValues} />
 
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+              <div className="grid items-stretch gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                 <ExecutiveStageBarsCard
                   title="Funil do pipeline"
                   subtitle="Quantidade atual de oportunidades por estágio"
@@ -8640,7 +8640,7 @@ function ExecutiveStageBarsCard({
   const max = Math.max(...topRows.map((row) => row.value), 1);
 
   return (
-    <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="flex min-h-[392px] flex-col rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -8651,14 +8651,14 @@ function ExecutiveStageBarsCard({
         </div>
       </div>
 
-      <div className="mt-5 overflow-x-auto pb-1">
-        <div className="flex min-w-max gap-3">
+      <div className="mt-6 overflow-x-auto pb-2">
+        <div className="flex min-w-max gap-4">
           {topRows.map((row, index) => {
             const width = Math.max((row.value / max) * 100, 10);
             return (
               <div
                 key={row.label}
-                className="w-[168px] shrink-0 rounded-[24px] border border-white/8 bg-[#121823] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                className="flex min-h-[204px] w-[220px] shrink-0 flex-col rounded-[24px] border border-white/8 bg-[#121823] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div
@@ -8670,14 +8670,14 @@ function ExecutiveStageBarsCard({
                   </div>
                 </div>
 
-                <div className="mt-4 text-sm font-medium text-white">
+                <div className="mt-5 text-sm font-medium text-white">
                   {normalizeUiText(row.label)}
                 </div>
                 <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-zinc-500">
                   etapa do funil
                 </div>
 
-                <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#1a2433]">
+                <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-[#1a2433]">
                   <div
                     className="h-full rounded-full shadow-[0_0_24px_rgba(44,139,255,0.18)]"
                     style={{
@@ -8687,7 +8687,7 @@ function ExecutiveStageBarsCard({
                   />
                 </div>
 
-                <div className="mt-2 text-xs text-zinc-500">
+                <div className="mt-auto pt-4 text-xs leading-5 text-zinc-500">
                   {Math.round((row.value / max) * 100)}% da etapa líder
                 </div>
               </div>
@@ -8938,7 +8938,7 @@ function PipelineStageValueComboCard({
   const topStage = [...items].sort((a, b) => b.totalValue - a.totalValue)[0];
 
   return (
-    <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="flex min-h-[392px] flex-col rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex flex-col gap-4 border-b border-white/8 pb-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1">
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
@@ -8960,9 +8960,9 @@ function PipelineStageValueComboCard({
         </div>
       </div>
 
-      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] p-5">
+      <div className="mt-6 rounded-[24px] border border-white/6 bg-[#121823] p-6">
         {topStage ? (
-          <div className="mb-5 flex flex-wrap items-start justify-between gap-3 rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-3">
+          <div className="mb-6 flex flex-wrap items-start justify-between gap-3 rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-4">
             <div>
               <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Etapa dominante</div>
               <div className="mt-1 text-base font-semibold text-white">
@@ -8978,14 +8978,14 @@ function PipelineStageValueComboCard({
           </div>
         ) : null}
 
-        <div className="overflow-x-auto pb-1">
-          <div className="flex min-w-max gap-3">
+        <div className="overflow-x-auto pb-2">
+          <div className="flex min-w-max gap-4">
           {items.map((item, index) => {
             const valueWidth = Math.max((item.totalValue / maxValue) * 100, 8);
             return (
               <div
                 key={item.status}
-                className="w-[196px] shrink-0 rounded-[22px] border border-white/8 bg-white/[0.02] px-4 py-4"
+                className="flex min-h-[204px] w-[220px] shrink-0 flex-col rounded-[22px] border border-white/8 bg-white/[0.02] px-5 py-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -9002,14 +9002,14 @@ function PipelineStageValueComboCard({
                   </div>
                 </div>
 
-                <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/[0.05]">
+                <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-white/[0.05]">
                   <div
                     className="h-full rounded-full bg-[linear-gradient(90deg,#BFD5FF,#5E8DFF,#8B5CF6)] shadow-[0_0_22px_rgba(120,168,255,0.16)]"
                     style={{ width: `${valueWidth}%` }}
                   />
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <div className="max-w-full break-words rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-400">
                     etapa {index + 1}
                   </div>
@@ -9018,7 +9018,7 @@ function PipelineStageValueComboCard({
                   </div>
                 </div>
 
-                <div className="mt-3 text-xs text-zinc-500">
+                <div className="mt-auto pt-4 text-xs leading-5 text-zinc-500">
                   Forecast: {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
                 </div>
               </div>
