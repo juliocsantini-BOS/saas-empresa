@@ -8642,7 +8642,7 @@ function ExecutiveStageBarsCard({
   return (
     <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
           <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
         </div>
@@ -8651,33 +8651,44 @@ function ExecutiveStageBarsCard({
         </div>
       </div>
 
-      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] p-4">
-        <div className="space-y-4">
+      <div className="mt-5 overflow-x-auto pb-1">
+        <div className="flex min-w-max gap-3">
           {topRows.map((row, index) => {
             const width = Math.max((row.value / max) * 100, 10);
             return (
-              <div key={row.label} className="grid items-center gap-3 md:grid-cols-[140px_minmax(0,1fr)_56px]">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-white">
-                    {normalizeUiText(row.label)}
-                  </div>
-                  <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                    etapa do funil
-                  </div>
-                </div>
-                <div className="relative">
-                  <div className="h-12 overflow-hidden rounded-[16px] border border-white/6 bg-[#182231]">
-                    <div
-                      className="h-full rounded-[16px] shadow-[0_0_24px_rgba(44,139,255,0.18)]"
-                      style={{
-                        width: `${width}%`,
-                        background: `linear-gradient(90deg, ${palette[index % palette.length]}, rgba(255,255,255,0.14))`,
-                      }}
-                    />
+              <div
+                key={row.label}
+                className="w-[168px] shrink-0 rounded-[24px] border border-white/8 bg-[#121823] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div
+                    className="h-3 w-3 rounded-full shadow-[0_0_16px_rgba(255,255,255,0.18)]"
+                    style={{ backgroundColor: palette[index % palette.length] }}
+                  />
+                  <div className="text-lg font-semibold tracking-[-0.03em] text-white">
+                    {row.value}
                   </div>
                 </div>
-                <div className="text-right text-lg font-semibold tracking-[-0.03em] text-white">
-                  {row.value}
+
+                <div className="mt-4 text-sm font-medium text-white">
+                  {normalizeUiText(row.label)}
+                </div>
+                <div className="mt-1 text-[11px] uppercase tracking-[0.16em] text-zinc-500">
+                  etapa do funil
+                </div>
+
+                <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#1a2433]">
+                  <div
+                    className="h-full rounded-full shadow-[0_0_24px_rgba(44,139,255,0.18)]"
+                    style={{
+                      width: `${width}%`,
+                      background: `linear-gradient(90deg, ${palette[index % palette.length]}, rgba(255,255,255,0.22))`,
+                    }}
+                  />
+                </div>
+
+                <div className="mt-2 text-xs text-zinc-500">
+                  {Math.round((row.value / max) * 100)}% da etapa líder
                 </div>
               </div>
             );
@@ -8967,20 +8978,24 @@ function PipelineStageValueComboCard({
           </div>
         ) : null}
 
-        <div className="space-y-4">
+        <div className="overflow-x-auto pb-1">
+          <div className="flex min-w-max gap-3">
           {items.map((item, index) => {
             const valueWidth = Math.max((item.totalValue / maxValue) * 100, 8);
             return (
-              <div key={item.status} className="rounded-[20px] border border-white/8 bg-white/[0.02] px-4 py-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+              <div
+                key={item.status}
+                className="w-[196px] shrink-0 rounded-[22px] border border-white/8 bg-white/[0.02] px-4 py-4"
+              >
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-sm font-medium text-white">
                       {normalizeUiText(STATUS_LABELS[item.status])}
                     </div>
                     <div className="mt-1 text-xs text-zinc-500">{item.count} oportunidade(s)</div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-white">
+                  <div className="text-right min-w-0">
+                    <div className="break-words text-sm font-semibold text-white">
                       {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
                     </div>
                     <div className="mt-1 text-xs text-zinc-500">valor em pipeline</div>
@@ -8994,20 +9009,22 @@ function PipelineStageValueComboCard({
                   />
                 </div>
 
-                <div className="mt-3 grid gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
-                  <div className="text-xs text-zinc-500">
-                    Forecast: {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
-                  </div>
-                  <div className="inline-flex items-center justify-center rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-400">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <div className="max-w-full break-words rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-400">
                     etapa {index + 1}
                   </div>
                   <div className="inline-flex items-center justify-center rounded-full border border-cyan-400/18 bg-cyan-400/[0.06] px-2.5 py-1 text-[11px] font-medium text-cyan-200">
                     {item.avgProbability}% prob.
                   </div>
                 </div>
+
+                <div className="mt-3 text-xs text-zinc-500">
+                  Forecast: {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
+                </div>
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </div>
