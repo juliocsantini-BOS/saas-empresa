@@ -8834,7 +8834,9 @@ function PipelineStageBoardCard({
                 <div className="text-sm font-medium text-white">
                   {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
                 </div>
-                <div className="mt-1 text-xs text-zinc-500">em carteira</div>
+                <div className="mt-1 inline-block rounded bg-[#121823] px-1.5 text-xs text-zinc-500">
+                  em carteira
+                </div>
               </div>
 
               <div className="flex items-center justify-between gap-3 xl:block xl:text-right">
@@ -8842,7 +8844,9 @@ function PipelineStageBoardCard({
                 <div className="text-sm font-medium text-white">
                   {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
                 </div>
-                <div className="mt-1 text-xs text-zinc-500">valor ponderado</div>
+                <div className="mt-1 inline-block rounded bg-[#121823] px-1.5 text-xs text-zinc-500">
+                  valor ponderado
+                </div>
               </div>
 
               <div className="flex items-center justify-between gap-3 xl:justify-end">
