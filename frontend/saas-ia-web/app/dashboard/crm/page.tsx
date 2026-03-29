@@ -8723,13 +8723,19 @@ function PipelineStageBoardCard({
 }) {
   const items = rows.slice(0, 5);
   const maxCount = Math.max(...items.map((item) => item.count), 1);
+  const totalCount = items.reduce((sum, item) => sum + item.count, 0);
+  const totalValue = items.reduce((sum, item) => sum + item.totalValue, 0);
+  const totalForecast = items.reduce((sum, item) => sum + item.forecast, 0);
+  const avgProbability = totalCount
+    ? Math.round(items.reduce((sum, item) => sum + item.avgProbability * item.count, 0) / totalCount)
+    : 0;
 
   return (
-    <div className="mb-4 rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-      <div className="flex flex-col gap-3 border-b border-white/8 pb-4 xl:flex-row xl:items-end xl:justify-between">
+    <div className="mb-4 rounded-[32px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.24)]">
+      <div className="flex flex-col gap-3 border-b border-white/8 pb-5 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Snapshot por etapa</div>
-          <div className="mt-2 text-[1.4rem] font-semibold tracking-[-0.04em] text-white">
+          <div className="mt-2 text-[1.55rem] font-semibold tracking-[-0.04em] text-white">
             Onde o pipeline trava, acelera e concentra valor
           </div>
           <div className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
@@ -8742,7 +8748,32 @@ function PipelineStageBoardCard({
         </div>
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-[24px] border border-white/8 bg-[#121823]">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-3">
+          <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Deals no recorte</div>
+          <div className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-white">{totalCount}</div>
+        </div>
+        <div className="rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-3">
+          <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Valor total</div>
+          <div className="mt-2 text-lg font-semibold text-white">
+            {canSeeValues ? formatMoney(totalValue) : 'Sem acesso'}
+          </div>
+        </div>
+        <div className="rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-3">
+          <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Forecast ponderado</div>
+          <div className="mt-2 text-lg font-semibold text-white">
+            {canSeeValues ? formatMoney(totalForecast) : 'Sem acesso'}
+          </div>
+        </div>
+        <div className="rounded-[20px] border border-cyan-400/14 bg-cyan-400/[0.06] px-4 py-3">
+          <div className="text-[11px] uppercase tracking-[0.16em] text-cyan-200/70">Qualidade média</div>
+          <div className="mt-2 inline-flex min-w-[88px] items-center justify-center rounded-full border border-cyan-400/18 bg-cyan-400/10 px-3 py-1.5 text-sm font-medium text-cyan-200">
+            {avgProbability}% prob.
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 overflow-hidden rounded-[26px] border border-white/8 bg-[#121823] shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
         <div className="hidden border-b border-white/6 px-5 py-3 text-[11px] uppercase tracking-[0.18em] text-zinc-500 xl:grid xl:grid-cols-[1.15fr_repeat(4,minmax(0,0.9fr))]">
           <span>Etapa</span>
           <span className="text-right">Volume</span>
@@ -8759,7 +8790,10 @@ function PipelineStageBoardCard({
           {items.map((item, index) => (
             <div
               key={item.status}
-              className="grid gap-4 px-5 py-4 xl:grid-cols-[1.15fr_repeat(4,minmax(0,0.9fr))] xl:items-center xl:gap-5"
+              className={classNames(
+                'grid gap-4 px-5 py-4 xl:grid-cols-[1.15fr_repeat(4,minmax(0,0.9fr))] xl:items-center xl:gap-5',
+                index % 2 === 0 ? 'bg-white/[0.01]' : 'bg-transparent',
+              )}
             >
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3">
@@ -8822,27 +8856,6 @@ function PipelineStageBoardCard({
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
-        {items.map((item, index) => (
-          <div
-            key={item.status}
-            className="rounded-[20px] border border-white/8 bg-white/[0.025] px-4 py-3"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                  {normalizeUiText(STATUS_LABELS[item.status])}
-                </div>
-                <div className="mt-1 text-sm text-white">
-                  {Math.round((item.count / maxCount) * 100)}% do volume do topo
-                </div>
-              </div>
-              <div className="text-xs text-zinc-500">{index + 1}ª etapa</div>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
