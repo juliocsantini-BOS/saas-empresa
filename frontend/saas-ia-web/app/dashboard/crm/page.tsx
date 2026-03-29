@@ -3711,6 +3711,32 @@ export default function CrmPage() {
                   canSeeValues={canSeeValues}
                 />
               </div>
+
+              <div className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                <ReportBarChartCard
+                  title="Taxa de conversão"
+                  subtitle="Eficiência de avanço entre as etapas do funil"
+                  accent="blue"
+                  rows={stageConversionReport.map((item) => ({
+                    label: STATUS_LABELS[item.label as LeadStatus] || item.label,
+                    value: item.rate || 0,
+                    helper: `${item.count} lead(s)`,
+                    valueLabel: `${item.rate || 0}%`,
+                  }))}
+                />
+                <ExecutiveDonutStatusCard
+                  title="Motivos de perda"
+                  subtitle="Distribuição dos fatores que mais derrubam negociações"
+                  rows={lossReasonsBreakdownReport.map((item) => ({
+                    label: item.label,
+                    value: item.count,
+                  }))}
+                  centerLabel="perdas"
+                  centerValue={String(
+                    lossReasonsBreakdownReport.reduce((sum, item) => sum + item.count, 0),
+                  )}
+                />
+              </div>
             </CrmPanel>
             ) : null}
 
@@ -5019,6 +5045,61 @@ export default function CrmPage() {
               </div>
             </CrmPanel>
 
+            {showPipelineWorkspace ? (
+            <CrmPanel className="p-4 md:p-5">
+              <CrmSectionHeader
+                eyebrow="Pipeline tático"
+                title="Pressão operacional e prioridades"
+                description="Blocos de execução perto do topo para apoiar a leitura dos gráficos, sem disputar espaço com eles."
+              />
+
+              <div className="space-y-4">
+                <PipelineOwnerPressureCard
+                  title="Deals parados por owner"
+                  subtitle="Owners com maior concentração de oportunidades sem avanço recente"
+                  rows={stalledLeadsByOwnerReport.map((item) => ({
+                    label: item.label,
+                    stalled: item.count,
+                    tasks: openTasksByOwnerReport.find((taskItem) => taskItem.label === item.label)
+                      ?.count || 0,
+                  }))}
+                />
+
+                <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+                    Prioridades do pipeline
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-zinc-400">
+                    Gargalos mais urgentes para proteger conversão e forecast.
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    {pipelineGovernanceSummary.blockers.length > 0 ? (
+                      pipelineGovernanceSummary.blockers.slice(0, 4).map((blocker) => (
+                        <div
+                          key={blocker.label}
+                          className="rounded-[20px] border border-white/8 bg-[#171D27] px-4 py-3"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm text-white">{blocker.label}</div>
+                            <div className="text-sm font-medium text-white">{blocker.count}</div>
+                          </div>
+                          <div className="mt-1 text-xs leading-5 text-zinc-500">
+                            {blocker.helper}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+                        Sem bloqueios críticos no recorte atual.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CrmPanel>
+            ) : null}
+
             {showPipelineWorkspace || showCoachingWorkspace ? (
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
@@ -5664,85 +5745,6 @@ export default function CrmPage() {
             </CrmPanel>
             ) : null}
 
-            {showPipelineWorkspace ? (
-            <CrmPanel className="p-4 md:p-5">
-              <CrmSectionHeader
-                eyebrow="Pipeline tático"
-                title="Sinais rápidos do funil"
-                description="Use a lateral para ler eficiência, perdas e pressão operacional sem comprimir os gráficos estratégicos."
-              />
-
-              <div className="space-y-4">
-                <ReportBarChartCard
-                  title="Taxa de conversão"
-                  subtitle="Eficiência de avanço entre as etapas do funil"
-                  accent="blue"
-                  rows={stageConversionReport.map((item) => ({
-                    label: STATUS_LABELS[item.label as LeadStatus] || item.label,
-                    value: item.rate || 0,
-                    helper: `${item.count} lead(s)`,
-                    valueLabel: `${item.rate || 0}%`,
-                  }))}
-                />
-
-                <ExecutiveDonutStatusCard
-                  title="Motivos de perda"
-                  subtitle="Distribuição dos fatores que mais derrubam negociações"
-                  rows={lossReasonsBreakdownReport.map((item) => ({
-                    label: item.label,
-                    value: item.count,
-                  }))}
-                  centerLabel="perdas"
-                  centerValue={String(
-                    lossReasonsBreakdownReport.reduce((sum, item) => sum + item.count, 0),
-                  )}
-                />
-
-                <PipelineOwnerPressureCard
-                  title="Deals parados por owner"
-                  subtitle="Owners com maior concentração de oportunidades sem avanço recente"
-                  rows={stalledLeadsByOwnerReport.map((item) => ({
-                    label: item.label,
-                    stalled: item.count,
-                    tasks: openTasksByOwnerReport.find((taskItem) => taskItem.label === item.label)
-                      ?.count || 0,
-                  }))}
-                />
-
-                <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
-                    Prioridades do pipeline
-                  </div>
-                  <div className="mt-2 text-sm leading-6 text-zinc-400">
-                    Gargalos mais urgentes para proteger conversão e forecast.
-                  </div>
-
-                  <div className="mt-5 space-y-3">
-                    {pipelineGovernanceSummary.blockers.length > 0 ? (
-                      pipelineGovernanceSummary.blockers.slice(0, 4).map((blocker) => (
-                        <div
-                          key={blocker.label}
-                          className="rounded-[20px] border border-white/8 bg-[#171D27] px-4 py-3"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="text-sm text-white">{blocker.label}</div>
-                            <div className="text-sm font-medium text-white">{blocker.count}</div>
-                          </div>
-                          <div className="mt-1 text-xs leading-5 text-zinc-500">
-                            {blocker.helper}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
-                        Sem bloqueios críticos no recorte atual.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CrmPanel>
-            ) : null}
           </div>
         </div>
         ) : null}
