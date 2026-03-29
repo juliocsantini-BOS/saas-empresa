@@ -3681,15 +3681,15 @@ export default function CrmPage() {
             <CrmPanel className="p-4 md:p-5">
               <CrmSectionHeader
                 eyebrow="Inteligência do pipeline"
-                title="Leitura financeira e operacional do funil"
-                description="Veja quantidade, valor, forecast e risco médio por etapa."
+                title="Leitura visual do funil e gargalos de conversão"
+                description="Entenda onde o pipeline concentra volume, onde o valor está parado e quais owners precisam destravar etapas agora."
               />
 
-              <div className="grid gap-3 2xl:grid-cols-2">
+              <div className="mb-3 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                 {visualPipelineTotals.map((item) => (
                   <div
                     key={item.status}
-                    className="rounded-[22px] border border-white/10 bg-black/20 p-4"
+                    className="rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.08),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.16))] p-4 shadow-[0_16px_40px_rgba(0,0,0,0.18)]"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div>
@@ -3718,6 +3718,95 @@ export default function CrmPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div className="grid gap-3 xl:grid-cols-2">
+                <ExecutiveStageBarsCard
+                  title="Funil do pipeline"
+                  subtitle="Quantidade atual de oportunidades por estágio"
+                  rows={visualPipelineTotals.map((item) => ({
+                    label: STATUS_LABELS[item.status],
+                    value: item.count,
+                  }))}
+                  badge={`${visualStats.open} deals`}
+                />
+                <PipelineStageValueComboCard
+                  title="Valor por estágio"
+                  subtitle="Peso financeiro do pipeline com linha de probabilidade média"
+                  rows={visualPipelineTotals}
+                  canSeeValues={canSeeValues}
+                />
+              </div>
+
+              <div className="mt-3 grid gap-3 xl:grid-cols-2">
+                <ReportBarChartCard
+                  title="Taxa de conversão"
+                  subtitle="Eficiência de avanço entre as etapas do funil"
+                  accent="blue"
+                  rows={stageConversionReport.map((item) => ({
+                    label: STATUS_LABELS[item.label as LeadStatus] || item.label,
+                    value: item.rate || 0,
+                    helper: `${item.count} lead(s)`,
+                    valueLabel: `${item.rate || 0}%`,
+                  }))}
+                />
+                <ExecutiveDonutStatusCard
+                  title="Motivos de perda"
+                  subtitle="Distribuição dos fatores que mais derrubam negociações"
+                  rows={lossReasonsBreakdownReport.map((item) => ({
+                    label: item.label,
+                    value: item.count,
+                  }))}
+                  centerLabel="perdas"
+                  centerValue={String(
+                    lossReasonsBreakdownReport.reduce((sum, item) => sum + item.count, 0),
+                  )}
+                />
+              </div>
+
+              <div className="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+                <PipelineOwnerPressureCard
+                  title="Deals parados por owner"
+                  subtitle="Owners com maior concentração de oportunidades sem avanço recente"
+                  rows={stalledLeadsByOwnerReport.map((item) => ({
+                    label: item.label,
+                    stalled: item.count,
+                    tasks: openTasksByOwnerReport.find((taskItem) => taskItem.label === item.label)
+                      ?.count || 0,
+                  }))}
+                />
+
+                <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">
+                    Prioridades do pipeline
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-zinc-400">
+                    Gargalos mais urgentes para proteger conversão e forecast.
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    {pipelineGovernanceSummary.blockers.length > 0 ? (
+                      pipelineGovernanceSummary.blockers.slice(0, 4).map((blocker) => (
+                        <div
+                          key={blocker.label}
+                          className="rounded-[20px] border border-white/8 bg-[#171D27] px-4 py-3"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm text-white">{blocker.label}</div>
+                            <div className="text-sm font-medium text-white">{blocker.count}</div>
+                          </div>
+                          <div className="mt-1 text-xs leading-5 text-zinc-500">
+                            {blocker.helper}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+                        Sem bloqueios críticos no recorte atual.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </CrmPanel>
             ) : null}
@@ -8647,6 +8736,146 @@ function ExecutiveOwnerBarsCard({
             })
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function PipelineStageValueComboCard({
+  title,
+  subtitle,
+  rows,
+  canSeeValues,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{
+    status: LeadStatus;
+    count: number;
+    totalValue: number;
+    forecast: number;
+    avgProbability: number;
+  }>;
+  canSeeValues: boolean;
+}) {
+  const items = rows.slice(0, 5);
+  const maxValue = Math.max(...items.map((item) => item.totalValue), 1);
+
+  return (
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+
+      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] px-5 pb-5 pt-6">
+        <div className="relative h-[220px]">
+          <div className="pointer-events-none absolute inset-0 grid grid-rows-4">
+            {[0, 1, 2, 3].map((line) => (
+              <div key={line} className="border-b border-dashed border-white/8 last:border-b-0" />
+            ))}
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 flex h-full items-end gap-6">
+            {items.map((item, index) => {
+              const barHeight = Math.max((item.totalValue / maxValue) * 100, 10);
+              const lineBottom = Math.max(6, Math.min(item.avgProbability, 100));
+
+              return (
+                <div key={item.status} className="relative flex min-w-0 flex-1 flex-col items-center">
+                  <div className="mb-2 text-[11px] text-zinc-500">
+                    {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
+                  </div>
+                  <div className="relative flex h-[170px] w-full items-end justify-center">
+                    <div
+                      className="w-12 rounded-t-[12px] bg-[linear-gradient(180deg,rgba(191,219,254,0.88),rgba(74,144,226,0.24))] shadow-[0_0_22px_rgba(120,168,255,0.15)]"
+                      style={{ height: `${barHeight}%` }}
+                    />
+                    <div
+                      className="absolute left-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 rounded-full border border-rose-200 bg-rose-300 shadow-[0_0_16px_rgba(253,164,175,0.32)]"
+                      style={{ bottom: `calc(${lineBottom}% - 4px)` }}
+                    />
+                    {index < items.length - 1 ? (
+                      <div
+                        className="absolute left-1/2 top-0 h-full w-[calc(100%+1.5rem)] -translate-x-0"
+                        aria-hidden
+                      >
+                        <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
+                          <path
+                            d={`M 8 ${100 - lineBottom} Q 50 ${(100 - lineBottom + (100 - Math.max(6, Math.min(items[index + 1].avgProbability, 100)))) / 2} 92 ${100 - Math.max(6, Math.min(items[index + 1].avgProbability, 100))}`}
+                            fill="none"
+                            stroke="rgba(248,113,113,0.95)"
+                            strokeWidth="2"
+                          />
+                        </svg>
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="mt-3 text-center text-xs text-zinc-400">
+                    {normalizeUiText(STATUS_LABELS[item.status])}
+                  </div>
+                  <div className="mt-1 text-[11px] text-zinc-500">{item.avgProbability}%</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PipelineOwnerPressureCard({
+  title,
+  subtitle,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; stalled: number; tasks: number }>;
+}) {
+  const items = rows.filter((row) => row.stalled > 0 || row.tasks > 0).slice(0, 5);
+  const maxValue = Math.max(...items.map((item) => item.stalled + item.tasks), 1);
+
+  return (
+    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+
+      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] px-5 pb-5 pt-6">
+        {items.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+            Sem pressão operacional relevante neste recorte.
+          </div>
+        ) : (
+          <div className="flex h-[220px] items-end gap-6">
+            {items.map((item) => {
+              const stalledHeight = ((item.stalled || 0) / maxValue) * 100;
+              const taskHeight = ((item.tasks || 0) / maxValue) * 100;
+              const total = item.stalled + item.tasks;
+
+              return (
+                <div key={item.label} className="flex min-w-0 flex-1 flex-col items-center gap-3">
+                  <div className="text-xs text-zinc-500">{total}</div>
+                  <div className="flex h-[170px] items-end">
+                    <div className="flex w-12 flex-col justify-end overflow-hidden rounded-t-[12px] bg-[#182231]">
+                      <div
+                        className="bg-[linear-gradient(180deg,rgba(248,113,113,0.96),rgba(248,113,113,0.72))]"
+                        style={{ height: `${Math.max(stalledHeight, item.stalled > 0 ? 10 : 0)}%` }}
+                      />
+                      <div
+                        className="bg-[linear-gradient(180deg,rgba(148,163,184,0.9),rgba(99,113,132,0.78))]"
+                        style={{ height: `${Math.max(taskHeight, item.tasks > 0 ? 10 : 0)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="text-center text-xs text-zinc-400">{normalizeUiText(item.label)}</div>
+                  <div className="text-[11px] text-zinc-500">
+                    {item.stalled} parados · {item.tasks} tarefas
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
