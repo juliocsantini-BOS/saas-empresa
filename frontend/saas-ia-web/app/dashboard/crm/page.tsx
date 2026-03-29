@@ -4507,458 +4507,445 @@ export default function CrmPage() {
                 description="Cards com valor, probabilidade, prioridade, origem e ritmo comercial."
               />
 
-              {canUseBulkActions ? (
-                <div className="mb-5 grid gap-3 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.16))] p-4 xl:grid-cols-[minmax(180px,auto)_minmax(220px,auto)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                  <div className="self-end rounded-[18px] border border-white/8 bg-white/[0.03] px-3.5 py-3 text-sm text-zinc-300">
-                    {selectedLeadCount} lead(s) selecionado(s)
-                  </div>
-                  <div className="flex flex-wrap items-end gap-2">
-                    <button
-                      type="button"
-                      onClick={selectFilteredLeads}
-                      disabled={
-                        filteredLeads.length === 0 ||
-                        selectedLeadCount === filteredLeads.length
-                      }
-                        className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Selecionar filtrados
-                    </button>
-                    <button
-                      type="button"
-                      onClick={clearSelection}
-                      disabled={selectedLeadCount === 0}
-                        className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Limpar
-                    </button>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                      Status em lote
-                    </div>
-                    <div className="flex gap-2">
-                      <select
-                        value={bulkStatusValue}
-                        onChange={(event) =>
-                          setBulkStatusValue(event.target.value as 'ALL' | LeadStatus)
-                        }
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#8B5CF6]/25 focus:bg-white/[0.07]"
-                      >
-                        <option value="ALL">Selecionar status</option>
-                        {STATUS_ORDER.map((status) => (
-                          <option key={status} value={status}>
-                            {STATUS_LABELS[status]}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => void applyBulkStatus()}
-                        disabled={
-                          selectedLeadCount === 0 ||
-                          bulkStatusValue === 'ALL' ||
-                          savingBulkAction
-                        }
-                        className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#8B5CF6]/15 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Aplicar
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                      Responsável em lote
-                    </div>
-                    <div className="flex gap-2">
-                      <select
-                        value={bulkOwnerValue}
-                        onChange={(event) => setBulkOwnerValue(event.target.value)}
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#8B5CF6]/25 focus:bg-white/[0.07]"
-                      >
-                        <option value="ALL">Selecionar responsável</option>
-                        <option value="UNASSIGNED">Sem responsável</option>
-                        {visualOwnerOptions.map((item) => (
-                          <option key={item.id} value={item.id}>
-                            {item.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => void applyBulkOwner()}
-                        disabled={
-                          selectedLeadCount === 0 ||
-                          bulkOwnerValue === 'ALL' ||
-                          savingBulkAction
-                        }
-                        className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#8B5CF6]/15 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Aplicar
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
-                      Prioridade em lote
-                    </div>
-                    <div className="flex gap-2">
-                      <select
-                        value={bulkPriorityValue}
-                        onChange={(event) =>
-                          setBulkPriorityValue(
-                            event.target.value as 'ALL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT',
-                          )
-                        }
-                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#8B5CF6]/25 focus:bg-white/[0.07]"
-                      >
-                        <option value="ALL">Selecionar prioridade</option>
-                        <option value="LOW">{PRIORITY_LABELS.LOW}</option>
-                        <option value="MEDIUM">{PRIORITY_LABELS.MEDIUM}</option>
-                        <option value="HIGH">{PRIORITY_LABELS.HIGH}</option>
-                        <option value="URGENT">{PRIORITY_LABELS.URGENT}</option>
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => void applyBulkPriority()}
-                        disabled={
-                          selectedLeadCount === 0 ||
-                          bulkPriorityValue === 'ALL' ||
-                          savingBulkAction
-                        }
-                        className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#8B5CF6]/15 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Aplicar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              {loading ? (
-                <div className="crm-scroll-x w-full max-w-full overflow-x-auto pb-3">
-                    <div className="flex w-max min-w-max gap-4">
-                    {STATUS_ORDER.map((status) => (
-                      <div
-                        key={status}
-                        className="w-[320px] min-w-[320px] max-w-[320px] shrink-0 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4"
-                      >
-                        <div className="h-5 w-28 animate-pulse rounded bg-white/10" />
-                        <div className="mt-4 space-y-3">
-                          <div className="h-28 animate-pulse rounded-[22px] bg-white/5" />
-                          <div className="h-28 animate-pulse rounded-[22px] bg-white/5" />
-                        </div>
+              <div className="rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.07),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.18))] p-4 md:p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)]">
+                  <div className="space-y-4">
+                    <div className="rounded-[24px] border border-white/10 bg-[#121722] p-4">
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                        Operação em lote
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="crm-scroll-x w-full max-w-full overflow-x-auto pb-3">
-                  <div className="flex w-max min-w-max gap-4">
-                    {STATUS_ORDER.map((status) => {
-                      const stageLeads = pipelineGroups[status];
-                      const stageValue = stageLeads.reduce(
-                        (sum, lead) => sum + parseMoney(lead.dealValue),
-                        0,
-                      );
-                      const stageAvgProbability = stageLeads.length
-                        ? Math.round(
-                            stageLeads.reduce(
-                              (sum, lead) => sum + normalizeProbability(lead),
-                              0,
-                            ) / stageLeads.length,
-                          )
-                        : 0;
+                      <div className="mt-2 text-sm leading-6 text-zinc-400">
+                        Ações rápidas para o recorte atual do kanban.
+                      </div>
+                      <div className="mt-4 rounded-[18px] border border-white/8 bg-white/[0.03] px-3.5 py-3 text-sm text-zinc-300">
+                        {selectedLeadCount} lead(s) selecionado(s)
+                      </div>
+                      {canUseBulkActions ? (
+                        <div className="mt-4 space-y-3">
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={selectFilteredLeads}
+                              disabled={
+                                filteredLeads.length === 0 ||
+                                selectedLeadCount === filteredLeads.length
+                              }
+                              className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              Selecionar filtrados
+                            </button>
+                            <button
+                              type="button"
+                              onClick={clearSelection}
+                              disabled={selectedLeadCount === 0}
+                              className="rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-zinc-300 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              Limpar
+                            </button>
+                          </div>
 
-                      return (
-                        <div
-                          key={status}
-                          className="crm-scroll flex max-h-[78vh] w-[376px] min-w-[376px] max-w-[376px] shrink-0 flex-col overflow-y-auto overflow-x-hidden rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4 shadow-[0_22px_52px_rgba(0,0,0,0.2)]"
-                        >
-                          <div className="sticky top-0 z-10 -mx-1 mb-4 rounded-[26px] border border-white/10 bg-[#090B0C]/95 px-4 py-4 backdrop-blur">
-                            <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.16),transparent)]" />
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <div className="truncate text-xs uppercase tracking-[0.18em] text-zinc-500">
-                                  {STATUS_LABELS[status]}
-                                </div>
-                                <div className="mt-1 text-[18px] font-semibold tracking-[-0.03em] text-white">
-                                  {stageLeads.length} lead(s)
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-400">
-                                  {stageAvgProbability}% prob.
-                                </div>
-                                <div
-                                  className={classNames(
-                                    'h-3 w-3 shrink-0 rounded-full shadow-[0_0_12px_rgba(255,255,255,0.16)]',
-                                    statusDotClass(status),
-                                  )}
-                                />
-                              </div>
+                          <div className="space-y-2">
+                            <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                              Status
                             </div>
-                            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                              <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
-                                <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                                  Valor da etapa
-                                </div>
-                                <div className="mt-1.5 break-words text-[15px] font-semibold tracking-[-0.03em] text-white">
-                                  {canSeeValues ? formatMoney(stageValue) : 'Sem acesso'}
-                                </div>
-                              </div>
-                              <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
-                                <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                                  Ticket medio
-                                </div>
-                                <div className="mt-1.5 break-words text-[15px] font-semibold tracking-[-0.03em] text-white">
-                                  {canSeeValues && stageLeads.length > 0
-                                    ? formatMoney(stageValue / stageLeads.length)
-                                    : 'Sem acesso'}
-                                </div>
-                              </div>
+                            <div className="flex gap-2">
+                              <select
+                                value={bulkStatusValue}
+                                onChange={(event) =>
+                                  setBulkStatusValue(event.target.value as 'ALL' | LeadStatus)
+                                }
+                                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#8B5CF6]/25 focus:bg-white/[0.07]"
+                              >
+                                <option value="ALL">Selecionar status</option>
+                                {STATUS_ORDER.map((status) => (
+                                  <option key={status} value={status}>
+                                    {STATUS_LABELS[status]}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => void applyBulkStatus()}
+                                disabled={
+                                  selectedLeadCount === 0 ||
+                                  bulkStatusValue === 'ALL' ||
+                                  savingBulkAction
+                                }
+                                className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#8B5CF6]/15 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                Aplicar
+                              </button>
                             </div>
                           </div>
 
-                          <div className="space-y-3">
-                            {stageLeads.length === 0 ? (
-                              <div className="rounded-[22px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
-                                Nenhum lead nesta etapa
-                              </div>
-                            ) : (
-                              stageLeads.map((lead) => {
-                                const score = getLeadScore(lead, [], []);
-                                const guidance = getLeadGuidance(lead, [], []);
-                                const temperature = getLeadTemperature(score);
-                                const health = getLeadHealth(getLastActivity(lead), lead.status);
-                                const probability = normalizeProbability(lead);
-                                const isStalled = daysSince(getLastActivity(lead)) > 5;
-                                const forecast = parseMoney(lead.dealValue) * (probability / 100);
+                          <div className="space-y-2">
+                            <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                              Responsável
+                            </div>
+                            <div className="flex gap-2">
+                              <select
+                                value={bulkOwnerValue}
+                                onChange={(event) => setBulkOwnerValue(event.target.value)}
+                                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#8B5CF6]/25 focus:bg-white/[0.07]"
+                              >
+                                <option value="ALL">Selecionar responsável</option>
+                                <option value="UNASSIGNED">Sem responsável</option>
+                                {visualOwnerOptions.map((item) => (
+                                  <option key={item.id} value={item.id}>
+                                    {item.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => void applyBulkOwner()}
+                                disabled={
+                                  selectedLeadCount === 0 ||
+                                  bulkOwnerValue === 'ALL' ||
+                                  savingBulkAction
+                                }
+                                className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#8B5CF6]/15 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                Aplicar
+                              </button>
+                            </div>
+                          </div>
 
-                                return (
+                          <div className="space-y-2">
+                            <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                              Prioridade
+                            </div>
+                            <div className="flex gap-2">
+                              <select
+                                value={bulkPriorityValue}
+                                onChange={(event) =>
+                                  setBulkPriorityValue(
+                                    event.target.value as 'ALL' | 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT',
+                                  )
+                                }
+                                className="w-full rounded-2xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-[#8B5CF6]/25 focus:bg-white/[0.07]"
+                              >
+                                <option value="ALL">Selecionar prioridade</option>
+                                <option value="LOW">{PRIORITY_LABELS.LOW}</option>
+                                <option value="MEDIUM">{PRIORITY_LABELS.MEDIUM}</option>
+                                <option value="HIGH">{PRIORITY_LABELS.HIGH}</option>
+                                <option value="URGENT">{PRIORITY_LABELS.URGENT}</option>
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => void applyBulkPriority()}
+                                disabled={
+                                  selectedLeadCount === 0 ||
+                                  bulkPriorityValue === 'ALL' ||
+                                  savingBulkAction
+                                }
+                                className="rounded-2xl border border-[#8B5CF6]/20 bg-[#8B5CF6]/10 px-3.5 py-2.5 text-sm font-medium text-white transition hover:bg-[#8B5CF6]/15 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                Aplicar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="rounded-[24px] border border-white/10 bg-[#121722] p-4">
+                      <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                        Leitura do board
+                      </div>
+                      <div className="mt-3 space-y-2.5">
+                        <MiniStat label="Etapa dominante" value={STATUS_LABELS[dominantStatus]} />
+                        <MiniStat label="Leads em aberto" value={String(visualStats.open)} />
+                        <MiniStat
+                          label="Pipeline em foco"
+                          value={canSeeValues ? formatMoney(visualTotalPipelineValue) : 'Sem acesso'}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {loading ? (
+                    <div className="crm-scroll-x w-full max-w-full overflow-x-auto pb-3">
+                      <div className="flex w-max min-w-max gap-4">
+                        {STATUS_ORDER.map((status) => (
+                          <div
+                            key={status}
+                            className="w-[340px] min-w-[340px] max-w-[340px] shrink-0 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4"
+                          >
+                            <div className="h-24 animate-pulse rounded-[24px] bg-white/5" />
+                            <div className="mt-4 space-y-3">
+                              <div className="h-40 animate-pulse rounded-[24px] bg-white/5" />
+                              <div className="h-40 animate-pulse rounded-[24px] bg-white/5" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="crm-scroll-x w-full max-w-full overflow-x-auto pb-3">
+                      <div className="flex w-max min-w-max gap-4">
+                        {STATUS_ORDER.map((status) => {
+                          const stageLeads = pipelineGroups[status];
+                          const stageValue = stageLeads.reduce(
+                            (sum, lead) => sum + parseMoney(lead.dealValue),
+                            0,
+                          );
+                          const stageAvgProbability = stageLeads.length
+                            ? Math.round(
+                                stageLeads.reduce(
+                                  (sum, lead) => sum + normalizeProbability(lead),
+                                  0,
+                                ) / stageLeads.length,
+                              )
+                            : 0;
+
+                          return (
+                            <div
+                              key={status}
+                              className="crm-scroll flex max-h-[78vh] w-[348px] min-w-[348px] max-w-[348px] shrink-0 flex-col overflow-y-auto overflow-x-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,#141a24,#0f131b)] p-3 shadow-[0_22px_52px_rgba(0,0,0,0.2)]"
+                            >
+                              <div className="sticky top-0 z-10 mb-3 rounded-[24px] border border-white/10 bg-[#111722]/95 p-3 backdrop-blur">
+                                <div className="mb-3 flex items-center justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div className="truncate text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                                      {STATUS_LABELS[status]}
+                                    </div>
+                                    <div className="mt-1 text-[22px] font-semibold tracking-[-0.03em] text-white">
+                                      {stageLeads.length}
+                                    </div>
+                                  </div>
                                   <div
-                                    key={lead.id}
-                                    onClick={() => void openLeadDetails(lead)}
-                                    onKeyDown={(event) => {
-                                      if (event.key === 'Enter' || event.key === ' ') {
-                                        event.preventDefault();
-                                        void openLeadDetails(lead);
-                                      }
-                                    }}
-                                    role="button"
-                                    tabIndex={0}
                                     className={classNames(
-                                      'group relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 text-left shadow-[0_14px_34px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20 hover:shadow-[0_16px_38px_rgba(0,0,0,0.26)]',
-                                      isLeadSelected(lead.id)
-                                        ? 'border-[#8B5CF6]/25 shadow-[0_12px_32px_rgba(139,92,246,0.08)]'
-                                        : '',
+                                      'h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_0_14px_rgba(255,255,255,0.16)]',
+                                      statusDotClass(status),
                                     )}
-                                  >
-                                    <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent)] opacity-0 transition group-hover:opacity-100" />
-                                    <div className="flex items-start justify-between gap-3">
-                                      <div className="min-w-0">
-                                        <div className="truncate text-sm font-semibold tracking-[-0.02em] text-white">
-                                          {normalizeUiText(lead.name)}
-                                        </div>
-                                        <div className="mt-1 truncate text-xs text-zinc-500">
-                                          {normalizeUiText(
-                                            lead.companyName ||
-                                              lead.email ||
-                                              lead.phone ||
-                                              'Sem empresa',
-                                          )}
-                                        </div>
-                                      </div>
-                                      <div className="flex shrink-0 items-center gap-1.5">
-                                        {canUseBulkActions ? (
-                                          <button
-                                            type="button"
-                                            onClick={(event) => {
-                                              event.stopPropagation();
-                                              toggleLeadSelection(lead.id);
-                                            }}
-                                            className={classNames(
-                                              'flex h-7 w-7 items-center justify-center rounded-full border text-xs transition',
-                                              isLeadSelected(lead.id)
-                                                ? 'border-[#8B5CF6]/25 bg-[#8B5CF6]/10 text-white'
-                                                : 'border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10',
-                                            )}
-                                            aria-label={
-                                              isLeadSelected(lead.id)
-                                                ? 'Remover seleção'
-                                                : 'Selecionar lead'
-                                            }
-                                          >
-                                            {isLeadSelected(lead.id) ? '✓' : '+'}
-                                          </button>
-                                        ) : null}
-                                        <span
-                                          className={classNames(
-                                            'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
-                                            getTemperatureChipClass(temperature),
-                                          )}
-                                        >
-                                          {temperature}
-                                        </span>
-                                      </div>
-                                    </div>
+                                  />
+                                </div>
 
-                                    <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                                      <div className="rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(44,139,255,0.1),rgba(255,255,255,0.02))] px-3.5 py-3">
-                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Valor
-                                        </div>
-                                        <div className="mt-2 text-[17px] font-semibold tracking-[-0.03em] text-white">
-                                          {canSeeValues
-                                            ? formatMoney(lead.dealValue, lead.currency || 'BRL')
-                                            : 'Sem acesso'}
-                                        </div>
-                                      </div>
-                                      <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
-                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Forecast
-                                        </div>
-                                        <div className="mt-2 text-[17px] font-semibold tracking-[-0.03em] text-white">
-                                          {canSeeValues
-                                            ? formatMoney(forecast, lead.currency || 'BRL')
-                                            : 'Sem acesso'}
-                                        </div>
-                                      </div>
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                  <div className="rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2.5">
+                                    <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                      Valor
                                     </div>
-
-                                    <div className="mt-3 rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3">
-                                      <div className="mb-1 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                                        <span className="min-w-0">Probabilidade</span>
-                                        <span className="shrink-0 text-white">
-                                          {probability}%
-                                        </span>
-                                      </div>
-                                      <div className="h-2 rounded-full bg-white/5">
-                                        <div
-                                          className="h-2 rounded-full bg-[linear-gradient(90deg,#8B5CF6,#C4B5FD)]"
-                                          style={{ width: `${probability}%` }}
-                                        />
-                                      </div>
+                                    <div className="mt-1.5 break-words text-[14px] font-semibold tracking-[-0.03em] text-white">
+                                      {canSeeValues ? formatMoney(stageValue) : 'Sem acesso'}
                                     </div>
+                                  </div>
+                                  <div className="rounded-[16px] border border-cyan-400/14 bg-cyan-400/[0.05] px-3 py-2.5">
+                                    <div className="text-[10px] uppercase tracking-[0.16em] text-cyan-200/70">
+                                      Prob.
+                                    </div>
+                                    <div className="mt-1.5 text-[14px] font-semibold text-cyan-200">
+                                      {stageAvgProbability}%
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
 
-                                    <div className="mt-3 flex flex-wrap gap-2">
-                                      <span
+                              <div className="space-y-3">
+                                {stageLeads.length === 0 ? (
+                                  <div className="rounded-[22px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
+                                    Nenhum lead nesta etapa
+                                  </div>
+                                ) : (
+                                  stageLeads.map((lead) => {
+                                    const score = getLeadScore(lead, [], []);
+                                    const guidance = getLeadGuidance(lead, [], []);
+                                    const temperature = getLeadTemperature(score);
+                                    const health = getLeadHealth(getLastActivity(lead), lead.status);
+                                    const probability = normalizeProbability(lead);
+                                    const isStalled = daysSince(getLastActivity(lead)) > 5;
+                                    const forecast = parseMoney(lead.dealValue) * (probability / 100);
+
+                                    return (
+                                      <div
+                                        key={lead.id}
+                                        onClick={() => void openLeadDetails(lead)}
+                                        onKeyDown={(event) => {
+                                          if (event.key === 'Enter' || event.key === ' ') {
+                                            event.preventDefault();
+                                            void openLeadDetails(lead);
+                                          }
+                                        }}
+                                        role="button"
+                                        tabIndex={0}
                                         className={classNames(
-                                          'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
-                                          getLeadGuidanceClass(guidance.level),
+                                          'group relative w-full overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))] p-4 text-left shadow-[0_12px_28px_rgba(0,0,0,0.14)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20 hover:shadow-[0_16px_36px_rgba(0,0,0,0.24)]',
+                                          isLeadSelected(lead.id)
+                                            ? 'border-[#8B5CF6]/25 shadow-[0_12px_32px_rgba(139,92,246,0.08)]'
+                                            : '',
                                         )}
                                       >
-                                        {guidance.title}
-                                      </span>
-                                      <span
-                                        className={classNames(
-                                          'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
-                                          getLeadHealthClass(
-                                            getLastActivity(lead),
-                                            lead.status,
-                                          ),
-                                        )}
-                                        >
-                                          {health}
-                                        </span>
-                                      <span
-                                        className={classNames(
-                                          'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
-                                          priorityClass(lead.priority),
-                                        )}
-                                      >
-                                        {formatPriority(lead.priority)}
-                                      </span>
-                                    </div>
-
-                                    <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                                      <div className="rounded-[18px] border border-white/10 bg-black/20 px-3.5 py-3 text-xs text-zinc-400">
-                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Responsável
-                                        </div>
-                                        <div className="mt-1 truncate text-sm text-zinc-100">
-                                          {normalizeUiText(lead.ownerUser?.name || 'Não definido')}
-                                        </div>
-                                        <div className="mt-3 text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Origem
-                                        </div>
-                                        <div className="mt-1 truncate text-sm text-zinc-100">
-                                          {normalizeUiText(lead.source || 'Não informada')}
-                                        </div>
-                                      </div>
-                                      <div className="rounded-[18px] border border-white/10 bg-black/20 px-3.5 py-3 text-xs text-zinc-400">
-                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Última atividade
-                                        </div>
-                                        <div
-                                          className={classNames(
-                                            'mt-1 text-sm',
-                                            isStalled ? 'text-amber-200' : 'text-zinc-100',
-                                          )}
-                                        >
-                                          {formatRelativeTime(getLastActivity(lead))}
-                                        </div>
-                                        <div className="mt-3 text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Fechamento
-                                        </div>
-                                        <div className="mt-1 text-sm text-zinc-100">
-                                          {lead.expectedCloseDate
-                                            ? formatDateShort(lead.expectedCloseDate)
-                                            : 'Sem previsão'}
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="mt-3 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))] px-3.5 py-3">
-                                      <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                        Recomendação comercial
-                                      </div>
-                                      <div className="mt-1 text-sm text-white">{guidance.action}</div>
-                                      <div className="mt-1 text-xs leading-5 text-zinc-500">
-                                        {guidance.reason}
-                                      </div>
-                                    </div>
-
-                                    {lead.nextStep ? (
-                                      <div className="mt-3 rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3">
                                         <div className="flex items-start justify-between gap-3">
-                                          <div>
-                                            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-                                              Próximo passo
+                                          <div className="min-w-0">
+                                            <div className="truncate text-[15px] font-semibold tracking-[-0.02em] text-white">
+                                              {normalizeUiText(lead.name)}
                                             </div>
-                                            <div className="mt-1 break-words text-sm text-white">
-                                              {normalizeUiText(lead.nextStep)}
+                                            <div className="mt-1 truncate text-xs text-zinc-500">
+                                              {normalizeUiText(
+                                                lead.companyName ||
+                                                  lead.email ||
+                                                  lead.phone ||
+                                                  'Sem empresa',
+                                              )}
                                             </div>
                                           </div>
-                                          {lead.nextStepDueAt ? (
-                                            <div className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] text-zinc-300">
-                                              {formatDateShort(lead.nextStepDueAt)}
-                                            </div>
-                                          ) : null}
+                                          <div className="flex shrink-0 items-center gap-1.5">
+                                            {canUseBulkActions ? (
+                                              <button
+                                                type="button"
+                                                onClick={(event) => {
+                                                  event.stopPropagation();
+                                                  toggleLeadSelection(lead.id);
+                                                }}
+                                                className={classNames(
+                                                  'flex h-7 w-7 items-center justify-center rounded-full border text-xs transition',
+                                                  isLeadSelected(lead.id)
+                                                    ? 'border-[#8B5CF6]/25 bg-[#8B5CF6]/10 text-white'
+                                                    : 'border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10',
+                                                )}
+                                                aria-label={
+                                                  isLeadSelected(lead.id)
+                                                    ? 'Remover seleção'
+                                                    : 'Selecionar lead'
+                                                }
+                                              >
+                                                {isLeadSelected(lead.id) ? '✓' : '+'}
+                                              </button>
+                                            ) : null}
+                                            <span
+                                              className={classNames(
+                                                'rounded-full border px-2.5 py-1 text-[10px]',
+                                                getTemperatureChipClass(temperature),
+                                              )}
+                                            >
+                                              {temperature}
+                                            </span>
+                                          </div>
                                         </div>
-                                      </div>
-                                    ) : null}
 
-                                    {isStalled ? (
-                                      <div className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
-                                        Lead em atenção: sem atividade recente há{' '}
-                                        {daysSince(getLastActivity(lead))} dia(s).
+                                        <div className="mt-4 grid grid-cols-3 gap-2">
+                                          <div className="rounded-[16px] border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                                            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                              Valor
+                                            </div>
+                                            <div className="mt-1.5 break-words text-[13px] font-semibold text-white">
+                                              {canSeeValues
+                                                ? formatMoney(lead.dealValue, lead.currency || 'BRL')
+                                                : 'Sem acesso'}
+                                            </div>
+                                          </div>
+                                          <div className="rounded-[16px] border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                                            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                              Forecast
+                                            </div>
+                                            <div className="mt-1.5 break-words text-[13px] font-semibold text-white">
+                                              {canSeeValues
+                                                ? formatMoney(forecast, lead.currency || 'BRL')
+                                                : 'Sem acesso'}
+                                            </div>
+                                          </div>
+                                          <div className="rounded-[16px] border border-cyan-400/14 bg-cyan-400/[0.05] px-3 py-2.5">
+                                            <div className="text-[10px] uppercase tracking-[0.16em] text-cyan-200/70">
+                                              Prob.
+                                            </div>
+                                            <div className="mt-1.5 text-[13px] font-semibold text-cyan-200">
+                                              {probability}%
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="mt-3 flex flex-wrap gap-2">
+                                          <span
+                                            className={classNames(
+                                              'rounded-full border px-2.5 py-1 text-[10px]',
+                                              getLeadGuidanceClass(guidance.level),
+                                            )}
+                                          >
+                                            {guidance.title}
+                                          </span>
+                                          <span
+                                            className={classNames(
+                                              'rounded-full border px-2.5 py-1 text-[10px]',
+                                              getLeadHealthClass(getLastActivity(lead), lead.status),
+                                            )}
+                                          >
+                                            {health}
+                                          </span>
+                                          <span
+                                            className={classNames(
+                                              'rounded-full border px-2.5 py-1 text-[10px]',
+                                              priorityClass(lead.priority),
+                                            )}
+                                          >
+                                            {formatPriority(lead.priority)}
+                                          </span>
+                                        </div>
+
+                                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                                          <div className="rounded-[16px] border border-white/10 bg-black/20 px-3 py-2.5 text-xs text-zinc-400">
+                                            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                              Responsável
+                                            </div>
+                                            <div className="mt-1 truncate text-sm text-zinc-100">
+                                              {normalizeUiText(lead.ownerUser?.name || 'Não definido')}
+                                            </div>
+                                          </div>
+                                          <div className="rounded-[16px] border border-white/10 bg-black/20 px-3 py-2.5 text-xs text-zinc-400">
+                                            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                              Origem
+                                            </div>
+                                            <div className="mt-1 truncate text-sm text-zinc-100">
+                                              {normalizeUiText(lead.source || 'Não informada')}
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-3">
+                                          <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                              <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                                Próximo passo
+                                              </div>
+                                              <div className="mt-1 line-clamp-2 text-sm text-white">
+                                                {normalizeUiText(lead.nextStep || guidance.action)}
+                                              </div>
+                                            </div>
+                                            <div className="shrink-0 text-right">
+                                              <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                                Última atividade
+                                              </div>
+                                              <div
+                                                className={classNames(
+                                                  'mt-1 text-sm',
+                                                  isStalled ? 'text-amber-200' : 'text-zinc-100',
+                                                )}
+                                              >
+                                                {formatRelativeTime(getLastActivity(lead))}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {isStalled ? (
+                                          <div className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
+                                            Lead em atenção: sem atividade recente há{' '}
+                                            {daysSince(getLastActivity(lead))} dia(s).
+                                          </div>
+                                        ) : null}
                                       </div>
-                                    ) : null}
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </CrmPanel>
             ) : null}
           </div>
@@ -8941,21 +8928,23 @@ function PipelineStageValueComboCard({
 
   return (
     <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-      <div className="flex flex-col gap-3 border-b border-white/8 pb-4 md:flex-row md:items-end md:justify-between">
-        <div>
+      <div className="flex flex-col gap-4 border-b border-white/8 pb-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 flex-1">
           <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
           <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
         </div>
-        <div className="grid grid-cols-2 gap-2 text-right">
-          <div className="rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2">
+        <div className="grid min-w-0 grid-cols-1 gap-2 text-left sm:min-w-[240px] sm:grid-cols-2 sm:text-right">
+          <div className="min-w-0 rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2">
             <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Valor</div>
-            <div className="mt-1 text-sm font-semibold text-white">
+            <div className="mt-1 break-words text-[15px] font-semibold leading-5 text-white">
               {canSeeValues ? formatMoney(totalValue) : 'Sem acesso'}
             </div>
           </div>
-          <div className="rounded-[16px] border border-cyan-400/14 bg-cyan-400/[0.05] px-3 py-2">
+          <div className="min-w-0 rounded-[16px] border border-cyan-400/14 bg-cyan-400/[0.05] px-3 py-2">
             <div className="text-[10px] uppercase tracking-[0.16em] text-cyan-200/70">Prob.</div>
-            <div className="mt-1 text-sm font-semibold text-cyan-200">{avgProbability}%</div>
+            <div className="mt-1 break-words text-[15px] font-semibold leading-5 text-cyan-200">
+              {avgProbability}%
+            </div>
           </div>
         </div>
       </div>
