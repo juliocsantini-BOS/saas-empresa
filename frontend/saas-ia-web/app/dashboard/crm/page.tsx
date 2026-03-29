@@ -4546,8 +4546,8 @@ export default function CrmPage() {
               />
 
               {canUseBulkActions ? (
-                <div className="mb-4 grid gap-2.5 rounded-[20px] border border-white/10 bg-black/20 p-3 xl:grid-cols-[minmax(140px,auto)_minmax(220px,auto)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
-                  <div className="self-end text-sm text-zinc-300">
+                <div className="mb-5 grid gap-3 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(0,0,0,0.16))] p-4 xl:grid-cols-[minmax(180px,auto)_minmax(220px,auto)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
+                  <div className="self-end rounded-[18px] border border-white/8 bg-white/[0.03] px-3.5 py-3 text-sm text-zinc-300">
                     {selectedLeadCount} lead(s) selecionado(s)
                   </div>
                   <div className="flex flex-wrap items-end gap-2">
@@ -4702,29 +4702,42 @@ export default function CrmPage() {
                         (sum, lead) => sum + parseMoney(lead.dealValue),
                         0,
                       );
+                      const stageAvgProbability = stageLeads.length
+                        ? Math.round(
+                            stageLeads.reduce(
+                              (sum, lead) => sum + normalizeProbability(lead),
+                              0,
+                            ) / stageLeads.length,
+                          )
+                        : 0;
 
                       return (
                         <div
                           key={status}
-                          className="crm-scroll flex max-h-[78vh] w-[348px] min-w-[348px] max-w-[348px] shrink-0 flex-col overflow-y-auto overflow-x-hidden rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4 shadow-[0_20px_48px_rgba(0,0,0,0.18)]"
+                          className="crm-scroll flex max-h-[78vh] w-[376px] min-w-[376px] max-w-[376px] shrink-0 flex-col overflow-y-auto overflow-x-hidden rounded-[32px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4 shadow-[0_22px_52px_rgba(0,0,0,0.2)]"
                         >
-                          <div className="sticky top-0 z-10 -mx-1 mb-4 rounded-[24px] border border-white/10 bg-[#090B0C]/94 px-4 py-4 backdrop-blur">
+                          <div className="sticky top-0 z-10 -mx-1 mb-4 rounded-[26px] border border-white/10 bg-[#090B0C]/95 px-4 py-4 backdrop-blur">
                             <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.16),transparent)]" />
-                            <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="truncate text-xs uppercase tracking-[0.18em] text-zinc-500">
                                   {STATUS_LABELS[status]}
                                 </div>
-                                <div className="mt-1 text-[16px] font-semibold tracking-[-0.03em] text-white">
+                                <div className="mt-1 text-[18px] font-semibold tracking-[-0.03em] text-white">
                                   {stageLeads.length} lead(s)
                                 </div>
                               </div>
-                              <div
-                                className={classNames(
-                                  'h-3 w-3 shrink-0 rounded-full shadow-[0_0_12px_rgba(255,255,255,0.16)]',
-                                  statusDotClass(status),
-                                )}
-                              />
+                              <div className="flex items-center gap-2">
+                                <div className="rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-400">
+                                  {stageAvgProbability}% prob.
+                                </div>
+                                <div
+                                  className={classNames(
+                                    'h-3 w-3 shrink-0 rounded-full shadow-[0_0_12px_rgba(255,255,255,0.16)]',
+                                    statusDotClass(status),
+                                  )}
+                                />
+                              </div>
                             </div>
                             <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
                               <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
@@ -4776,7 +4789,7 @@ export default function CrmPage() {
                                     role="button"
                                     tabIndex={0}
                                     className={classNames(
-                                      'group relative w-full overflow-hidden rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 text-left shadow-[0_14px_34px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20 hover:shadow-[0_16px_38px_rgba(0,0,0,0.26)]',
+                                      'group relative w-full overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 text-left shadow-[0_14px_34px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20 hover:shadow-[0_16px_38px_rgba(0,0,0,0.26)]',
                                       isLeadSelected(lead.id)
                                         ? 'border-[#8B5CF6]/25 shadow-[0_12px_32px_rgba(139,92,246,0.08)]'
                                         : '',
@@ -4797,7 +4810,7 @@ export default function CrmPage() {
                                           )}
                                         </div>
                                       </div>
-                                        <div className="flex shrink-0 items-center gap-1.5">
+                                      <div className="flex shrink-0 items-center gap-1.5">
                                         {canUseBulkActions ? (
                                           <button
                                             type="button"
@@ -4820,14 +4833,14 @@ export default function CrmPage() {
                                             {isLeadSelected(lead.id) ? '✓' : '+'}
                                           </button>
                                         ) : null}
-                                        <div
+                                        <span
                                           className={classNames(
-                                            'max-w-full truncate',
-                                            statusBadge(lead.status),
+                                            'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
+                                            getTemperatureChipClass(temperature),
                                           )}
                                         >
-                                          {STATUS_LABELS[lead.status]}
-                                        </div>
+                                          {temperature}
+                                        </span>
                                       </div>
                                     </div>
 
@@ -4881,22 +4894,14 @@ export default function CrmPage() {
                                       <span
                                         className={classNames(
                                           'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
-                                          getTemperatureChipClass(temperature),
-                                        )}
-                                      >
-                                        {temperature}
-                                      </span>
-                                      <span
-                                        className={classNames(
-                                          'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
                                           getLeadHealthClass(
                                             getLastActivity(lead),
                                             lead.status,
                                           ),
                                         )}
-                                      >
-                                        {health}
-                                      </span>
+                                        >
+                                          {health}
+                                        </span>
                                       <span
                                         className={classNames(
                                           'max-w-full break-words rounded-full border px-2.5 py-1 text-[10px]',
@@ -4945,8 +4950,18 @@ export default function CrmPage() {
                                       </div>
                                     </div>
 
+                                    <div className="mt-3 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))] px-3.5 py-3">
+                                      <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                        Recomendação comercial
+                                      </div>
+                                      <div className="mt-1 text-sm text-white">{guidance.action}</div>
+                                      <div className="mt-1 text-xs leading-5 text-zinc-500">
+                                        {guidance.reason}
+                                      </div>
+                                    </div>
+
                                     {lead.nextStep ? (
-                                      <div className="mt-3 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))] px-3.5 py-3">
+                                      <div className="mt-3 rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3">
                                         <div className="flex items-start justify-between gap-3">
                                           <div>
                                             <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
@@ -4961,9 +4976,6 @@ export default function CrmPage() {
                                               {formatDateShort(lead.nextStepDueAt)}
                                             </div>
                                           ) : null}
-                                        </div>
-                                        <div className="mt-2 text-xs leading-5 text-zinc-500">
-                                          {guidance.action}
                                         </div>
                                       </div>
                                     ) : null}
@@ -8907,6 +8919,7 @@ function PipelineStageValueComboCard({
   const avgProbability = items.length
     ? Math.round(items.reduce((sum, item) => sum + item.avgProbability, 0) / items.length)
     : 0;
+  const topStage = [...items].sort((a, b) => b.totalValue - a.totalValue)[0];
 
   return (
     <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
@@ -8929,59 +8942,65 @@ function PipelineStageValueComboCard({
         </div>
       </div>
 
-      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] px-5 pb-5 pt-6">
-        <div className="relative h-[220px]">
-          <div className="pointer-events-none absolute inset-0 grid grid-rows-4">
-            {[0, 1, 2, 3].map((line) => (
-              <div key={line} className="border-b border-dashed border-white/8 last:border-b-0" />
-            ))}
+      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] p-5">
+        {topStage ? (
+          <div className="mb-5 flex flex-wrap items-start justify-between gap-3 rounded-[20px] border border-white/8 bg-white/[0.03] px-4 py-3">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Etapa dominante</div>
+              <div className="mt-1 text-base font-semibold text-white">
+                {normalizeUiText(STATUS_LABELS[topStage.status])}
+              </div>
+              <div className="mt-1 text-xs text-zinc-500">
+                {canSeeValues ? formatMoney(topStage.totalValue) : 'Sem acesso'} concentrados nesta etapa
+              </div>
+            </div>
+            <div className="inline-flex items-center rounded-full border border-cyan-400/16 bg-cyan-400/[0.06] px-3 py-1.5 text-xs font-medium text-cyan-200">
+              {topStage.avgProbability}% de chance media
+            </div>
           </div>
+        ) : null}
 
-          <div className="absolute inset-x-0 bottom-0 flex h-full items-end gap-6">
-            {items.map((item, index) => {
-              const barHeight = Math.max((item.totalValue / maxValue) * 100, 10);
-              const lineBottom = Math.max(6, Math.min(item.avgProbability, 100));
+        <div className="space-y-4">
+          {items.map((item, index) => {
+            const valueWidth = Math.max((item.totalValue / maxValue) * 100, 8);
+            return (
+              <div key={item.status} className="rounded-[20px] border border-white/8 bg-white/[0.02] px-4 py-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-white">
+                      {normalizeUiText(STATUS_LABELS[item.status])}
+                    </div>
+                    <div className="mt-1 text-xs text-zinc-500">{item.count} oportunidade(s)</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-white">
+                      {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
+                    </div>
+                    <div className="mt-1 text-xs text-zinc-500">valor em pipeline</div>
+                  </div>
+                </div>
 
-              return (
-                <div key={item.status} className="relative flex min-w-0 flex-1 flex-col items-center">
-                  <div className="mb-2 text-[11px] text-zinc-500">
-                    {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
+                <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/[0.05]">
+                  <div
+                    className="h-full rounded-full bg-[linear-gradient(90deg,#BFD5FF,#5E8DFF,#8B5CF6)] shadow-[0_0_22px_rgba(120,168,255,0.16)]"
+                    style={{ width: `${valueWidth}%` }}
+                  />
+                </div>
+
+                <div className="mt-3 grid gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
+                  <div className="text-xs text-zinc-500">
+                    Forecast: {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
                   </div>
-                  <div className="relative flex h-[170px] w-full items-end justify-center">
-                    <div
-                      className="w-14 rounded-t-[14px] border border-white/10 bg-[linear-gradient(180deg,rgba(191,219,254,0.92),rgba(74,144,226,0.24))] shadow-[0_0_26px_rgba(120,168,255,0.18)]"
-                      style={{ height: `${barHeight}%` }}
-                    />
-                    <div
-                      className="absolute left-1/2 z-10 h-3 w-3 -translate-x-1/2 rounded-full border border-rose-200 bg-rose-300 shadow-[0_0_16px_rgba(253,164,175,0.32)]"
-                      style={{ bottom: `calc(${lineBottom}% - 4px)` }}
-                    />
-                    {index < items.length - 1 ? (
-                      <div
-                        className="absolute left-1/2 top-0 h-full w-[calc(100%+1.5rem)] -translate-x-0"
-                        aria-hidden
-                      >
-                        <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
-                          <path
-                            d={`M 8 ${100 - lineBottom} Q 50 ${(100 - lineBottom + (100 - Math.max(6, Math.min(items[index + 1].avgProbability, 100)))) / 2} 92 ${100 - Math.max(6, Math.min(items[index + 1].avgProbability, 100))}`}
-                            fill="none"
-                            stroke="rgba(248,113,113,0.95)"
-                            strokeWidth="2"
-                          />
-                        </svg>
-                      </div>
-                    ) : null}
+                  <div className="inline-flex items-center justify-center rounded-full border border-white/8 bg-white/[0.03] px-2.5 py-1 text-[11px] text-zinc-400">
+                    etapa {index + 1}
                   </div>
-                  <div className="mt-3 text-center text-xs text-zinc-400">
-                    {normalizeUiText(STATUS_LABELS[item.status])}
-                  </div>
-                  <div className="mt-1 inline-flex items-center justify-center rounded-full border border-white/8 bg-white/[0.03] px-2 py-0.5 text-[11px] text-zinc-500">
+                  <div className="inline-flex items-center justify-center rounded-full border border-cyan-400/18 bg-cyan-400/[0.06] px-2.5 py-1 text-[11px] font-medium text-cyan-200">
                     {item.avgProbability}% prob.
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
