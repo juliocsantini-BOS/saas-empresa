@@ -4706,16 +4706,16 @@ export default function CrmPage() {
                       return (
                         <div
                           key={status}
-                          className="crm-scroll flex max-h-[76vh] w-[320px] min-w-[320px] max-w-[320px] shrink-0 flex-col overflow-y-auto overflow-x-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4 shadow-[0_18px_42px_rgba(0,0,0,0.16)]"
+                          className="crm-scroll flex max-h-[78vh] w-[348px] min-w-[348px] max-w-[348px] shrink-0 flex-col overflow-y-auto overflow-x-hidden rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4 shadow-[0_20px_48px_rgba(0,0,0,0.18)]"
                         >
-                          <div className="sticky top-0 z-10 -mx-1 mb-3 rounded-[22px] border border-white/10 bg-[#090B0C]/92 px-3.5 py-3.5 backdrop-blur">
+                          <div className="sticky top-0 z-10 -mx-1 mb-4 rounded-[24px] border border-white/10 bg-[#090B0C]/94 px-4 py-4 backdrop-blur">
                             <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.16),transparent)]" />
                             <div className="flex items-center justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="truncate text-xs uppercase tracking-[0.18em] text-zinc-500">
                                   {STATUS_LABELS[status]}
                                 </div>
-                                <div className="mt-1 text-[15px] font-semibold tracking-[-0.03em] text-white">
+                                <div className="mt-1 text-[16px] font-semibold tracking-[-0.03em] text-white">
                                   {stageLeads.length} lead(s)
                                 </div>
                               </div>
@@ -4726,8 +4726,8 @@ export default function CrmPage() {
                                 )}
                               />
                             </div>
-                            <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                              <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                            <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                              <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
                                 <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                                   Valor da etapa
                                 </div>
@@ -4735,7 +4735,7 @@ export default function CrmPage() {
                                   {canSeeValues ? formatMoney(stageValue) : 'Sem acesso'}
                                 </div>
                               </div>
-                              <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3 py-2.5">
+                              <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
                                 <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                                   Ticket medio
                                 </div>
@@ -4776,7 +4776,7 @@ export default function CrmPage() {
                                     role="button"
                                     tabIndex={0}
                                     className={classNames(
-                                      'group relative w-full overflow-hidden rounded-[24px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-3.5 text-left shadow-[0_14px_34px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20 hover:shadow-[0_16px_38px_rgba(0,0,0,0.26)]',
+                                      'group relative w-full overflow-hidden rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 text-left shadow-[0_14px_34px_rgba(0,0,0,0.16)] transition hover:-translate-y-0.5 hover:border-[#8B5CF6]/20 hover:shadow-[0_16px_38px_rgba(0,0,0,0.26)]',
                                       isLeadSelected(lead.id)
                                         ? 'border-[#8B5CF6]/25 shadow-[0_12px_32px_rgba(139,92,246,0.08)]'
                                         : '',
@@ -4831,29 +4831,30 @@ export default function CrmPage() {
                                       </div>
                                     </div>
 
-                                    <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                                      <LeadMiniInfo
-                                        label="Valor"
-                                        value={
-                                          canSeeValues
-                                            ? formatMoney(
-                                                lead.dealValue,
-                                                lead.currency || 'BRL',
-                                              )
-                                            : 'Sem acesso'
-                                        }
-                                      />
-                                      <LeadMiniInfo
-                                        label="Forecast"
-                                        value={
-                                          canSeeValues
+                                    <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                                      <div className="rounded-[18px] border border-white/10 bg-[linear-gradient(180deg,rgba(44,139,255,0.1),rgba(255,255,255,0.02))] px-3.5 py-3">
+                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                          Valor
+                                        </div>
+                                        <div className="mt-2 text-[17px] font-semibold tracking-[-0.03em] text-white">
+                                          {canSeeValues
+                                            ? formatMoney(lead.dealValue, lead.currency || 'BRL')
+                                            : 'Sem acesso'}
+                                        </div>
+                                      </div>
+                                      <div className="rounded-[18px] border border-white/10 bg-white/[0.03] px-3.5 py-3">
+                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                          Forecast
+                                        </div>
+                                        <div className="mt-2 text-[17px] font-semibold tracking-[-0.03em] text-white">
+                                          {canSeeValues
                                             ? formatMoney(forecast, lead.currency || 'BRL')
-                                            : 'Sem acesso'
-                                        }
-                                      />
+                                            : 'Sem acesso'}
+                                        </div>
+                                      </div>
                                     </div>
 
-                                    <div className="mt-3 rounded-[20px] border border-white/10 bg-black/20 px-3 py-2.5">
+                                    <div className="mt-3 rounded-[20px] border border-white/10 bg-black/20 px-3.5 py-3">
                                       <div className="mb-1 flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.16em] text-zinc-500">
                                         <span className="min-w-0">Probabilidade</span>
                                         <span className="shrink-0 text-white">
@@ -4902,71 +4903,68 @@ export default function CrmPage() {
                                           priorityClass(lead.priority),
                                         )}
                                       >
-                                        Prioridade {formatPriority(lead.priority)}
+                                        {formatPriority(lead.priority)}
                                       </span>
                                     </div>
 
-                                    <div className="mt-3 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))] px-3 py-2.5">
-                                      <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                                        Guided selling
-                                      </div>
-                                      <div className="mt-1 break-words text-sm text-white">
-                                        {guidance.action}
-                                      </div>
-                                      <div className="mt-1 text-xs leading-5 text-zinc-500">
-                                        {guidance.reason}
-                                      </div>
-                                    </div>
-
-                                    <div className="mt-3 grid gap-2 rounded-[20px] border border-white/10 bg-black/20 px-3 py-2.5 text-xs text-zinc-400">
-                                      <div className="flex min-w-0 items-center justify-between gap-2">
-                                        <span className="shrink-0">Responsável</span>
-                                        <span className="min-w-0 truncate text-right text-zinc-200">
-                                          {normalizeUiText(
-                                            lead.ownerUser?.name || 'Não definido',
-                                          )}
-                                        </span>
-                                      </div>
-                                      <div className="flex min-w-0 items-center justify-between gap-2">
-                                        <span className="shrink-0">Origem</span>
-                                        <span className="min-w-0 truncate text-right text-zinc-200">
+                                    <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                                      <div className="rounded-[18px] border border-white/10 bg-black/20 px-3.5 py-3 text-xs text-zinc-400">
+                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                          Responsável
+                                        </div>
+                                        <div className="mt-1 truncate text-sm text-zinc-100">
+                                          {normalizeUiText(lead.ownerUser?.name || 'Não definido')}
+                                        </div>
+                                        <div className="mt-3 text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                          Origem
+                                        </div>
+                                        <div className="mt-1 truncate text-sm text-zinc-100">
                                           {normalizeUiText(lead.source || 'Não informada')}
-                                        </span>
+                                        </div>
                                       </div>
-                                      <div className="flex min-w-0 items-center justify-between gap-2">
-                                        <span className="shrink-0">Última atividade</span>
-                                        <span
+                                      <div className="rounded-[18px] border border-white/10 bg-black/20 px-3.5 py-3 text-xs text-zinc-400">
+                                        <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                          Última atividade
+                                        </div>
+                                        <div
                                           className={classNames(
-                                            'min-w-0 text-right',
-                                            isStalled ? 'text-amber-200' : 'text-zinc-200',
+                                            'mt-1 text-sm',
+                                            isStalled ? 'text-amber-200' : 'text-zinc-100',
                                           )}
                                         >
                                           {formatRelativeTime(getLastActivity(lead))}
-                                        </span>
-                                      </div>
-                                      <div className="flex min-w-0 items-center justify-between gap-2">
-                                        <span className="shrink-0">Fechamento previsto</span>
-                                        <span className="min-w-0 text-right text-zinc-200">
+                                        </div>
+                                        <div className="mt-3 text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                          Fechamento
+                                        </div>
+                                        <div className="mt-1 text-sm text-zinc-100">
                                           {lead.expectedCloseDate
                                             ? formatDateShort(lead.expectedCloseDate)
                                             : 'Sem previsão'}
-                                        </span>
+                                        </div>
                                       </div>
                                     </div>
 
                                     {lead.nextStep ? (
-                                      <div className="mt-3 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))] px-3 py-2.5">
-                                        <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                                          Próximo passo
-                                        </div>
-                                        <div className="mt-1 break-words text-sm text-white">
-                                          {normalizeUiText(lead.nextStep)}
-                                        </div>
-                                        {lead.nextStepDueAt ? (
-                                          <div className="mt-1 text-xs text-zinc-500">
-                                            Prazo: {formatDateShort(lead.nextStepDueAt)}
+                                      <div className="mt-3 rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))] px-3.5 py-3">
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div>
+                                            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                                              Próximo passo
+                                            </div>
+                                            <div className="mt-1 break-words text-sm text-white">
+                                              {normalizeUiText(lead.nextStep)}
+                                            </div>
                                           </div>
-                                        ) : null}
+                                          {lead.nextStepDueAt ? (
+                                            <div className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10px] text-zinc-300">
+                                              {formatDateShort(lead.nextStepDueAt)}
+                                            </div>
+                                          ) : null}
+                                        </div>
+                                        <div className="mt-2 text-xs leading-5 text-zinc-500">
+                                          {guidance.action}
+                                        </div>
                                       </div>
                                     ) : null}
 
@@ -7930,15 +7928,6 @@ function MiniStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function LeadMiniInfo({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-0 rounded-2xl border border-white/10 bg-black/20 p-3.5">
-      <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">{label}</div>
-      <div className="mt-1 break-words text-sm font-medium text-white">{value}</div>
-    </div>
-  );
-}
-
 function ReportListCard({
   title,
   rows,
@@ -8369,14 +8358,16 @@ function ExecutiveDonutStatusCard({
 
     return acc;
   }, []);
+  const topSegment = segments[0];
 
   return (
-    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
       <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-[180px_minmax(0,1fr)] xl:items-center">
-        <div className="relative mx-auto h-[180px] w-[180px]">
+      <div className="mt-5 grid gap-5 xl:grid-cols-[200px_minmax(0,1fr)] xl:items-center">
+        <div className="relative mx-auto h-[190px] w-[190px]">
+          <div className="absolute inset-[26px] rounded-full bg-[radial-gradient(circle,rgba(44,139,255,0.12),transparent_60%)]" />
           <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
             <circle cx="60" cy="60" r="45" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="14" />
             {segments.map((segment) => (
@@ -8403,6 +8394,15 @@ function ExecutiveDonutStatusCard({
         </div>
 
         <div className="space-y-3">
+          {topSegment ? (
+            <div className="rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3">
+              <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Maior concentração</div>
+              <div className="mt-1 text-sm font-medium text-white">{normalizeUiText(topSegment.label)}</div>
+              <div className="mt-1 text-xs text-zinc-500">
+                {Math.round((topSegment.value / Math.max(total, 1)) * 100)}% do total no recorte
+              </div>
+            </div>
+          ) : null}
           {segments.length === 0 ? (
             <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-zinc-500">
               Sem dados para este recorte.
@@ -8411,18 +8411,29 @@ function ExecutiveDonutStatusCard({
             segments.map((segment) => (
               <div
                 key={segment.label}
-                className="flex items-center justify-between gap-3 rounded-[18px] border border-white/8 bg-[#171D27] px-3.5 py-3"
+                className="rounded-[18px] border border-white/8 bg-[#171D27] px-3.5 py-3"
               >
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: segment.color }}
-                  />
-                  <span className="truncate text-sm text-white">
-                    {normalizeUiText(segment.label)}
-                  </span>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: segment.color }}
+                    />
+                    <span className="truncate text-sm text-white">
+                      {normalizeUiText(segment.label)}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-white">{segment.value}</span>
                 </div>
-                <span className="text-sm font-medium text-white">{segment.value}</span>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/6">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.max((segment.value / Math.max(total, 1)) * 100, 8)}%`,
+                      backgroundColor: segment.color,
+                    }}
+                  />
+                </div>
               </div>
             ))
           )}
@@ -8884,13 +8895,33 @@ function PipelineStageValueComboCard({
 }) {
   const items = rows.slice(0, 5);
   const maxValue = Math.max(...items.map((item) => item.totalValue), 1);
+  const totalValue = items.reduce((sum, item) => sum + item.totalValue, 0);
+  const avgProbability = items.length
+    ? Math.round(items.reduce((sum, item) => sum + item.avgProbability, 0) / items.length)
+    : 0;
 
   return (
-    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
-      <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
-      <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+    <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+      <div className="flex flex-col gap-3 border-b border-white/8 pb-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-right">
+          <div className="rounded-[16px] border border-white/8 bg-white/[0.03] px-3 py-2">
+            <div className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Valor</div>
+            <div className="mt-1 text-sm font-semibold text-white">
+              {canSeeValues ? formatMoney(totalValue) : 'Sem acesso'}
+            </div>
+          </div>
+          <div className="rounded-[16px] border border-cyan-400/14 bg-cyan-400/[0.05] px-3 py-2">
+            <div className="text-[10px] uppercase tracking-[0.16em] text-cyan-200/70">Prob.</div>
+            <div className="mt-1 text-sm font-semibold text-cyan-200">{avgProbability}%</div>
+          </div>
+        </div>
+      </div>
 
-      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] px-5 pb-5 pt-6">
+      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] px-5 pb-5 pt-6">
         <div className="relative h-[220px]">
           <div className="pointer-events-none absolute inset-0 grid grid-rows-4">
             {[0, 1, 2, 3].map((line) => (
@@ -8910,11 +8941,11 @@ function PipelineStageValueComboCard({
                   </div>
                   <div className="relative flex h-[170px] w-full items-end justify-center">
                     <div
-                      className="w-12 rounded-t-[12px] bg-[linear-gradient(180deg,rgba(191,219,254,0.88),rgba(74,144,226,0.24))] shadow-[0_0_22px_rgba(120,168,255,0.15)]"
+                      className="w-14 rounded-t-[14px] border border-white/10 bg-[linear-gradient(180deg,rgba(191,219,254,0.92),rgba(74,144,226,0.24))] shadow-[0_0_26px_rgba(120,168,255,0.18)]"
                       style={{ height: `${barHeight}%` }}
                     />
                     <div
-                      className="absolute left-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 rounded-full border border-rose-200 bg-rose-300 shadow-[0_0_16px_rgba(253,164,175,0.32)]"
+                      className="absolute left-1/2 z-10 h-3 w-3 -translate-x-1/2 rounded-full border border-rose-200 bg-rose-300 shadow-[0_0_16px_rgba(253,164,175,0.32)]"
                       style={{ bottom: `calc(${lineBottom}% - 4px)` }}
                     />
                     {index < items.length - 1 ? (
@@ -8936,7 +8967,9 @@ function PipelineStageValueComboCard({
                   <div className="mt-3 text-center text-xs text-zinc-400">
                     {normalizeUiText(STATUS_LABELS[item.status])}
                   </div>
-                  <div className="mt-1 text-[11px] text-zinc-500">{item.avgProbability}%</div>
+                  <div className="mt-1 inline-flex items-center justify-center rounded-full border border-white/8 bg-white/[0.03] px-2 py-0.5 text-[11px] text-zinc-500">
+                    {item.avgProbability}% prob.
+                  </div>
                 </div>
               );
             })}
@@ -8960,40 +8993,59 @@ function PipelineOwnerPressureCard({
   const maxValue = Math.max(...items.map((item) => item.stalled + item.tasks), 1);
 
   return (
-    <div className="rounded-[28px] border border-[#222833] bg-[linear-gradient(180deg,#161B24,#11151D)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+    <div className="rounded-[30px] border border-[#222833] bg-[linear-gradient(180deg,#171D27,#10141C)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
       <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">{title}</div>
       <div className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</div>
 
-      <div className="mt-6 rounded-[22px] border border-white/6 bg-[#121823] px-5 pb-5 pt-6">
+      <div className="mt-5 rounded-[24px] border border-white/6 bg-[#121823] p-4">
         {items.length === 0 ? (
           <div className="rounded-[20px] border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-zinc-500">
             Sem pressão operacional relevante neste recorte.
           </div>
         ) : (
-          <div className="flex h-[220px] items-end gap-6">
+          <div className="space-y-3">
             {items.map((item) => {
-              const stalledHeight = ((item.stalled || 0) / maxValue) * 100;
-              const taskHeight = ((item.tasks || 0) / maxValue) * 100;
               const total = item.stalled + item.tasks;
+              const width = Math.max((total / maxValue) * 100, 10);
+              const stalledWidth = total > 0 ? (item.stalled / total) * 100 : 0;
+              const taskWidth = total > 0 ? (item.tasks / total) * 100 : 0;
 
               return (
-                <div key={item.label} className="flex min-w-0 flex-1 flex-col items-center gap-3">
-                  <div className="text-xs text-zinc-500">{total}</div>
-                  <div className="flex h-[170px] items-end">
-                    <div className="flex w-12 flex-col justify-end overflow-hidden rounded-t-[12px] bg-[#182231]">
+                <div key={item.label} className="rounded-[20px] border border-white/8 bg-white/[0.025] px-4 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium text-white">
+                        {normalizeUiText(item.label)}
+                      </div>
+                      <div className="mt-1 text-xs text-zinc-500">
+                        {item.stalled} parados · {item.tasks} tarefas
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-white">{total}</div>
+                  </div>
+
+                  <div className="mt-3 h-3 overflow-hidden rounded-full bg-[#182231]" style={{ width: `${width}%` }}>
+                    <div className="flex h-full w-full">
                       <div
-                        className="bg-[linear-gradient(180deg,rgba(248,113,113,0.96),rgba(248,113,113,0.72))]"
-                        style={{ height: `${Math.max(stalledHeight, item.stalled > 0 ? 10 : 0)}%` }}
+                        className="h-full bg-[linear-gradient(90deg,rgba(248,113,113,0.96),rgba(248,113,113,0.72))]"
+                        style={{ width: `${stalledWidth}%` }}
                       />
                       <div
-                        className="bg-[linear-gradient(180deg,rgba(148,163,184,0.9),rgba(99,113,132,0.78))]"
-                        style={{ height: `${Math.max(taskHeight, item.tasks > 0 ? 10 : 0)}%` }}
+                        className="h-full bg-[linear-gradient(90deg,rgba(148,163,184,0.9),rgba(99,113,132,0.78))]"
+                        style={{ width: `${taskWidth}%` }}
                       />
                     </div>
                   </div>
-                  <div className="text-center text-xs text-zinc-400">{normalizeUiText(item.label)}</div>
-                  <div className="text-[11px] text-zinc-500">
-                    {item.stalled} parados · {item.tasks} tarefas
+
+                  <div className="mt-2 flex items-center gap-4 text-[11px] text-zinc-500">
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-full bg-rose-400" />
+                      Parados
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-full bg-slate-400" />
+                      Tarefas
+                    </span>
                   </div>
                 </div>
               );
