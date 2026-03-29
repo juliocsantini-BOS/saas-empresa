@@ -8742,67 +8742,104 @@ function PipelineStageBoardCard({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-4 xl:grid-cols-5">
+      <div className="mt-6 overflow-hidden rounded-[24px] border border-white/8 bg-[#121823]">
+        <div className="hidden border-b border-white/6 px-5 py-3 text-[11px] uppercase tracking-[0.18em] text-zinc-500 xl:grid xl:grid-cols-[1.15fr_repeat(4,minmax(0,0.9fr))]">
+          <span>Etapa</span>
+          <span className="text-right">Volume</span>
+          <span className="text-right">Valor</span>
+          <span className="text-right">Forecast</span>
+          <span className="text-right">Probabilidade</span>
+        </div>
+
+        <div className="relative hidden xl:block">
+          <div className="pointer-events-none absolute left-[8%] right-[8%] top-[52px] h-px bg-gradient-to-r from-cyan-400/0 via-cyan-400/20 to-cyan-400/0" />
+        </div>
+
+        <div className="divide-y divide-white/6 xl:divide-y-0">
+          {items.map((item, index) => (
+            <div
+              key={item.status}
+              className="grid gap-4 px-5 py-4 xl:grid-cols-[1.15fr_repeat(4,minmax(0,0.9fr))] xl:items-center xl:gap-5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={classNames(
+                      'h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_0_16px_rgba(255,255,255,0.16)]',
+                      statusDotClass(item.status),
+                    )}
+                  />
+                  <div>
+                    <div className="text-sm font-semibold text-white">
+                      {normalizeUiText(STATUS_LABELS[item.status])}
+                    </div>
+                    <div className="mt-1 text-xs text-zinc-500">
+                      {index === 0
+                        ? 'Entrada de novas oportunidades'
+                        : index === items.length - 1
+                          ? 'Etapa mais próxima de receita'
+                          : 'Fase intermediária do funil'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 xl:block xl:text-right">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500 xl:hidden">Volume</div>
+                <div className="text-xl font-semibold tracking-[-0.03em] text-white">{item.count}</div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/6 xl:ml-auto xl:max-w-[140px]">
+                  <div
+                    className="h-full rounded-full bg-[linear-gradient(90deg,#4a8fe2,#7dd3fc)]"
+                    style={{ width: `${Math.max((item.count / maxCount) * 100, 10)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 xl:block xl:text-right">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500 xl:hidden">Valor</div>
+                <div className="text-sm font-medium text-white">
+                  {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
+                </div>
+                <div className="mt-1 text-xs text-zinc-500">em carteira</div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 xl:block xl:text-right">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500 xl:hidden">Forecast</div>
+                <div className="text-sm font-medium text-white">
+                  {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
+                </div>
+                <div className="mt-1 text-xs text-zinc-500">valor ponderado</div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 xl:justify-end">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500 xl:hidden">
+                  Probabilidade
+                </div>
+                <div className="inline-flex min-w-[78px] items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-xs font-medium text-cyan-200">
+                  {item.avgProbability}%
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
         {items.map((item, index) => (
           <div
             key={item.status}
-            className="relative overflow-hidden rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top_left,rgba(44,139,255,0.08),transparent_48%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.16))] p-5"
+            className="rounded-[20px] border border-white/8 bg-white/[0.025] px-4 py-3"
           >
-            {index < items.length - 1 ? (
-              <div className="pointer-events-none absolute -right-2 top-9 hidden h-px w-4 bg-gradient-to-r from-white/10 to-transparent xl:block" />
-            ) : null}
-
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">
                   {normalizeUiText(STATUS_LABELS[item.status])}
                 </div>
-                <div className="mt-3 text-[2rem] font-semibold tracking-[-0.04em] text-white">
-                  {item.count}
+                <div className="mt-1 text-sm text-white">
+                  {Math.round((item.count / maxCount) * 100)}% do volume do topo
                 </div>
-                <div className="text-sm text-zinc-500">oportunidades ativas</div>
               </div>
-              <div
-                className={classNames(
-                  'mt-1 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_0_16px_rgba(255,255,255,0.16)]',
-                  statusDotClass(item.status),
-                )}
-              />
-            </div>
-
-            <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-zinc-500">
-                <span>Peso no funil</span>
-                <span>{Math.round((item.count / maxCount) * 100)}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/6">
-                <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,#4a8fe2,#7dd3fc)]"
-                  style={{ width: `${Math.max((item.count / maxCount) * 100, 8)}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="mt-5 space-y-3">
-              <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="text-zinc-500">Valor</span>
-                <span className="font-medium text-white">
-                  {canSeeValues ? formatMoney(item.totalValue) : 'Sem acesso'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-4 text-sm">
-                <span className="text-zinc-500">Forecast</span>
-                <span className="font-medium text-white">
-                  {canSeeValues ? formatMoney(item.forecast) : 'Sem acesso'}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/8 pt-4">
-              <div className="text-[11px] uppercase tracking-[0.16em] text-zinc-500">Probabilidade</div>
-              <div className="inline-flex min-w-[72px] items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-xs font-medium text-cyan-200">
-                {item.avgProbability}%
-              </div>
+              <div className="text-xs text-zinc-500">{index + 1}ª etapa</div>
             </div>
           </div>
         ))}
